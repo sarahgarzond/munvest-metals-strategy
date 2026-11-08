@@ -402,7 +402,7 @@ footer{padding-block:28px 48px;color:var(--muted);font-size:12px;border-top:1px 
 </div></section>
 
 <section class="block view" id="data" hidden><div class="wrap">
- <div class="shead small"><div class="kick">05 · Data &amp; sources</div><h2>Everything behind the numbers</h2><p>Download the tracker data or search the source log. Non-English sources were translated by the team.</p></div>
+ <div class="shead small"><div class="kick">05 · Data &amp; sources</div><h2>Everything behind the numbers</h2><p>Download the tracker data or search the source log. Non-English sources were translated by the team.</p><p class="note" id="feed-note">Data feed: built-in snapshot of 8 November 2026. On GitHub, a monthly job refreshes World Bank prices and UN Comtrade trade data after a teammate approves it.</p></div>
  <div class="srctools">
   <input id="s-q" type="search" placeholder="Search sources, e.g. USGS" aria-label="Search sources">
   <button class="btn" data-dl="apps"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 2v8m0 0 3-3m-3 3L5 7M3 13h10"/></svg>Metal × application (CSV)</button>
@@ -415,7 +415,7 @@ footer{padding-block:28px 48px;color:var(--muted);font-size:12px;border-top:1px 
 </main>
 </div>
 <nav class="dockbar" id="topnav" aria-label="Views"><a href="#home">Home</a><a href="#pathway">Pathway</a><a href="#metals">Metals</a><a href="#matrix">Metal × industry</a><a href="#industries">Industries</a><a href="#scenarios">2035 scenarios</a><a href="#data">Data</a></nav>
-<footer><div class="wrap">Munvest Metal Atlas · BMDS Project Study, TUM Campus Heilbronn · Prototype, 28 October 2026. Own estimates are marked and are not official forecasts.</div></footer>
+<footer><div class="wrap">Munvest Metal Atlas · BMDS Project Study, TUM Campus Heilbronn · Prototype, 8 November 2026<span id="feed-stamp"></span>. Own estimates are marked and are not official forecasts.</div></footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script>
@@ -921,7 +921,8 @@ const SIGNALS=[
  {id:"ni",sym:"Ni",label:"Nickel signal: jet engine & turbine exports",short:"Jet engine & turbine exports, 2024",val:engines,fmt:v=>"USD "+fmtBig(v),src:"S045"},
  {id:"co",sym:"Co",label:"Cobalt signal: hip & knee implants",short:"Hip + knee implants, 2023 (est.)",val:implants,fmt:v=>fmtBig(v)+" implants",src:"S077"}];
 let sig="ni",customSig=null;
-const NAME=iso=>(C[iso]&&C[iso][0])||EXTRA_NAMES[iso]||iso;
+let LIVE=null;
+const NAME=iso=>(C[iso]&&C[iso][0])||EXTRA_NAMES[iso]||(LIVE&&LIVE.trade&&LIVE.trade.names&&LIVE.trade.names[iso])||iso;
 $("#sig").innerHTML=SIGNALS.map(s=>`<button data-s="${s.id}" aria-pressed="${s.id===sig}"><b>${s.sym}</b>${s.label.split(": ")[1]}</button>`).join("");
 $("#sig").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;sig=b.dataset.s;document.querySelectorAll("#sig button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.s===sig));legendG();draw();if(selCont)renderCont()});
 function legendG(){$("#sig").hidden=!!customSig;if(customSig){$("#glegend").innerHTML=`<span><i class="sp"></i>${esc(customSig.label)} (${srcLink(customSig.src)})</span>`;return}const S=SIGNALS.find(s=>s.id===sig);$("#glegend").innerHTML=`<span><i class="sp"></i>${S.short} (${srcLink(S.src)})</span><span><i class="hs"></i>Mine supply hotspot (${srcLink("S010")}, ${srcLink("S001")})</span>`}
@@ -1072,13 +1073,13 @@ function krows(arr,cls){return arr.filter(k=>k[1]).map(k=>`<div class="krow ${cl
 function renderMetal(){
  const m=MET[curMetal],el=$("#mdetail");
  if(m.none){el.innerHTML=`<div class="gapnote" style="font-size:15px"><b>${m.name}.</b> ${esc(m.gap)} The tracker has no applications, customers or numbers for it yet, so the atlas shows nothing rather than guessing.</div>`;return}
- if(m.supplyOnly){el.innerHTML=`<div class="mdetail"><div><p class="mline">${esc(m.line)}</p><div class="kgroup"><span class="kick">Supply</span>${krows(m.supply,"supply-tag")}</div></div><div><span class="kick">What it is used for</span><p class="lead" style="margin:6px 0 12px">${esc(m.uses)} <span class="src">${srcLink(m.src)}</span></p><div class="gapnote">No applications are mapped to ${esc(m.name.toLowerCase())} in the team tracker yet, so there is no demand model or 2035 scenario for it. Supply figures come from USGS Mineral Commodity Summaries.</div></div></div>`;return}
+ if(m.supplyOnly){el.innerHTML=`<div class="mdetail"><div><p class="mline">${esc(m.line)}</p><div class="kgroup"><span class="kick">Supply</span>${krows(supplyRows(m),"supply-tag")}</div></div><div><span class="kick">What it is used for</span><p class="lead" style="margin:6px 0 12px">${esc(m.uses)} <span class="src">${srcLink(m.src)}</span></p><div class="gapnote">No applications are mapped to ${esc(m.name.toLowerCase())} in the team tracker yet, so there is no demand model or 2035 scenario for it. Supply figures come from USGS Mineral Commodity Summaries.</div></div></div>`;return}
  const apps=appsFor(m.key);const byInd=INDK.map(k=>({k,a:apps.filter(x=>x[0]===k)})).filter(x=>x.a.length).sort((a,b)=>b.a.length-a.a.length);const mx=d3.max(byInd,x=>x.a.length);
  const gain=apps.filter(a=>a[4]==="Gain").length,lose=apps.filter(a=>a[4]==="Lose").length;
  const M=MODELS2[m.model],ch=Math.pow(1+M.scen.base.r,2035-M.base.year)-1,v35=M.base.value*Math.pow(1+M.scen.base.r,2035-M.base.year);
  el.innerHTML=`<div class="mdetail"><div>
   <p class="mline">${esc(m.line)}</p>
-  ${m.supply.length?`<div class="kgroup"><span class="kick">Supply</span>${krows(m.supply,"supply-tag")}</div>`:""}
+  ${supplyRows(m).length?`<div class="kgroup"><span class="kick">Supply</span>${krows(supplyRows(m),"supply-tag")}</div>`:""}
   ${m.gap?`<div class="gapnote">${esc(m.gap)}</div>`:""}
   <div class="kgroup"><span class="kick">Demand</span>${krows(m.demand.map(k=>k[0]==="Applications in tracker"?[k[0],String(apps.length),`${gain} gaining, ${lose} losing to 2035`,"S039, S058, S010"]:k))}</div>
   <div class="minifc"><div><div class="kick">2035, base scenario</div><div class="big">${M.unit==="USD bn"?"USD "+fmtN(v35)+" bn":fmtBig(v35)} <span style="font-size:14px;color:${ch<0?"var(--copper)":"var(--teal)"}">${pct(ch)}</span></div><div class="src">${esc(M.label)} · ${esc(M.scen.base.why)} · ${srcLink(M.scen.base.src)}</div></div><a href="#scenarios" data-model="${m.model}">Open scenario →</a></div>
@@ -1184,6 +1185,10 @@ function layersFor(a){const L={},ind=a[0];
  if(ind==="auto")L.make={...PATH_VEH,why:"Where cars are built: demand for engine, exhaust and sensor parts"};
  if(ind==="aero")L.ex={...fromC(5,"Jet engine & gas turbine exports (HS 8411), 2024","S045"),why:"Countries that export finished engines: where hot-section parts end up"};
  if(ind==="med"&&!/instrument|MRI/i.test(a[1])){L.ex={...fromC(10,"Artificial joint exports (HS 902131), 2024","S045"),why:"Countries that export finished hip and knee implants"};L.im={...fromC(11,"Artificial joint imports (HS 902131), 2024","S045"),why:"Countries that import implants: where the demand is"}}
+ const LT=LIVE&&LIVE.trade&&LIVE.trade.series;if(LT){const lv=k=>{const x=LT[k];if(!x)return null;const d={};Object.entries(x.d).forEach(([i,v])=>{if(GEO.cent[i])d[i]=v});return {label:x.label,src:"COMTRADE",unit:"USD",d}};
+  if(L.ex&&ind==="aero"&&lv("hs8411_x"))L.ex={...lv("hs8411_x"),why:L.ex.why};
+  if(L.ex&&ind==="med"&&lv("hs902131_x"))L.ex={...lv("hs902131_x"),why:L.ex.why};
+  if(L.im&&lv("hs902131_m"))L.im={...lv("hs902131_m"),why:L.im.why}}
  const S=PATH_SUPPLY[a[2]];if(S)L.sup={...S,why:"Where the raw metal is mined or refined"};
  Object.values(L).forEach(l=>l.fmt=fmtU(l.unit));return L}
 function setPw(o){Object.assign(pw,o);if(location.hash!=="#pathway")location.hash="pathway";else renderPathway()}
@@ -1231,6 +1236,14 @@ function renderPathway(){
 function tileHTML(k){const m=MET[k],a=appsFor(k),f=new Set(a.map(x=>x[3])).size;return `<button class="mtile" data-pm="${k}"><span class="face f-${k}"><small>${m.z}</small><b>${m.sym}</b></span><span class="meta"><strong>${m.name}</strong><span>${a.length} application${a.length===1?"":"s"} · ${f} form${f===1?"":"s"}</span></span></button>`}
 $("#st-tiles").innerHTML=PWM.map(tileHTML).join("");
 $("#st-tiles").querySelectorAll("[data-pm]").forEach(b=>b.onclick=()=>{if(selCont)closeCont();setPw({metal:b.dataset.pm,form:null,app:null,layer:null,region:null})});
+
+// =============== LIVE DATA FEED (data/live.json, written by the monthly GitHub job) ===============
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function supplyRows(m){const r=m.supply.slice(),p=LIVE&&LIVE.prices&&LIVE.prices.series&&LIVE.prices.series[m.key];
+ if(p){const mo=MON[+p.month.slice(5)-1]+" "+p.month.slice(0,4);r.unshift(["World Bank monthly price","USD "+fmtN(p.usd_t)+"/t",mo+(p.yoy!=null?"; "+pct(p.yoy)+" vs a year earlier":"")+"; live feed","WB_PINK"])}return r}
+fetch("data/live.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.updated)return;LIVE=j;Object.assign(SOURCES,j.sources||{});
+ $("#feed-note").textContent="Data feed: updated "+j.updated+" by the monthly job"+(j.prices?" · World Bank prices to "+j.prices.series.ni.month:"")+(j.trade?" · UN Comtrade trade "+Object.values(j.trade.series)[0].year:"")+". Built-in data is used for everything else.";
+ $("#feed-stamp").textContent=" · data feed "+j.updated;renderSources();renderMetal();if(view==="pathway")renderPathway()}).catch(()=>{});
 
 // =============== ROUTER ===============
 const VIEWS=["home","pathway","metals","matrix","industries","scenarios","data"];let view="home";
