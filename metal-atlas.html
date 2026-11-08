@@ -331,6 +331,39 @@ footer{padding-block:28px 48px;color:var(--muted);font-size:12px;border-top:1px 
  .chart svg{min-height:210px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ===== sample: tiles-first home, globe returns at the map step ===== */
+.app[data-view="home"],.app[data-view="home"].open{position:relative;overflow:hidden;grid-template-columns:minmax(0,1fr);grid-template-areas:"intro" "start";align-content:center;row-gap:8px;padding:40px 24px 120px}
+.app[data-view="home"] .dock{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;opacity:.2;z-index:0}
+.app[data-view="home"] .globe-wrap{width:min(1100px,130vh,120vw);max-width:none}
+.app[data-view="home"] #sig,.app[data-view="home"] #glegend,.app[data-view="home"] #gnote,.app[data-view="home"] #gtip,.app[data-view="home"] .menu,.app[data-view="home"] .cpanel,.app[data-view="home"] .st-head{display:none!important}
+.app[data-view="home"] .intro,.app[data-view="home"] .starter{position:relative;z-index:1}
+.app[data-view="home"] .starter{max-width:1080px;margin-top:18px}
+.app[data-view="home"] .st-tiles{grid-template-columns:repeat(5,minmax(0,1fr))}
+.app[data-view="home"] .mtile{background:rgba(10,42,52,.78);backdrop-filter:blur(4px)}
+.app[data-view="home"]~.dockbar{display:flex}
+.mtile .face small.tag{left:auto;right:10px}
+.mtile{align-content:start}
+.f-mo{background:linear-gradient(135deg,#B9BCC2 0%,#7E848D 40%,#D7D9DD 57%,#6B7179 100%)}
+.f-ti{background:linear-gradient(135deg,#B7B3C4 0%,#7D778F 40%,#D8D4E2 57%,#6A6480 100%)}
+.f-w{background:linear-gradient(135deg,#A9ADB0 0%,#6F7478 40%,#C9CCCE 57%,#5D6266 100%)}
+.f-mn{background:linear-gradient(135deg,#C7B8B3 0%,#8F7C76 40%,#E2D6D2 57%,#7C6A64 100%)}
+.f-al{background:linear-gradient(135deg,#E3E6E8 0%,#AEB4B9 40%,#F6F7F8 57%,#9AA1A7 100%)}
+.f-cu{background:linear-gradient(135deg,#E2A27E 0%,#B0643E 40%,#F0C1A3 57%,#97512F 100%)}
+.app:not([data-view="home"]):not(.mapstep){grid-template-columns:minmax(0,1fr);grid-template-areas:"main"}
+.app:not([data-view="home"]):not(.mapstep) .dock{display:none}
+.app.mapstep .dock{animation:globeIn .9s cubic-bezier(.2,.8,.2,1)}
+@keyframes globeIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
+@media (min-width:1001px){.app.mapstep{grid-template-columns:440px minmax(0,1fr)}.app.mapstep .cpanel{left:440px}}
+@media (max-width:900px){.app[data-view="home"] .st-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.app[data-view="home"]{align-content:start}}
+
+/* intro animation: title first, then metals drop in */
+.app.play .intro .eyebrow{animation:fadeUp .6s ease both}
+.app.play .intro h1{animation:fadeUp .7s .12s cubic-bezier(.2,.8,.2,1) both}
+.app.play .intro .lede{animation:fadeUp .6s .3s ease both}
+.app.play .st-tiles .mtile{animation:tileDrop .75s cubic-bezier(.2,.9,.3,1.12) backwards;animation-delay:calc(.75s + var(--i,0)*85ms)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes tileDrop{0%{opacity:0;transform:translateY(-90px) rotate(-2deg)}60%{opacity:1}100%{opacity:1;transform:none}}
 </style>
 
 <header class="bar"><div class="barin">
@@ -341,8 +374,8 @@ footer{padding-block:28px 48px;color:var(--muted);font-size:12px;border-top:1px 
 <div class="app" id="app" data-view="home">
  <div class="intro" id="intro">
   <div class="eyebrow">Metal Atlas · strategy horizon 2035</div>
-  <h1>Follow the <em>metal</em>.</h1>
-  <p class="lede">Where Munvest's nickel, cobalt, zirconium and stainless alloys will be needed by 2035: which industries buy them, on which continent, and how fast that demand grows.</p>
+  <h1>Pick a <em>metal</em>.</h1>
+  <p class="lede">Follow it to its product forms, the industries that buy them, and the countries that make and trade them.</p>
  </div>
  <div class="dock" id="dock">
   <div class="globe-wrap" id="gwrap">
@@ -402,7 +435,7 @@ footer{padding-block:28px 48px;color:var(--muted);font-size:12px;border-top:1px 
 </div></section>
 
 <section class="block view" id="data" hidden><div class="wrap">
- <div class="shead small"><div class="kick">05 · Data &amp; sources</div><h2>Everything behind the numbers</h2><p>Download the tracker data or search the source log. Non-English sources were translated by the team.</p></div>
+ <div class="shead small"><div class="kick">05 · Data &amp; sources</div><h2>Everything behind the numbers</h2><p>Download the tracker data or search the source log. Non-English sources were translated by the team.</p><p class="note" id="feed-note">Data feed: built-in snapshot of 8 November 2026. On GitHub, a monthly job refreshes World Bank prices and UN Comtrade trade data after a teammate approves it.</p></div>
  <div class="srctools">
   <input id="s-q" type="search" placeholder="Search sources, e.g. USGS" aria-label="Search sources">
   <button class="btn" data-dl="apps"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 2v8m0 0 3-3m-3 3L5 7M3 13h10"/></svg>Metal × application (CSV)</button>
@@ -415,7 +448,7 @@ footer{padding-block:28px 48px;color:var(--muted);font-size:12px;border-top:1px 
 </main>
 </div>
 <nav class="dockbar" id="topnav" aria-label="Views"><a href="#home">Home</a><a href="#pathway">Pathway</a><a href="#metals">Metals</a><a href="#matrix">Metal × industry</a><a href="#industries">Industries</a><a href="#scenarios">2035 scenarios</a><a href="#data">Data</a></nav>
-<footer><div class="wrap">Munvest Metal Atlas · BMDS Project Study, TUM Campus Heilbronn · Prototype, 28 October 2026. Own estimates are marked and are not official forecasts.</div></footer>
+<footer><div class="wrap">Munvest Metal Atlas · BMDS Project Study, TUM Campus Heilbronn · Prototype, 8 November 2026<span id="feed-stamp"></span>. Own estimates are marked and are not official forecasts.</div></footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script>
@@ -921,7 +954,8 @@ const SIGNALS=[
  {id:"ni",sym:"Ni",label:"Nickel signal: jet engine & turbine exports",short:"Jet engine & turbine exports, 2024",val:engines,fmt:v=>"USD "+fmtBig(v),src:"S045"},
  {id:"co",sym:"Co",label:"Cobalt signal: hip & knee implants",short:"Hip + knee implants, 2023 (est.)",val:implants,fmt:v=>fmtBig(v)+" implants",src:"S077"}];
 let sig="ni",customSig=null;
-const NAME=iso=>(C[iso]&&C[iso][0])||EXTRA_NAMES[iso]||iso;
+let LIVE=null;
+const NAME=iso=>(C[iso]&&C[iso][0])||EXTRA_NAMES[iso]||(LIVE&&LIVE.trade&&LIVE.trade.names&&LIVE.trade.names[iso])||iso;
 $("#sig").innerHTML=SIGNALS.map(s=>`<button data-s="${s.id}" aria-pressed="${s.id===sig}"><b>${s.sym}</b>${s.label.split(": ")[1]}</button>`).join("");
 $("#sig").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;sig=b.dataset.s;document.querySelectorAll("#sig button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.s===sig));legendG();draw();if(selCont)renderCont()});
 function legendG(){$("#sig").hidden=!!customSig;if(customSig){$("#glegend").innerHTML=`<span><i class="sp"></i>${esc(customSig.label)} (${srcLink(customSig.src)})</span>`;return}const S=SIGNALS.find(s=>s.id===sig);$("#glegend").innerHTML=`<span><i class="sp"></i>${S.short} (${srcLink(S.src)})</span><span><i class="hs"></i>Mine supply hotspot (${srcLink("S010")}, ${srcLink("S001")})</span>`}
@@ -1072,13 +1106,13 @@ function krows(arr,cls){return arr.filter(k=>k[1]).map(k=>`<div class="krow ${cl
 function renderMetal(){
  const m=MET[curMetal],el=$("#mdetail");
  if(m.none){el.innerHTML=`<div class="gapnote" style="font-size:15px"><b>${m.name}.</b> ${esc(m.gap)} The tracker has no applications, customers or numbers for it yet, so the atlas shows nothing rather than guessing.</div>`;return}
- if(m.supplyOnly){el.innerHTML=`<div class="mdetail"><div><p class="mline">${esc(m.line)}</p><div class="kgroup"><span class="kick">Supply</span>${krows(m.supply,"supply-tag")}</div></div><div><span class="kick">What it is used for</span><p class="lead" style="margin:6px 0 12px">${esc(m.uses)} <span class="src">${srcLink(m.src)}</span></p><div class="gapnote">No applications are mapped to ${esc(m.name.toLowerCase())} in the team tracker yet, so there is no demand model or 2035 scenario for it. Supply figures come from USGS Mineral Commodity Summaries.</div></div></div>`;return}
+ if(m.supplyOnly){el.innerHTML=`<div class="mdetail"><div><p class="mline">${esc(m.line)}</p><div class="kgroup"><span class="kick">Supply</span>${krows(supplyRows(m),"supply-tag")}</div></div><div><span class="kick">What it is used for</span><p class="lead" style="margin:6px 0 12px">${esc(m.uses)} <span class="src">${srcLink(m.src)}</span></p><div class="gapnote">No applications are mapped to ${esc(m.name.toLowerCase())} in the team tracker yet, so there is no demand model or 2035 scenario for it. Supply figures come from USGS Mineral Commodity Summaries.</div></div></div>`;return}
  const apps=appsFor(m.key);const byInd=INDK.map(k=>({k,a:apps.filter(x=>x[0]===k)})).filter(x=>x.a.length).sort((a,b)=>b.a.length-a.a.length);const mx=d3.max(byInd,x=>x.a.length);
  const gain=apps.filter(a=>a[4]==="Gain").length,lose=apps.filter(a=>a[4]==="Lose").length;
  const M=MODELS2[m.model],ch=Math.pow(1+M.scen.base.r,2035-M.base.year)-1,v35=M.base.value*Math.pow(1+M.scen.base.r,2035-M.base.year);
  el.innerHTML=`<div class="mdetail"><div>
   <p class="mline">${esc(m.line)}</p>
-  ${m.supply.length?`<div class="kgroup"><span class="kick">Supply</span>${krows(m.supply,"supply-tag")}</div>`:""}
+  ${supplyRows(m).length?`<div class="kgroup"><span class="kick">Supply</span>${krows(supplyRows(m),"supply-tag")}</div>`:""}
   ${m.gap?`<div class="gapnote">${esc(m.gap)}</div>`:""}
   <div class="kgroup"><span class="kick">Demand</span>${krows(m.demand.map(k=>k[0]==="Applications in tracker"?[k[0],String(apps.length),`${gain} gaining, ${lose} losing to 2035`,"S039, S058, S010"]:k))}</div>
   <div class="minifc"><div><div class="kick">2035, base scenario</div><div class="big">${M.unit==="USD bn"?"USD "+fmtN(v35)+" bn":fmtBig(v35)} <span style="font-size:14px;color:${ch<0?"var(--copper)":"var(--teal)"}">${pct(ch)}</span></div><div class="src">${esc(M.label)} · ${esc(M.scen.base.why)} · ${srcLink(M.scen.base.src)}</div></div><a href="#scenarios" data-model="${m.model}">Open scenario →</a></div>
@@ -1184,13 +1218,17 @@ function layersFor(a){const L={},ind=a[0];
  if(ind==="auto")L.make={...PATH_VEH,why:"Where cars are built: demand for engine, exhaust and sensor parts"};
  if(ind==="aero")L.ex={...fromC(5,"Jet engine & gas turbine exports (HS 8411), 2024","S045"),why:"Countries that export finished engines: where hot-section parts end up"};
  if(ind==="med"&&!/instrument|MRI/i.test(a[1])){L.ex={...fromC(10,"Artificial joint exports (HS 902131), 2024","S045"),why:"Countries that export finished hip and knee implants"};L.im={...fromC(11,"Artificial joint imports (HS 902131), 2024","S045"),why:"Countries that import implants: where the demand is"}}
+ const LT=LIVE&&LIVE.trade&&LIVE.trade.series;if(LT){const lv=k=>{const x=LT[k];if(!x)return null;const d={};Object.entries(x.d).forEach(([i,v])=>{if(GEO.cent[i])d[i]=v});return {label:x.label,src:"COMTRADE",unit:"USD",d}};
+  if(L.ex&&ind==="aero"&&lv("hs8411_x"))L.ex={...lv("hs8411_x"),why:L.ex.why};
+  if(L.ex&&ind==="med"&&lv("hs902131_x"))L.ex={...lv("hs902131_x"),why:L.ex.why};
+  if(L.im&&lv("hs902131_m"))L.im={...lv("hs902131_m"),why:L.im.why}}
  const S=PATH_SUPPLY[a[2]];if(S)L.sup={...S,why:"Where the raw metal is mined or refined"};
  Object.values(L).forEach(l=>l.fmt=fmtU(l.unit));return L}
 function setPw(o){Object.assign(pw,o);if(location.hash!=="#pathway")location.hash="pathway";else renderPathway()}
 function leavePathway(){customSig=null;legendG();if(selCont){closeCont()}}
 function renderPathway(){
  const lvl=pw.app!=null?3:pw.form?2:pw.metal?1:0,M=pw.metal&&MET[pw.metal];
- document.querySelectorAll("#pw-steps i").forEach((x,i)=>x.classList.toggle("on",i<=lvl));
+ document.querySelectorAll("#pw-steps i").forEach((x,i)=>x.classList.toggle("on",i<=lvl));$("#app").classList.toggle("mapstep",lvl===3);
  const cr=[["Metals",{metal:null,form:null,app:null}]];if(M)cr.push([M.name,{form:null,app:null}]);if(pw.form)cr.push([pw.form,{app:null}]);if(pw.app!=null)cr.push([APPS[pw.app][1],{}]);
  $("#pw-crumbs").innerHTML=cr.map((c,i)=>`<button data-i="${i}" ${i===cr.length-1?'aria-current="step"':""}>${esc(c[0])}</button>`).join("<span>/</span>");
  $("#pw-crumbs").querySelectorAll("button").forEach(b=>b.onclick=()=>{const o=cr[+b.dataset.i][1];if(Object.keys(o).length)setPw({...o,layer:null,region:null})});
@@ -1228,9 +1266,20 @@ function renderPathway(){
  body.querySelectorAll("[data-ly]").forEach(b=>b.onclick=()=>{if(!b.disabled)setPw({layer:b.dataset.ly,region:null})});
  body.querySelectorAll("[data-rg]").forEach(b=>b.onclick=()=>{if(!b.disabled)setPw({region:b.dataset.rg||null})});
 }
-function tileHTML(k){const m=MET[k],a=appsFor(k),f=new Set(a.map(x=>x[3])).size;return `<button class="mtile" data-pm="${k}"><span class="face f-${k}"><small>${m.z}</small><b>${m.sym}</b></span><span class="meta"><strong>${m.name}</strong><span>${a.length} application${a.length===1?"":"s"} · ${f} form${f===1?"":"s"}</span></span></button>`}
-$("#st-tiles").innerHTML=PWM.map(tileHTML).join("");
-$("#st-tiles").querySelectorAll("[data-pm]").forEach(b=>b.onclick=()=>{if(selCont)closeCont();setPw({metal:b.dataset.pm,form:null,app:null,layer:null,region:null})});
+function tileHTML(k){const m=MET[k],a=appsFor(k),f=new Set(a.map(x=>x[3])).size;return `<button class="mtile" data-pm="${k}"><span class="face f-${k}"><small>${m.z}</small>${m.supplyOnly?'<small class="tag">supply</small>':""}<b>${m.sym}</b></span><span class="meta"><strong>${m.name}</strong><span>${m.supplyOnly?"Supply data only":a.length+" application"+(a.length===1?"":"s")+" · "+f+" form"+(f===1?"":"s")}</span></span></button>`}
+$("#st-tiles").innerHTML=METALS.map(m=>tileHTML(m.key)).join("");$("#st-tiles").querySelectorAll(".mtile").forEach((b,i)=>b.style.setProperty("--i",i));
+function playIntro(){const a=$("#app");a.classList.remove("play");void a.offsetWidth;a.classList.add("play")}
+$("#st-tiles").querySelectorAll("[data-pm]").forEach(b=>b.onclick=()=>{if(selCont)closeCont();const k=b.dataset.pm;
+ if(MET[k].supplyOnly){curMetal=k;document.querySelectorAll("#ptable .pt").forEach(x=>x.setAttribute("aria-pressed",x.dataset.m===k));renderMetal();location.hash="metals";return}
+ setPw({metal:k,form:null,app:null,layer:null,region:null})});
+
+// =============== LIVE DATA FEED (data/live.json, written by the monthly GitHub job) ===============
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function supplyRows(m){const r=m.supply.slice(),p=LIVE&&LIVE.prices&&LIVE.prices.series&&LIVE.prices.series[m.key];
+ if(p){const mo=MON[+p.month.slice(5)-1]+" "+p.month.slice(0,4);r.unshift(["World Bank monthly price","USD "+fmtN(p.usd_t)+"/t",mo+(p.yoy!=null?"; "+pct(p.yoy)+" vs a year earlier":"")+"; live feed","WB_PINK"])}return r}
+fetch("data/live.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.updated)return;LIVE=j;Object.assign(SOURCES,j.sources||{});
+ $("#feed-note").textContent="Data feed: updated "+j.updated+" by the monthly job"+(j.prices?" · World Bank prices to "+j.prices.series.ni.month:"")+(j.trade?" · UN Comtrade trade "+Object.values(j.trade.series)[0].year:"")+". Built-in data is used for everything else.";
+ $("#feed-stamp").textContent=" · data feed "+j.updated;renderSources();renderMetal();if(view==="pathway")renderPathway()}).catch(()=>{});
 
 // =============== ROUTER ===============
 const VIEWS=["home","pathway","metals","matrix","industries","scenarios","data"];let view="home";
@@ -1238,7 +1287,8 @@ function route(){const h=(location.hash||"").slice(1);const v=VIEWS.includes(h)?
  $("#app").dataset.view=v;document.querySelectorAll(".view").forEach(s=>s.hidden=s.id!==v);
  document.querySelectorAll("#topnav a").forEach(a=>{if(a.getAttribute("href")==="#"+v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
  if(v==="metals"&&(curMetal==="ni"||curMetal==="co")&&sig!==curMetal){sig=curMetal;document.querySelectorAll("#sig button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.s===sig));legendG()}
- if(v==="pathway")renderPathway();else if(customSig)leavePathway();
+ if(v==="home"&&(changed||!route.done))playIntro();route.done=true;
+ if(v==="pathway")renderPathway();else{$("#app").classList.remove("mapstep");if(customSig)leavePathway()}
  if(changed)scrollTo(0,0)}
 addEventListener("hashchange",route);route();
 $("#mm-metals").textContent=METALS.length+" metals · "+MROWS.length+" with applications";
