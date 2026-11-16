@@ -325,15 +325,15 @@ function playerCard(title, items) {
 
 function viewDemandDetail(scenario) {
   var needs = scenario.needs.map(function (item) { return "<li>" + esc(item) + "</li>" }).join("")
-  var products = scenario.products.map(demandProduct).join("")
+  var products = scenario.products.map(function (p) { return demandProduct(p).replace(/<\/article>$/, evProductCalc(scenario, p) + "</article>") }).join("")
   return '<div class="demand"><h1>' + esc(scenario.name) + "</h1>" + demandTags(scenario.tags) +
-    '<section class="need-box"><p>' + esc(scenario.intro) + "</p><ul>" + needs + "</ul></section>" +
+    evBottomLine(scenario) + '<section class="need-box"><p>' + esc(scenario.intro) + "</p><ul>" + needs + "</ul></section>" +
     "<h2>Product opportunity</h2>" + products +
     "<h2>Market players</h2><div class=\"players\">" +
     playerCard("Suppliers", scenario.players.suppliers) +
     playerCard("Customers", scenario.players.customers) +
     playerCard("Competitors", scenario.players.competitors) +
-    "</div><details class=\"demand-sources\"><summary>Sources</summary><p>Modeled scenario.</p></details></div>"
+    "</div>" + evAssumptions(scenario) + "</div>"
 }
 
 function promptCard(scenario) {

@@ -1576,3 +1576,23 @@ h1.chain-title {
     animation: none !important;
   }
 }
+
+/* ---------- Evidence layer: plain text in plain boxes ---------- */
+.ev-verdict, .ev-box { margin: 16px 0 4px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 8px; background: none; }
+.ev-verdict { margin: 0 0 16px; }
+.demand .ev-verdict, .ev-box.ev-wide { max-width: 920px; }
+.ev-box.ev-wide { margin-top: 28px; }
+.ev-kicker, .ev-box h3 { margin-bottom: 6px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.ev-box.ev-wide h2 { margin-bottom: 8px; font-size: 18px; font-weight: 600; }
+.ev-head { font-size: 15px; }
+.ev-next, .ev-why { margin-top: 6px; }
+.ev-why { color: var(--muted); }
+.ev-formula { margin-bottom: 4px; }
+.ev-table { width: 100%; margin-top: 8px; border-collapse: collapse; font-size: 13px; }
+.ev-table th, .ev-table td { padding: 4px 6px 4px 0; text-align: left; vertical-align: top; font-weight: 400; }
+.ev-table th { color: var(--muted); }
+.ev-table .num { text-align: right; }
+.ev-badge { font-size: inherit; }
+.ev-calc { margin-top: 8px; color: #6d7a82; font-size: 13px; }
+.ev-box-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.ev-csv { padding: 0; border: 0; background: none; color: var(--link); font-size: 13px; text-decoration: underline; }
