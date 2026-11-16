@@ -46,11 +46,46 @@ function evCalculation(row) {
     ? "Gap = Demand − Supply = " + evNum(row.demand) + " − " + evNum(row.supply) + " → cannot be calculated"
     : "Gap = Demand − Supply = " + evNum(row.demand) + " − " + evNum(row.supply) + " = " + evNum(gap) + " " + row.unit
   var contract = row.contracts && row.contracts[0] ? row.contracts[0].name + " " + row.contracts[0].year : ""
-  return '<section class="ev-box"><h3>How this number is calculated</h3><p class="ev-formula">' + esc(formula) + "</p>" +
+  return '<section class="ev-box"><div class="ev-box-head"><h3>How this number is calculated</h3>' +
+    '<button type="button" class="ev-csv" onclick="evDownloadCsv(\'' + esc(row.id) + '\')">Download CSV</button></div><p class="ev-formula">' + esc(formula) + "</p>" +
     '<table class="ev-table"><thead><tr><th>Input</th><th>Value</th><th>Basis</th><th>Source</th></tr></thead><tbody>' +
     "<tr><td>Demand</td><td>" + esc(evQty(row.demand, row.unit)) + "</td><td>" + evBasis(row.evidence) + "</td><td>" + evSource(row.demandSource || contract) + "</td></tr>" +
     "<tr><td>Supply</td><td>" + esc(evQty(row.supply, row.unit)) + "</td><td>" + (row.supply == null ? evBadge("missing", "No data") : evBadge("reported", "Estimate")) + "</td><td>" + evSource(row.supplySource) + "</td></tr>" +
     "</tbody></table></section>"
+}
+
+/* CSV of the calculation table for one product row (UTF-8 with BOM so Excel keeps ä, ü, ·, −). */
+function evCalcRows(row) {
+  var product = productById(row.productId) || {}
+  var contract = row.contracts && row.contracts[0] ? row.contracts[0].name + " " + row.contracts[0].year : ""
+  var gap = gapOf(row)
+  var base = [plainText(product.grade), product.form || "", row.region, row.delivery]
+  return [
+    ["Grade", "Form", "Region", "Window", "Input", "Value", "Unit", "Basis", "Source"],
+    base.concat(["Demand", row.demand == null ? "" : row.demand, row.unit, row.evidence || "Not stated", row.demandSource || contract || "Source missing"]),
+    base.concat(["Supply", row.supply == null ? "" : row.supply, row.unit, row.supply == null ? "No data" : "Estimate", row.supplySource || "Source missing"]),
+    base.concat(["Gap", gap == null ? "" : gap, row.unit, "Calculated: Demand − Supply", gap == null ? "Cannot be calculated" : ""])
+  ]
+}
+
+function plainText(v) { return String(v == null ? "" : v).replace(/<[^>]*>/g, "") }
+
+function evCsvCell(v) {
+  var s = String(v == null ? "" : v)
+  return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s
+}
+
+function evDownloadCsv(id) {
+  var row = (ATLAS.observations || []).filter(function (r) { return r.id === id })[0]
+  if (!row) return
+  var csv = "\ufeff" + evCalcRows(row).map(function (r) { return r.map(evCsvCell).join(",") }).join("\r\n") + "\r\n"
+  var product = productById(row.productId) || {}
+  var name = (plainText(product.grade) + " " + row.region + " calculation").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "").toLowerCase() + ".csv"
+  var url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }))
+  var a = document.createElement("a")
+  a.href = url; a.download = name
+  document.body.appendChild(a); a.click(); a.remove()
+  setTimeout(function () { URL.revokeObjectURL(url) }, 1000)
 }
 
 function evGradeKey(name) { return String(name).split(" ").slice(0, 2).join(" ").replace(/,$/, "") }

@@ -1594,3 +1594,5 @@ h1.chain-title {
 .ev-table .num { text-align: right; }
 .ev-badge { font-size: inherit; }
 .ev-calc { margin-top: 8px; color: #6d7a82; font-size: 13px; }
+.ev-box-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.ev-csv { padding: 0; border: 0; background: none; color: var(--link); font-size: 13px; text-decoration: underline; }
