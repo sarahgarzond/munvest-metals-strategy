@@ -388,11 +388,11 @@ function detailPanel(params) {
   var row = visibleObservation(params)
   if (!row) return '<section class="detail"><h2 class="name">None</h2><p class="unknown">Unknown</p></section>'
   var product = productById(row.productId)
-  return '<section class="detail"><h2 class="name">' + plain(product.grade) + '</h2><p class="meta-line"><span>' + esc(product.form) + "</span><span>" + esc(row.region) + "</span><span>" + esc(row.delivery) + '</span></p><p class="meta-evidence">' + esc(row.evidence) + '</p><div class="figures">' +
+  return '<section class="detail">' + evVerdict(row, product) + '<h2 class="name">' + plain(product.grade) + '</h2><p class="meta-line"><span>' + esc(product.form) + "</span><span>" + esc(row.region) + "</span><span>" + esc(row.delivery) + '</span></p><p class="meta-evidence">' + esc(row.evidence) + '</p><div class="figures">' +
     figure("Demand", row.demand, row.unit) +
     figure("Supply", row.supply, row.unit) +
     figure("Gap", gapOf(row), row.unit) +
-    "</div>" +
+    "</div>" + evCalculation(row) + evConsistency(product) +
     listSection("Suppliers", product.directory.suppliers) +
     listSection("Customers", product.directory.customers) +
     listSection("Competitors", product.directory.competitors) +
