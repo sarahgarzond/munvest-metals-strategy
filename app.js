@@ -65,7 +65,7 @@ function readRoute() {
   var params = new URLSearchParams(q === -1 ? "" : raw.slice(q + 1))
   var alias = { scenarios: "builder", reactors: "builder", duplex: "builder" }
   if (alias[path]) path = alias[path]
-  var known = { shortages: 1, trends: 1, demand: 1, builder: 1, supply: 1, wire: 1, plate: 1 }
+  var known = { shortages: 1, trends: 1, strategy: 1, demand: 1, builder: 1, supply: 1, wire: 1, plate: 1 }
   return { page: known[path] ? path : "shortages", params: params }
 }
 
@@ -158,7 +158,6 @@ function normalize(route) {
     }
   }
   if (route.page === "demand") changed = normalizeDemand(params) || changed
-  if (route.page === "trends") changed = normalizeTrends(params) || changed
   if (route.page === "supply") changed = normalizeSupply(params) || changed
   if (route.page === "builder") changed = normalizeScenarios(params) || changed
   if (route.page === "wire") changed = setParam(params, "id", "nicr-8020-wire") || changed
@@ -170,7 +169,8 @@ function normalize(route) {
 function titles(page) {
   return {
     shortages: "Current shortages",
-    trends: "Trends by industry",
+    trends: "Market scenarios",
+    strategy: "Board strategy",
     demand: "Scenarios",
     builder: "Scenario builder",
     supply: "Total supply",
@@ -180,7 +180,7 @@ function titles(page) {
 }
 
 function markNav(page) {
-  ["shortages", "trends", "demand", "builder", "supply"].forEach(function (id) {
+  ["shortages", "trends", "strategy", "demand", "builder", "supply"].forEach(function (id) {
     var link = document.getElementById("nav-" + id)
     if (!link) return
     if (page === id) link.setAttribute("aria-current", "page")
@@ -501,10 +501,7 @@ function summary(route) {
     return product.grade + ", demand " + (num(row.demand) || "unknown") + ", supply " + (num(row.supply) || "unknown") + ", gap " + (gap == null ? "unknown" : num(gap))
   }
   if (route.page === "builder") return scenarioSummary(simModel(route.params))
-  if (route.page === "trends") {
-    var trend = trendModel(route.params)
-    return trend.industry.name + ", probability " + trendLevel(route.params, trend.industry) + "%"
-  }
+  if (route.page === "trends" || route.page === "strategy") return scnSummary(scnModel(route.params))
   if (route.page === "demand") {
     var scenario = futureScenario(route.params.get("scenario"))
     return scenario ? scenario.name : "Scenarios"
@@ -520,7 +517,8 @@ function summary(route) {
 
 function view(route) {
   if (route.page === "demand") return viewDemand(route)
-  if (route.page === "trends") return viewTrends(route)
+  if (route.page === "trends") return viewSimulator(route)
+  if (route.page === "strategy") return viewStrategy(route)
   if (route.page === "builder") return viewScenarios(route)
   if (route.page === "supply") return viewChain(route)
   if (route.page === "wire") return viewForm(route, "Wire", "Nickel")
@@ -589,6 +587,8 @@ document.addEventListener("click", function (event) {
       try { localStorage.setItem("atlas-nav", closed ? "open" : "closed") } catch (err) { /* storage blocked */ }
       syncNav()
     }
+    if (action.dataset.action === "scn-reset") go(null, { a: null, b: null, c: null, d: null })
+    if (action.dataset.action === "scn-csv") scnCsv(action.dataset.kind)
     if (action.dataset.action === "clear-node") go("supply", { node: null })
     if (action.dataset.action === "zoom") {
       var step = action.dataset.dir === "in" ? 0.35 : -0.35
@@ -657,15 +657,14 @@ document.addEventListener("change", function (event) {
 })
 
 document.addEventListener("input", function (event) {
-  var slider = event.target.closest && event.target.closest("[data-trend]")
-  if (slider && readRoute().page === "trends") {
+  var driver = event.target.closest && event.target.closest("[data-driver]")
+  if (driver && readRoute().page === "trends") {
     var params = new URLSearchParams(readRoute().params)
-    if (params.get("industry") !== slider.dataset.trend) params.delete("form")
-    params.set("industry", slider.dataset.trend)
-    params.set("level", slider.value)
-    normalizeTrends(params)
+    params.set(driver.dataset.driver, driver.value)
     history.replaceState(null, "", hashFor("trends", params))
-    paintTrends(params)
+    var model = scnModel(params)
+    if (!scnPaintTrends(model)) render()
+    announce(scnSummary(model))
     return
   }
   var input = event.target.closest && event.target.closest("[role='combobox']")
