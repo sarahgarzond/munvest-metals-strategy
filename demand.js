@@ -289,9 +289,9 @@ function normalizeDemand(params) {
 }
 
 function signalText(signal) {
-  if (signal === "buy") return "Strong buy signal"
-  if (signal === "balanced") return "Balanced"
-  return "Watch closely"
+  if (signal === "buy") return "Grow capacity"
+  if (signal === "balanced") return "Watch"
+  return "Hold"
 }
 
 function signalClass(signal) {
@@ -327,7 +327,7 @@ function viewDemandDetail(scenario) {
   var needs = scenario.needs.map(function (item) { return "<li>" + esc(item) + "</li>" }).join("")
   var products = scenario.products.map(function (p) { return demandProduct(p).replace(/<\/article>$/, evProductCalc(scenario, p) + "</article>") }).join("")
   return '<div class="demand"><h1>' + esc(scenario.name) + "</h1>" + demandTags(scenario.tags) +
-    evBottomLine(scenario) + '<section class="need-box"><p>' + esc(scenario.intro) + "</p><ul>" + needs + "</ul></section>" +
+    evBottomLine(scenario) + (typeof scnFitStrip === "function" ? scnFitStrip(scenario) : "") + '<section class="need-box"><p>' + esc(scenario.intro) + "</p><ul>" + needs + "</ul></section>" +
     "<h2>Product opportunity</h2>" + products +
     "<h2>Market players</h2><div class=\"players\">" +
     playerCard("Suppliers", scenario.players.suppliers) +

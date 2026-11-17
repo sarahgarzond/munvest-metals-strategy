@@ -30,11 +30,11 @@ function evVerdict(row, product) {
   var word = level === "act" ? "Act now" : level === "watch" ? "Watch" : "No action"
   var dir = product.directory || {}
   var next = level === "none" ? "Supply covers demand in this window."
-    : "Offer " + plain(product.grade) + " to " + plain((dir.customers || []).slice(0, 2).join(" and ") || "the customers below") +
-      "; secure supply through " + plain((dir.suppliers || [])[0] || "a qualified supplier") + "."
+    : "Plan " + plain(product.grade) + " capacity for " + plain((dir.customers || []).slice(0, 2).join(" and ") || "the customers below") +
+      "; secure feedstock through " + plain((dir.suppliers || [])[0] || "a qualified supplier") + "."
   var why = firm
     ? "The demand side is a " + row.evidence.toLowerCase() + (row.contracts && row.contracts[0] ? " (" + esc(row.contracts[0].name + " " + row.contracts[0].year) + ")" : "") + ", not an estimate."
-    : "The demand side is reported, not contracted. Confirm it before committing stock."
+    : "The demand side is reported, not contracted. Confirm it before committing capacity."
   return '<section class="ev-verdict ev-' + level + '"><p class="ev-kicker">Verdict</p>' +
     '<p class="ev-head"><b>' + word + "</b>: " + evNum(gap) + " " + esc(row.unit) + " gap, " + share + "% of demand, " + esc(row.region) + " " + esc(row.delivery) + "</p>" +
     '<p class="ev-next">' + next + "</p><p class=\"ev-why\">" + why + "</p></section>"
@@ -140,9 +140,9 @@ function evBottomLine(s) {
   if (!s.products || !s.products.length) return ""
   var ranked = s.products.slice().sort(function (a, b) { return evPct(b) - evPct(a) })
   var top = ranked[0], rest = ranked.slice(1)
-  return '<section class="ev-verdict ev-act"><p class="ev-kicker">Bottom line</p>' +
+  return '<section class="ev-verdict ev-act"><p class="ev-kicker">Recommendation to the board</p>' +
     "<p class=\"ev-head\"><b>Biggest opportunity: " + esc(top.name) + "</b>, " + evNum(top.shortage) + " t short (" + evPct(top) + "% of extra demand)</p>" +
-    '<p class="ev-next">Prioritise ' + esc(top.name) + " sourcing from " + esc(s.players.suppliers[0]) + " and pitch it to " + esc(s.players.customers[0]) + "." +
+    '<p class="ev-next">Prioritise ' + esc(top.name) + " capacity and qualification; target " + esc(s.players.customers.slice(0, 2).join(" and ")) + "." +
     (rest.length ? " Lower priority: " + rest.map(function (p) { return esc(p.name) + " " + evPct(p) + "%" }).join(", ") + "." : "") + "</p>" +
     '<p class="ev-why">Confidence: ' + evBadge("reported", s.basis === "sourced" ? "Sourced" : "Modeled") + " — the numbers below show which inputs still need a source.</p></section>"
 }
