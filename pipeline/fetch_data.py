@@ -1,6 +1,6 @@
 """Monthly data refresh for the Munvest Metal Atlas.
 
-Pulls two public sources and writes data/live.json, which metal-atlas.html
+Pulls publisher data and writes data/live.json, which metal-atlas.html
 reads on load (the page keeps its built-in data as a fallback).
 
 1. World Bank Commodity Price Data ("Pink Sheet"), monthly workbook: no key.
@@ -24,6 +24,8 @@ import sys
 from pathlib import Path
 
 import requests
+
+from providers import refresh_providers
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "data" / "live.json"
@@ -71,9 +73,13 @@ def parse_pink_sheet(xlsx: bytes) -> dict:
         series = [(str(r[0]).strip(), r[j]) for r in data if isinstance(r[j], (int, float))]
         if len(series) < 13:
             raise ValueError(f"too few months for {name}")
-        (m, v), (m12, v12) = series[-1], series[-13]
+        (m, v) = series[-1]
+        m12 = f"{int(m[:4]) - 1:04d}{m[4:]}"
+        v12 = dict(series).get(m12)
         out[key] = {"name": name, "month": f"{m[:4]}-{m[5:]}", "usd_t": round(float(v), 1),
-                    "yoy": round(float(v) / float(v12) - 1, 4) if v12 else None}
+                    "yoy": round(float(v) / float(v12) - 1, 4) if v12 else None,
+                    "history": [{"month": f"{month[:4]}-{month[5:]}", "usd_t": round(float(price), 1)}
+                                for month, price in series]}
     return out
 
 
@@ -150,17 +156,20 @@ def main() -> int:
         new["prices"] = {**fetch_prices(), "fetched": dt.date.today().isoformat()}
         status["World Bank Pink Sheet"] = "updated"
     except Exception as e:  # keep last values
-        status["World Bank Pink Sheet"] = f"failed, kept previous values ({e})"
+        status["World Bank Pink Sheet"] = f"failed, kept previous values ({type(e).__name__})"
     key = os.environ.get("COMTRADE_KEY", "").strip()
     if key:
         try:
             new["trade"] = {**fetch_trade(key), "fetched": dt.date.today().isoformat()}
             status["UN Comtrade"] = "updated"
         except Exception as e:
-            status["UN Comtrade"] = f"failed, kept previous values ({e})"
+            status["UN Comtrade"] = f"failed, kept previous values ({type(e).__name__})"
     else:
         status["UN Comtrade"] = "skipped: no COMTRADE_KEY secret set"
-    if not any(v == "updated" for v in status.values()):
+    new["providers"] = refresh_providers(old.get("providers", {}), new, status)
+    if not any(entry.get("rows") for entry in new["providers"].values()) and not any(
+        v == "updated" for v in status.values()
+    ):
         print("\n".join(f"{k}: {v}" for k, v in status.items()))
         return 1
     new["updated"] = dt.date.today().isoformat()
@@ -168,6 +177,7 @@ def main() -> int:
                       "COMTRADE": ["UN Comtrade", "Trade data API, annual, world partner",
                                    "https://comtradeplus.un.org/"]}
     compare(old, new, report)
+    status.update({key: entry["status"] for key, entry in new["providers"].items()})
     OUT.parent.mkdir(exist_ok=True)
     OUT.write_text(json.dumps(new, indent=1, ensure_ascii=False) + "\n")
     REPORT.write_text(

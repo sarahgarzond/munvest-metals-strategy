@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data sources | Munvest Metals Strategy</title>
+<style>
+  :root { color-scheme: dark; font: 16px/1.55 system-ui, sans-serif; background: #10151d; color: #e9edf2; }
+  body { max-width: 78rem; margin: auto; padding: 2rem 1rem 4rem; }
+  a { color: #a9d9ff; }
+  label { display: block; font-weight: 600; }
+  select, input, button { font: inherit; color: inherit; background: #182330; border: 1px solid #64758a; padding: .45rem; border-radius: .25rem; max-width: 100%; }
+  .filters { display: flex; flex-wrap: wrap; align-items: end; gap: 1rem; }
+  .table-wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+  th, td { text-align: left; padding: .55rem; border-bottom: 1px solid #344355; }
+  th { color: #b4c2d3; }
+</style>
+<script src="data-sources.js" defer></script>
+</head>
+<body>
+<nav><a href="index.html">Dashboard</a> · <a href="metal-atlas.html">Metal Atlas</a></nav>
+<main>
+<h1>Data sources</h1>
+<div class="filters">
+<label>Publisher<br><select id="provider"></select></label>
+<label>Filter observations<br><input id="query" type="search" placeholder="Metric, geography, year or scenario"></label>
+</div>
+<p id="publisher"></p>
+<p id="status" role="status">Loading observations…</p>
+<div class="table-wrap">
+<table aria-label="Publisher observations" hidden>
+<thead><tr><th>Metric</th><th>Geography</th><th>Period</th><th>Scenario</th><th>Value</th><th>Unit</th><th>Flag</th><th>Source</th></tr></thead>
+<tbody></tbody>
+</table>
+</div>
+<p><button id="more" hidden>Show more</button></p>
+</main>
+</body>
+</html>

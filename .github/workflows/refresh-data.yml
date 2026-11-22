@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r pipeline/requirements.txt
-      - name: Fetch World Bank and UN Comtrade data
+      - name: Refresh publisher data
         run: python pipeline/fetch_data.py
         env:
           COMTRADE_KEY: ${{ secrets.COMTRADE_KEY }}
@@ -28,6 +28,6 @@ jobs:
           branch: data-refresh
           delete-branch: true
           add-paths: data/live.json
-          commit-message: "Data refresh from World Bank and UN Comtrade"
+          commit-message: "Refresh atlas publisher data"
           title: "Monthly data refresh"
           body-path: pipeline/last_run.md
