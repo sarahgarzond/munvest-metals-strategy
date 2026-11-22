@@ -588,6 +588,11 @@ document.addEventListener("click", function (event) {
       syncNav()
     }
     if (action.dataset.action === "scn-reset") go("trends", scnResetUpdates())
+    if (action.dataset.action === "scn-open-filters" || action.dataset.action === "scn-close-filters") {
+      var opening = action.dataset.action === "scn-open-filters" && readRoute().params.get("scn-filters") !== "1"
+      go("trends", { "scn-filters": opening ? "1" : null }, { replace: true })
+      document.getElementById(opening ? "scn-filter-industry" : "scn-filters-button").focus()
+    }
     if (action.dataset.action === "scn-csv") scnCsv(action.dataset.kind)
     if (action.dataset.action === "clear-node") go("supply", { node: null })
     if (action.dataset.action === "zoom") {
@@ -647,10 +652,13 @@ document.addEventListener("change", function (event) {
   var el = event.target
   if (el.matches && el.matches("[data-industry-slider]")) {
     var prefix = "scn-" + el.dataset.industrySlider + "-"
-    var sliderUpdates = { "scn-industry": null }
+    var sliderUpdates = {}
     sliderUpdates[prefix + "level"] = Number(el.value) || null
     sliderUpdates[prefix + "direction"] = null
-    sliderUpdates[prefix + "path"] = null
+    var industry = SCN_INDUSTRY_DRIVERS.find(function (item) { return item.id === el.dataset.industrySlider })
+    if (Math.sign(Number(el.value)) !== Math.sign(scnIndustryAssumption(readRoute().params, industry).level)) {
+      sliderUpdates[prefix + "path"] = null
+    }
     go("trends", sliderUpdates)
     return
   }

@@ -43,22 +43,31 @@ var SCN_REGIONS = {
 }
 
 var SCN_INDUSTRY_DRIVERS = [
-  { id: "ev", name: "EVs and batteries" },
-  { id: "energy", name: "Energy and power" },
-  { id: "elec", name: "Electronics" },
-  { id: "auto", name: "Automotive" },
-  { id: "aero", name: "Aerospace" },
-  { id: "med", name: "Medical technology" },
-  { id: "chem", name: "Chemical processing" },
-  { id: "og", name: "Oil and gas" },
-  { id: "steel", name: "Steel and construction" },
-  { id: "defence", name: "Defence" }
+  { id: "ev", name: "EVs and batteries", grow: ["Affordable EV models scale up", "Fleet electrification accelerates", "Local battery plants expand"], fall: ["EV incentives expire", "Battery plants delay expansion", "Buyers switch to hybrids"] },
+  { id: "energy", name: "Energy and power", grow: ["Grid upgrades accelerate", "Renewables win more capacity", "Nuclear projects reach construction"], fall: ["Grid connections are delayed", "Power projects lose funding"] },
+  { id: "elec", name: "Electronics", grow: ["New chip plants open", "Data centre demand rises"], fall: ["Chipmakers delay investment", "Electronics orders weaken"] },
+  { id: "auto", name: "Automotive", grow: ["Vehicle production expands", "Manufacturers bring production home"], fall: ["Vehicle sales slow", "Plants cut output"] },
+  { id: "aero", name: "Aerospace", grow: ["Airlines replace older aircraft", "Aircraft makers increase deliveries"], fall: ["Airlines defer deliveries", "Aircraft makers cut output"] },
+  { id: "med", name: "Medical technology", grow: ["Implant procedures increase", "Hospitals upgrade equipment"], fall: ["Hospitals defer purchases", "Procedure volumes weaken"] },
+  { id: "chem", name: "Chemical processing", grow: ["Plants invest in retrofits", "Demand for specialty chemicals rises"], fall: ["High energy costs force closures", "Chemical orders weaken"] },
+  { id: "og", name: "Oil and gas", grow: ["LNG projects proceed", "Operators increase maintenance"], fall: ["Producers defer projects", "LNG investments slow"] },
+  { id: "steel", name: "Steel and construction", grow: ["Infrastructure projects accelerate", "Construction investment recovers"], fall: ["High borrowing costs delay projects", "Steel orders decline"] },
+  { id: "defence", name: "Defence", grow: ["Procurement budgets rise", "Manufacturers expand capacity"], fall: ["Procurement programmes slip", "Public budgets tighten"] }
 ]
+
+function scnRegion(params) {
+  var region = params && params.get("scn-region")
+  if (Object.prototype.hasOwnProperty.call(SCN_REGIONS, region)) return region
+  // Older scenario links can carry a region on an individual industry.
+  var legacy = SCN_INDUSTRY_DRIVERS.map(function (industry) {
+    return params && params.get("scn-" + industry.id + "-region")
+  }).find(function (value) { return Object.prototype.hasOwnProperty.call(SCN_REGIONS, value) })
+  return legacy || "global"
+}
 
 function scnIndustryAssumption(params, industry) {
   var prefix = "scn-" + industry.id + "-"
-  var region = params && params.get(prefix + "region")
-  if (!Object.prototype.hasOwnProperty.call(SCN_REGIONS, region)) region = "global"
+  var region = scnRegion(params)
   var legacy = params && params.get(prefix + "direction")
   var rawLevel = params && params.get(prefix + "level")
   var level = Number(rawLevel)
@@ -69,7 +78,7 @@ function scnIndustryAssumption(params, industry) {
 }
 
 function scnResetUpdates() {
-  var updates = { a: null, b: null, c: null, d: null, "scn-industry": null }
+  var updates = { a: null, b: null, c: null, d: null, "scn-industry": null, "scn-region": null }
   SCN_INDUSTRY_DRIVERS.forEach(function (industry) {
     ["region", "direction", "level", "path"].forEach(function (key) { updates["scn-" + industry.id + "-" + key] = null })
   })
@@ -229,7 +238,7 @@ function scnInk(v) { return Math.abs(v) > 0.65 ? "#fff" : "#24343c" }
 
 function scnKeep(params) {
   var q = new URLSearchParams()
-  Object.keys(scnResetUpdates()).forEach(function (key) { if (params.get(key)) q.set(key, params.get(key)) })
+  Object.keys(scnResetUpdates()).forEach(function (key) { if (key !== "scn-industry" && params.get(key)) q.set(key, params.get(key)) })
   var s = q.toString()
   return s ? "?" + s : ""
 }
@@ -244,15 +253,39 @@ function scnDriverPanel(params) {
   var sliders = SCN_INDUSTRY_DRIVERS.map(function (item) {
     var state = scnIndustryAssumption(params, item)
     var id = "scn-" + item.id + "-level"
-    var region = state.region === "global" ? "" : " · " + SCN_REGIONS[state.region].name
-    return '<div class="scn-industry-card"><label for="' + id + '">' + esc(item.name + region) + '</label>' +
+    return '<div class="scn-industry-card"><label for="' + id + '">' + esc(item.name) + '</label>' +
       '<input type="range" id="' + id + '" min="-2" max="2" step="1" value="' + state.level + '" data-industry-slider="' + item.id +
       '" aria-valuetext="' + scnLevelLabel(state.level) + '">' +
       '<div class="scn-slide-ends" aria-hidden="true"><span>Decline</span><span>Grow</span></div></div>'
   }).join("")
+  var region = scnRegion(params)
+  var regions = Object.keys(SCN_REGIONS).map(function (id) {
+    return '<option value="' + id + '"' + (region === id ? ' selected' : '') + '>' + SCN_REGIONS[id].name + '</option>'
+  }).join("")
+  var filtersOpen = params.get("scn-filters") === "1"
   return '<section class="scn-panel" aria-labelledby="scn-drivers-heading"><div class="scn-reset"><h2 id="scn-drivers-heading" class="scn-heading">Industry drivers</h2>' +
-    '<button type="button" class="ev-csv" data-action="scn-reset">Reset assumptions</button></div>' +
-    '<div class="scn-industries">' + sliders + '</div></section>'
+    '<div class="scn-toolbar"><label>Region <select id="scn-region" name="scn-region" data-control>' + regions + '</select></label>' +
+    '<button id="scn-filters-button" type="button" class="ev-csv" data-action="scn-open-filters" aria-expanded="' + filtersOpen + '">More filters</button>' +
+    '<button id="scn-reset" type="button" class="ev-csv" data-action="scn-reset">Reset assumptions</button></div></div>' +
+    '<div class="scn-industries">' + sliders + '</div></section>' + (filtersOpen ? scnSideFilters(params) : "")
+}
+
+function scnSideFilters(params) {
+  var industry = SCN_INDUSTRY_DRIVERS.find(function (item) { return item.id === params.get("scn-industry") }) || SCN_INDUSTRY_DRIVERS[0]
+  var level = scnIndustryAssumption(params, industry).level
+  var industries = SCN_INDUSTRY_DRIVERS.map(function (item) {
+    return '<option value="' + item.id + '"' + (industry === item ? ' selected' : '') + '>' + esc(item.name) + '</option>'
+  }).join("")
+  var field = "scn-" + industry.id + "-path"
+  var paths = level > 0 ? industry.grow : level < 0 ? industry.fall : []
+  var options = paths.map(function (path) {
+    return '<option' + (params.get(field) === path ? ' selected' : '') + '>' + esc(path) + '</option>'
+  }).join("")
+  return '<aside class="scn-side-filters" aria-labelledby="scn-filters-title"><div class="scn-filter-heading">' +
+    '<h2 id="scn-filters-title">More filters</h2><button type="button" class="ev-csv" data-action="scn-close-filters">Close</button></div>' +
+    '<label>Industry<select id="scn-filter-industry" name="scn-industry" data-control>' + industries + '</select></label>' +
+    (paths.length ? '<label>How could this happen?<select id="scn-filter-path" name="' + field + '" data-control><option value="">Choose a reason</option>' + options + '</select></label>' :
+      '<p>Move this industry’s slider to explore possible reasons.</p>') + '</aside>'
 }
 
 function scnLikelihoods(model) {
@@ -284,7 +317,7 @@ function scnMetalCards(model) {
 
 function scnCalcTable(model) {
   return '<details class="ev-box ev-wide scn-calc"><summary>Show calculation</summary>' +
-    '<p class="ev-why">The baseline uses 24 indicators from report sections 3–4. Industry assumptions adjust the weights of scenarios and the industry scores. Regional effects use illustrative weights. Each metal uses a representative application or product line. End-market weights for the additional metals are illustrative. ' +
+    '<p class="ev-why">The baseline uses 24 indicators from report sections 3–4. Industry assumptions adjust the weights of scenarios and the industry scores. One region applies to all industry drivers using illustrative weights. Optional reasons record your assumptions. Each metal uses a representative application or product line. End-market weights for the additional metals are illustrative. ' +
     'Its score in each scenario is a weighted average of the end markets for that product line. The overall index (−2 to +2) weights those scores by scenario likelihood. ' +
     'The five squares show the separate scenario scores (blue for growth, orange for decline). These scores describe the modeled market outlook.</p>' +
     '<div class="scn-table-wrap"><table class="ev-table"><thead><tr><th>Metal</th><th>Product line</th>' +
