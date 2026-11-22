@@ -223,13 +223,37 @@ function listSection(title, items) {
   return '<section class="block"><h3>' + esc(title) + "</h3>" + body + "</section>"
 }
 
-function contractsBlock(contracts) {
-  var body = contracts && contracts.length
-    ? '<ul class="names">' + contracts.map(function (item) {
-      return "<li>" + esc(String(item.year)) + " " + plain(item.name) + "</li>"
+function evidenceDocumentUrl(item) {
+  try {
+    var url = new URL(item.url)
+    return url.protocol === "https:" ? url.href : ""
+  } catch (error) {
+    return ""
+  }
+}
+
+function evidenceCell(row, params) {
+  var references = row.contracts || []
+  var label = esc(row.evidence)
+  if (!references.length && row.evidence === "Reported") return label
+  var direct = references.length === 1 && evidenceDocumentUrl(references[0])
+  if (direct) return '<a class="form-hit" href="' + esc(direct) + '">' + label + "</a>"
+  var linkParams = new URLSearchParams(params)
+  linkParams.set("id", row.id)
+  return '<a class="form-hit" href="' + esc(hashFor("shortages", linkParams)) + '" data-evidence-ref="' +
+    esc(row.id) + '" aria-label="' + esc(row.evidence + " evidence reference") + '">' + label + "</a>"
+}
+
+function contractsBlock(row) {
+  var references = row.contracts || []
+  var body = references.length
+    ? '<ul class="names">' + references.map(function (item) {
+      var label = esc(String(item.year)) + " " + plain(item.name)
+      var url = evidenceDocumentUrl(item)
+      return "<li>" + (url ? '<a href="' + esc(url) + '">' + label + "</a>" : label + " · Document unavailable") + "</li>"
     }).join("") + "</ul>"
-    : '<p class="unknown">Unknown</p>'
-  return '<section class="block"><h3>Contracts</h3>' + body + "</section>"
+    : '<p class="unknown">No supporting document is linked.</p>'
+  return '<section class="block" id="contract-reference" tabindex="-1"><h3>Evidence references</h3>' + body + "</section>"
 }
 
 function figure(label, value, unit, when) {
@@ -375,7 +399,7 @@ function viewShortages(route) {
           form: esc(product.form),
           region: esc(row.region),
           delivery: esc(row.delivery),
-          evidence: esc(row.evidence),
+          evidence: evidenceCell(row, route.params),
           gap: amount(gapOf(row), row.unit)
         }
       }
@@ -396,7 +420,7 @@ function detailPanel(params) {
     listSection("Suppliers", product.directory.suppliers) +
     listSection("Customers", product.directory.customers) +
     listSection("Competitors", product.directory.competitors) +
-    contractsBlock(row.contracts) + "</section>"
+    contractsBlock(row) + "</section>"
 }
 
 function seriesById(id) {
@@ -630,6 +654,14 @@ document.addEventListener("click", function (event) {
   var panel = event.target.closest("[data-panel]")
   if (panel) {
     go(null, { panel: panel.dataset.panel })
+    return
+  }
+  var reference = event.target.closest("[data-evidence-ref]")
+  if (reference && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+    event.preventDefault()
+    go("shortages", { id: reference.dataset.evidenceRef }, { replace: true })
+    var evidence = document.getElementById("contract-reference")
+    if (evidence) evidence.focus()
     return
   }
   var profileHit = event.target.closest("[data-profile]")

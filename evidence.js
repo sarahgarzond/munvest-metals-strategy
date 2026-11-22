@@ -25,16 +25,17 @@ function evVerdict(row, product) {
       '<p class="ev-why">Fill this gap before acting on it.</p></section>'
   }
   var share = row.demand ? Math.round(gap / row.demand * 100) : 0
-  var firm = row.evidence === "Contract" || row.evidence === "Tender"
+  var documentLinked = (row.contracts || []).some(evidenceDocumentUrl)
+  var firm = row.evidence === "Contract" && documentLinked
   var level = gap <= 0 ? "none" : firm ? "act" : "watch"
   var word = level === "act" ? "Act now" : level === "watch" ? "Watch" : "No action"
   var dir = product.directory || {}
   var next = level === "none" ? "Supply covers demand in this window."
     : "Plan " + plain(product.grade) + " capacity for " + plain((dir.customers || []).slice(0, 2).join(" and ") || "the customers below") +
       "; secure feedstock through " + plain((dir.suppliers || [])[0] || "a qualified supplier") + "."
-  var why = firm
-    ? "The demand side is a " + row.evidence.toLowerCase() + (row.contracts && row.contracts[0] ? " (" + esc(row.contracts[0].name + " " + row.contracts[0].year) + ")" : "") + ", not an estimate."
-    : "The demand side is reported, not contracted. Confirm it before committing capacity."
+  var why = documentLinked
+    ? "Review the linked evidence and check the demand quantity before committing capacity."
+    : "The supporting document is unavailable. Confirm demand before committing capacity."
   return '<section class="ev-verdict ev-' + level + '"><p class="ev-kicker">Verdict</p>' +
     '<p class="ev-head"><b>' + word + "</b>: " + evNum(gap) + " " + esc(row.unit) + " gap, " + share + "% of demand, " + esc(row.region) + " " + esc(row.delivery) + "</p>" +
     '<p class="ev-next">' + next + "</p><p class=\"ev-why\">" + why + "</p></section>"
@@ -49,7 +50,7 @@ function evCalculation(row) {
   return '<section class="ev-box"><div class="ev-box-head"><h3>How this number is calculated</h3>' +
     '<button type="button" class="ev-csv" onclick="evDownloadCsv(\'' + esc(row.id) + '\')">Download CSV</button></div><p class="ev-formula">' + esc(formula) + "</p>" +
     '<table class="ev-table"><thead><tr><th>Input</th><th>Value</th><th>Basis</th><th>Source</th></tr></thead><tbody>' +
-    "<tr><td>Demand</td><td>" + esc(evQty(row.demand, row.unit)) + "</td><td>" + evBasis(row.evidence) + "</td><td>" + evSource(row.demandSource || contract) + "</td></tr>" +
+    "<tr><td>Demand</td><td>" + esc(evQty(row.demand, row.unit)) + "</td><td>" + evBasis(row.evidence) + "</td><td>" + evSource(row.demandSource || (contract && contract + " (reference)")) + "</td></tr>" +
     "<tr><td>Supply</td><td>" + esc(evQty(row.supply, row.unit)) + "</td><td>" + (row.supply == null ? evBadge("missing", "No data") : evBadge("reported", "Estimate")) + "</td><td>" + evSource(row.supplySource) + "</td></tr>" +
     "</tbody></table></section>"
 }
@@ -62,7 +63,7 @@ function evCalcRows(row) {
   var base = [plainText(product.grade), product.form || "", row.region, row.delivery]
   return [
     ["Grade", "Form", "Region", "Window", "Input", "Value", "Unit", "Basis", "Source"],
-    base.concat(["Demand", row.demand == null ? "" : row.demand, row.unit, row.evidence || "Not stated", row.demandSource || contract || "Source missing"]),
+    base.concat(["Demand", row.demand == null ? "" : row.demand, row.unit, row.evidence || "Not stated", row.demandSource || (contract && contract + " (reference)") || "Source missing"]),
     base.concat(["Supply", row.supply == null ? "" : row.supply, row.unit, row.supply == null ? "No data" : "Estimate", row.supplySource || "Source missing"]),
     base.concat(["Gap", gap == null ? "" : gap, row.unit, "Calculated: Demand − Supply", gap == null ? "Cannot be calculated" : ""])
   ]
