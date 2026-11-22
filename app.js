@@ -588,21 +588,6 @@ document.addEventListener("click", function (event) {
       syncNav()
     }
     if (action.dataset.action === "scn-reset") go("trends", scnResetUpdates())
-    if (action.dataset.action === "scn-industry") {
-      var industryId = action.dataset.industry
-      var activeIndustry = readRoute().params.get("scn-industry")
-      go("trends", { "scn-industry": activeIndustry === industryId ? null : industryId })
-    }
-    if (action.dataset.action === "scn-path") {
-      var industry = SCN_INDUSTRY_DRIVERS.find(function (item) { return item.id === action.dataset.industry })
-      if (industry) {
-        var assumption = scnIndustryAssumption(readRoute().params, industry)
-        var path = (industry[assumption.direction] || [])[Number(action.dataset.path)]
-        var change = {}
-        change["scn-" + industry.id + "-path"] = path === assumption.path ? null : path
-        go("trends", change)
-      }
-    }
     if (action.dataset.action === "scn-csv") scnCsv(action.dataset.kind)
     if (action.dataset.action === "clear-node") go("supply", { node: null })
     if (action.dataset.action === "zoom") {
@@ -661,16 +646,11 @@ document.addEventListener("click", function (event) {
 document.addEventListener("change", function (event) {
   var el = event.target
   if (el.matches && el.matches("[data-industry-slider]")) {
-    var id = el.dataset.industrySlider
-    var prefix = "scn-" + id + "-"
-    var params = readRoute().params
-    var industry = SCN_INDUSTRY_DRIVERS.find(function (item) { return item.id === id })
-    var previous = scnIndustryAssumption(params, industry)
-    var level = Number(el.value)
-    var sliderUpdates = { "scn-industry": id }
-    sliderUpdates[prefix + "level"] = level || null
+    var prefix = "scn-" + el.dataset.industrySlider + "-"
+    var sliderUpdates = { "scn-industry": null }
+    sliderUpdates[prefix + "level"] = Number(el.value) || null
     sliderUpdates[prefix + "direction"] = null
-    if (Math.sign(level) !== Math.sign(previous.level)) sliderUpdates[prefix + "path"] = null
+    sliderUpdates[prefix + "path"] = null
     go("trends", sliderUpdates)
     return
   }

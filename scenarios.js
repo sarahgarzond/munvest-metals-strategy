@@ -43,16 +43,16 @@ var SCN_REGIONS = {
 }
 
 var SCN_INDUSTRY_DRIVERS = [
-  { id: "ev", name: "EVs and batteries", grow: ["Affordable EV models scale up", "Fleet electrification accelerates", "Local battery plants expand"], fall: ["EV incentives expire", "Battery plants delay expansion", "Buyers switch to hybrids"] },
-  { id: "energy", name: "Energy and power", grow: ["Grid upgrades accelerate", "Renewables win more capacity", "Nuclear projects reach construction"], fall: ["Grid connections are delayed", "Power projects lose funding"] },
-  { id: "elec", name: "Electronics", grow: ["New chip plants open", "Data centre demand rises"], fall: ["Chipmakers delay investment", "Electronics orders weaken"] },
-  { id: "auto", name: "Automotive", grow: ["Vehicle production expands", "Manufacturers bring production home"], fall: ["Vehicle sales slow", "Plants cut output"] },
-  { id: "aero", name: "Aerospace", grow: ["Airlines replace older aircraft", "Aircraft makers increase deliveries"], fall: ["Airlines defer deliveries", "Aircraft makers cut output"] },
-  { id: "med", name: "Medical technology", grow: ["Implant procedures increase", "Hospitals upgrade equipment"], fall: ["Hospitals defer purchases", "Procedure volumes weaken"] },
-  { id: "chem", name: "Chemical processing", grow: ["Plants invest in retrofits", "Demand for specialty chemicals rises"], fall: ["High energy costs force closures", "Chemical orders weaken"] },
-  { id: "og", name: "Oil and gas", grow: ["LNG projects proceed", "Operators increase maintenance"], fall: ["Producers defer projects", "LNG investments slow"] },
-  { id: "steel", name: "Steel and construction", grow: ["Infrastructure projects accelerate", "Construction investment recovers"], fall: ["High borrowing costs delay projects", "Steel orders decline"] },
-  { id: "defence", name: "Defence", grow: ["Procurement budgets rise", "Manufacturers expand capacity"], fall: ["Procurement programmes slip", "Public budgets tighten"] }
+  { id: "ev", name: "EVs and batteries" },
+  { id: "energy", name: "Energy and power" },
+  { id: "elec", name: "Electronics" },
+  { id: "auto", name: "Automotive" },
+  { id: "aero", name: "Aerospace" },
+  { id: "med", name: "Medical technology" },
+  { id: "chem", name: "Chemical processing" },
+  { id: "og", name: "Oil and gas" },
+  { id: "steel", name: "Steel and construction" },
+  { id: "defence", name: "Defence" }
 ]
 
 function scnIndustryAssumption(params, industry) {
@@ -65,11 +65,7 @@ function scnIndustryAssumption(params, industry) {
   if (rawLevel == null || !Number.isInteger(level) || Math.abs(level) > 2) {
     level = legacy === "grow" ? 2 : legacy === "fall" ? -2 : 0
   }
-  var direction = level > 0 ? "grow" : level < 0 ? "fall" : ""
-  var pathways = industry[direction] || []
-  var path = params && params.get(prefix + "path")
-  if (!pathways.includes(path)) path = ""
-  return { region: region, direction: direction, level: level, path: path, shift: level / 2 * SCN_REGIONS[region].factor }
+  return { region: region, level: level, shift: level / 2 * SCN_REGIONS[region].factor }
 }
 
 function scnResetUpdates() {
@@ -102,6 +98,15 @@ var SCN_PRODUCTS = [
   { name: "Welding consumables", w: { og: 2, chem: 2, energy: 2 }, action: "Volume follows energy and LNG projects." },
   { name: "Zirconium", metal: "Zirconium", w: { chem: 2, energy: 2 }, action: "Move sales effort from EU chemicals to nuclear and energy." },
   { name: "Specialty stainless", w: { chem: 2, og: 2, energy: 1 }, action: "LNG, hydrogen and energy projects; no new capacity for European chemical new-build." }
+]
+
+/* Additional outlooks use illustrative end-market weights and appear only in Market scenarios. */
+var SCN_METAL_OUTLOOKS = [
+  { metal: "Chromium", name: "Stainless and corrosion-resistant alloys", w: { steel: 2, chem: 1, energy: 1 } },
+  { metal: "Molybdenum", name: "Alloy and stainless steels", w: { steel: 2, og: 1, chem: 1 } },
+  { metal: "Tantalum", name: "Capacitors and sputtering targets", w: { elec: 2 } },
+  { metal: "Titanium", name: "Aircraft and implant alloys", w: { aero: 2, med: 1 } },
+  { metal: "Tungsten", name: "Carbide tooling and specialty materials", w: { steel: 2, auto: 1, aero: 1 } }
 ]
 
 /* Which sector each project scenario on the Future demand page belongs to. */
@@ -168,7 +173,7 @@ function scnModel(params) {
     result.per = result.per.map(function (score) { return Math.max(-2, Math.min(2, score + 0.6 * shift)) })
     result.index = scnWeighted(result.per, vis)
   })
-  var products = SCN_PRODUCTS.map(function (pr) {
+  var results = SCN_PRODUCTS.concat(SCN_METAL_OUTLOOKS).map(function (pr) {
     var total = 0
     Object.keys(pr.w).forEach(function (k) { total += pr.w[k] })
     var per = SCN_VISIONS.map(function (v, i) {
@@ -181,7 +186,7 @@ function scnModel(params) {
     var index = scnWeighted(per, vis)
     return { name: pr.name, metal: pr.metal, w: pr.w, action: pr.action, per: per, index: index, chance: chance, strategy: scnProductStrategy(index) }
   })
-  return { drivers: dr, visions: vis, industries: ind, products: products }
+  return { drivers: dr, visions: vis, industries: ind, products: results.slice(0, SCN_PRODUCTS.length), metalOutlooks: results }
 }
 
 function scnWeighted(per, vis) {
@@ -236,40 +241,18 @@ function scnLevelLabel(level) {
 }
 
 function scnDriverPanel(params) {
-  var selected = params.get("scn-industry")
-  var industry = SCN_INDUSTRY_DRIVERS.find(function (item) { return item.id === selected })
-  var buttons = SCN_INDUSTRY_DRIVERS.map(function (item) {
+  var sliders = SCN_INDUSTRY_DRIVERS.map(function (item) {
     var state = scnIndustryAssumption(params, item)
-    var expanded = item === industry
-    var prefix = "scn-" + item.id + "-"
-    return '<div class="scn-industry-card"><button type="button" id="scn-industry-' + item.id + '" class="scn-industry" data-action="scn-industry" data-industry="' +
-      item.id + '" aria-expanded="' + expanded + '"><strong>' + esc(item.name) + '</strong><small>' +
-      esc(SCN_REGIONS[state.region].name) + '</small></button>' +
-      '<input type="range" id="' + prefix + 'level" min="-2" max="2" step="1" value="' + state.level + '" data-industry-slider="' + item.id +
-      '" aria-label="' + esc(item.name + " outlook") + '" aria-valuetext="' + scnLevelLabel(state.level) + '">' +
+    var id = "scn-" + item.id + "-level"
+    var region = state.region === "global" ? "" : " · " + SCN_REGIONS[state.region].name
+    return '<div class="scn-industry-card"><label for="' + id + '">' + esc(item.name + region) + '</label>' +
+      '<input type="range" id="' + id + '" min="-2" max="2" step="1" value="' + state.level + '" data-industry-slider="' + item.id +
+      '" aria-valuetext="' + scnLevelLabel(state.level) + '">' +
       '<div class="scn-slide-ends" aria-hidden="true"><span>Decline</span><span>Grow</span></div></div>'
   }).join("")
-  var editor = ""
-  if (industry) {
-    var state = scnIndustryAssumption(params, industry)
-    var prefix = "scn-" + industry.id + "-"
-    var regions = Object.keys(SCN_REGIONS).map(function (id) {
-      return '<option value="' + id + '"' + (state.region === id ? ' selected' : '') + '>' + SCN_REGIONS[id].name + '</option>'
-    }).join("")
-    var pathways = (industry[state.direction] || []).map(function (path, index) {
-      return '<button type="button" id="' + prefix + 'path-' + index + '" data-action="scn-path" data-industry="' +
-        industry.id + '" data-path="' + index + '" aria-pressed="' + (state.path === path) + '">' + esc(path) + '</button>'
-    }).join("")
-    editor = '<div class="scn-industry-editor" aria-label="' + esc(industry.name) + ' filters">' +
-      '<div class="scn-industry-controls"><strong>' + esc(industry.name) + '</strong>' +
-      '<label>Region<select id="' + prefix + 'region" name="' + prefix + 'region" data-control>' + regions + '</select></label>' +
-      '<span>' + scnLevelLabel(state.level) + '</span></div>' +
-      (pathways ? '<div class="scn-pathways"><strong>How could this happen?</strong><div>' + pathways + '</div></div>' : '') +
-      '</div>'
-  }
   return '<section class="scn-panel" aria-labelledby="scn-drivers-heading"><div class="scn-reset"><h2 id="scn-drivers-heading" class="scn-heading">Industry drivers</h2>' +
     '<button type="button" class="ev-csv" data-action="scn-reset">Reset assumptions</button></div>' +
-    '<div class="scn-industries">' + buttons + '</div>' + editor + '</section>'
+    '<div class="scn-industries">' + sliders + '</div></section>'
 }
 
 function scnLikelihoods(model) {
@@ -288,7 +271,7 @@ function scnSquares(per) {
 }
 
 function scnMetalProducts(model) {
-  return model.products.filter(function (product) { return product.metal })
+  return model.metalOutlooks.filter(function (product) { return product.metal })
     .sort(function (a, b) { return a.metal.localeCompare(b.metal) })
 }
 
@@ -301,7 +284,7 @@ function scnMetalCards(model) {
 
 function scnCalcTable(model) {
   return '<details class="ev-box ev-wide scn-calc"><summary>Show calculation</summary>' +
-    '<p class="ev-why">The baseline uses 24 indicators from report sections 3–4. Industry assumptions adjust the weights of scenarios and the industry scores. Regional effects use illustrative weights. Selected pathways record your reasoning. Each metal uses the model’s matching product line. ' +
+    '<p class="ev-why">The baseline uses 24 indicators from report sections 3–4. Industry assumptions adjust the weights of scenarios and the industry scores. Regional effects use illustrative weights. Each metal uses a representative application or product line. End-market weights for the additional metals are illustrative. ' +
     'Its score in each scenario is a weighted average of the end markets for that product line. The overall index (−2 to +2) weights those scores by scenario likelihood. ' +
     'The five squares show the separate scenario scores (blue for growth, orange for decline). These scores describe the modeled market outlook.</p>' +
     '<div class="scn-table-wrap"><table class="ev-table"><thead><tr><th>Metal</th><th>Product line</th>' +
