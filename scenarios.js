@@ -73,30 +73,31 @@ var SCN_NEWS = {
 }
 
 /* Profiles use the same −1 to +1 scale as the rescaled industry controls. */
-var SCN_DEMAND_PATHS = [
-  { id: "public-orders", title: "Public investment wave", factors: [["Governments fund infrastructure", "steel"], ["Long-term public orders", "defence"]], level: 0.85, driver: "a", direction: 1 },
-  { id: "cheap-credit", title: "Broad investment boom", factors: [["Lower borrowing costs", "auto"], ["Factories expand capacity", "elec"]], level: 0.95, driver: "a", direction: 1 },
-  { id: "cheaper-power", title: "Lower-cost industrial growth", factors: [["Cheaper industrial power", "chem"], ["Governments commission reactors", "energy"], ["Higher nuclear demand", "energy"]], level: 0.75, driver: "d", direction: 1 },
-  { id: "tight-credit", title: "Investment slowdown", factors: [["Higher borrowing costs", "auto"], ["Capital projects deferred", "steel"]], level: -0.95, driver: "a", direction: -1 },
-  { id: "energy-shock", title: "Energy-cost squeeze", factors: [["Expensive industrial power", "chem"], ["Tighter project financing", "energy"]], level: -0.85, driver: "c", direction: 1 },
-  { id: "trade-shock", title: "Trade and budget squeeze", factors: [["Disrupted cross-border supply", "elec"], ["Public orders delayed", "defence"]], level: -0.75, driver: "b", direction: 1 },
-  { id: "replacement", title: "Replacement-led demand", factors: [["Equipment replacement continues", "energy"], ["Expansion plans stay on hold", "chem"]], level: 0, driver: "d", direction: -1 },
-  { id: "steady-consumption", title: "Steady consumer demand", factors: [["Household spending holds", "auto"], ["Factory investment remains cautious", "steel"]], level: 0, driver: "a", direction: -1 },
-  { id: "productivity", title: "Productivity offsets costs", factors: [["Technology raises productivity", "elec"], ["Input costs limit expansion", "chem"]], level: 0, driver: "d", direction: 1 }
-]
-
+/* Illustrative 2035 actions by organisations with a role in each market. */
 var SCN_SECTOR_FACTORS = {
-  ev: [["Lower EV prices", "Charging network expands"], ["EV incentives expire", "Battery orders cut"]],
-  energy: [["Governments commission reactors", "Higher nuclear demand"], ["Grid projects lose funding", "Equipment orders deferred"]],
-  elec: [["New chip plants approved", "Higher chip-equipment orders"], ["Chip orders weaken", "New fabs deferred"]],
-  auto: [["Stronger new-car orders", "Vehicle plants raise output"], ["Weaker vehicle sales", "Automakers cut output"]],
-  aero: [["Airlines replace older fleets", "More aircraft deliveries"], ["Airlines defer fleet purchases", "Aircraft output slows"]],
-  med: [["Hospitals expand procurement", "More implant procedures"], ["Hospital budgets tighten", "Device orders postponed"]],
-  chem: [["Lower energy costs", "Chemical plants invest"], ["Higher power costs", "Chemical projects deferred"]],
-  og: [["LNG projects get approval", "Equipment orders rise"], ["LNG financing tightens", "Construction slips"]],
-  steel: [["Public infrastructure awards", "Construction orders rise"], ["Public projects delayed", "Building starts fall"]],
-  defence: [["Governments fund procurement", "More funded orders"], ["Defence budgets tighten", "Procurement is deferred"]]
+  ev: [["Volkswagen expands low-cost EV production", "CATL adds battery-cell lines", "Tesla opens more fast-charging sites"], ["Germany lets EV incentives lapse", "CATL delays new cell lines", "Volkswagen shifts orders toward hybrids"], "Tesla replaces battery-line equipment"],
+  energy: [["France funds EDF’s next reactor builds", "National Grid awards transmission contracts", "UK awards offshore wind contracts"], ["UK delays offshore wind awards", "National Grid reschedules grid upgrades", "France defers EDF reactor funding"], "EDF renovates existing reactors"],
+  elec: [["TSMC equips new fabs", "ASML adds lithography capacity", "Microsoft orders more data-centre equipment"], ["TSMC delays fab fit-outs", "Intel postpones tool orders", "Microsoft phases data-centre projects"], "TSMC replaces tools at existing fabs"],
+  auto: [["Toyota expands hybrid assembly", "Volkswagen retools European plants", "Ford adds commercial-vehicle shifts"], ["Volkswagen cuts assembly shifts", "Ford defers factory retooling", "Toyota delays assembly-line expansion"], "Toyota renews existing model tooling"],
+  aero: [["United orders fleet replacements", "Airbus adds A320 assembly slots", "GE Aerospace adds engine overhaul capacity"], ["Boeing pushes back delivery schedules", "United defers fleet replacements", "Airbus delays another assembly line"], "GE Aerospace overhauls in-service engines"],
+  med: [["NHS England funds joint replacements", "Stryker adds implant production", "Siemens Healthineers equips more hospitals"], ["NHS England phases hospital equipment orders", "Stryker defers a plant expansion", "Siemens Healthineers delays production expansion"], "NHS trusts replace worn imaging equipment"],
+  chem: [["BASF retrofits Ludwigshafen plants", "Dow upgrades chemical process equipment", "INEOS orders corrosion-resistant equipment"], ["BASF retires more Ludwigshafen units", "Dow postpones plant retrofits", "INEOS mothballs older capacity"], "BASF replaces equipment at existing plants"],
+  og: [["QatarEnergy orders LNG train equipment", "Shell commits to additional LNG capacity", "ExxonMobil orders offshore equipment"], ["Shell defers LNG expansion", "QatarEnergy phases new train orders", "ExxonMobil postpones offshore projects"], "Shell orders parts for LNG maintenance"],
+  steel: [["Germany tenders rail and bridge works", "ArcelorMittal adds steelmaking capacity", "Network Rail awards renewal contracts"], ["Germany postpones infrastructure tenders", "ArcelorMittal idles steel capacity", "Network Rail phases bridge renewals"], "Network Rail replaces worn track"],
+  defence: [["Germany places multiyear procurement orders", "France awards equipment framework contracts", "UK brings forward procurement funding"], ["UK defers planned procurement awards", "Germany phases equipment contracts", "France delays new procurement funding"], "UK renews existing equipment contracts"]
 }
+
+var SCN_DEMAND_PATHS = [
+  { id: "public-orders", title: "Public investment wave", factors: [["Germany tenders rail and bridge works", "steel"], ["France awards equipment framework contracts", "defence"]], level: 0.85, driver: "a", direction: 1 },
+  { id: "cheap-credit", title: "Broad investment boom", factors: [["Toyota expands hybrid assembly", "auto"], ["TSMC equips new fabs", "elec"]], level: 0.95, driver: "a", direction: 1 },
+  { id: "cheaper-power", title: "Power and plant investment", factors: [["France funds EDF’s next reactor builds", "energy"], ["National Grid awards transmission contracts", "energy"], ["BASF retrofits Ludwigshafen plants", "chem"]], level: 0.75, driver: "d", direction: 1 },
+  { id: "tight-credit", title: "Investment slowdown", factors: [["Ford defers factory retooling", "auto"], ["Germany postpones infrastructure tenders", "steel"]], level: -0.95, driver: "a", direction: -1 },
+  { id: "energy-shock", title: "Industrial projects put on hold", factors: [["BASF retires more Ludwigshafen units", "chem"], ["UK delays offshore wind awards", "energy"]], level: -0.85, driver: "c", direction: 1 },
+  { id: "trade-shock", title: "Trade and budget squeeze", factors: [["Intel postpones tool orders", "elec"], ["UK defers planned procurement awards", "defence"]], level: -0.75, driver: "b", direction: 1 },
+  { id: "replacement", title: "Replacement-led demand", factors: [["EDF renovates existing reactors", "energy"], ["BASF replaces equipment at existing plants", "chem"]], level: 0, driver: "d", direction: -1 },
+  { id: "steady-consumption", title: "Steady consumer demand", factors: [["Toyota renews existing model tooling", "auto"], ["Network Rail replaces worn track", "steel"]], level: 0, driver: "a", direction: -1 },
+  { id: "productivity", title: "Productivity offsets costs", factors: [["TSMC replaces tools at existing fabs", "elec"], ["Dow automates existing process lines", "chem"]], level: 0, driver: "d", direction: 1 }
+]
 
 /* Industry score = base trend + Σ sensitivity × average driver state, capped at ±2 (report section 6).
    Oil and gas is scored with the same formula (report section 10). */
@@ -457,8 +458,8 @@ function scnDemandScenarios(model) {
     active.slice(0, 5).forEach(function (item) {
       var level = item.shift > 0 ? 0.85 : -0.85
       var factors = SCN_SECTOR_FACTORS[item.id][level > 0 ? 0 : 1]
-      var alternative = (level > 0 ? item.grow : item.fall)[1]
-      var mechanismsByCase = [factors, [alternative, factors[1]]]
+      var alternative = factors[2]
+      var mechanismsByCase = [factors.slice(0, 2), [alternative, factors[1]]]
       mechanismsByCase.forEach(function (mechanisms, index) {
         candidates.push({
           id: item.id + (level > 0 ? "-rise-" : "-fall-") + index,
@@ -475,8 +476,8 @@ function scnDemandScenarios(model) {
       var downFactors = SCN_SECTOR_FACTORS[down.id][1]
       var pairs = [
         [upFactors[0], downFactors[0], 0.55],
-        [up.grow[1], downFactors[0], 0.42],
-        [upFactors[0], down.fall[1], 0.38]
+        [upFactors[2], downFactors[0], 0.42],
+        [upFactors[0], downFactors[2], 0.38]
       ]
       pairs.forEach(function (pair, index) {
         candidates.push({
@@ -515,13 +516,16 @@ function scnDemandScenarios(model) {
 
 function scnScenarioFactors(candidate, settings) {
   var active = settings.filter(function (item) { return Math.abs(item.shift) >= 0.08 })
-  var sectors = active.concat(settings.filter(function (item) {
-    return ["ev", "energy", "chem"].includes(item.id) && !active.includes(item)
-  }).slice(0, Math.max(0, 3 - active.length)))
-  var factors = candidate.factors.concat(sectors.map(function (item) {
+  var preferred = settings.filter(function (item) { return ["ev", "energy", "chem"].includes(item.id) })
+  var sectors = [...new Set(active.concat(preferred, settings))]
+  var factors = candidate.factors.slice()
+  sectors.forEach(function (item) {
     var score = candidate.overrides[item.id] ?? candidate.level
-    return [item.name + (score >= 0.2 ? " · Higher demand" : score <= -0.2 ? " · Lower demand" : " · Steady demand"), item.id]
-  }))
+    var actions = SCN_SECTOR_FACTORS[item.id]
+    var action = score >= 0.2 ? actions[0][0] : score <= -0.2 ? actions[1][0] : actions[2]
+    var represented = factors.some(function (factor) { return factor[1] === item.id })
+    if (!represented && (active.includes(item) || factors.length < 5)) factors.push([action, item.id])
+  })
   return factors.map(function (factor) {
     var input = settings.find(function (item) { return item.id === factor[1] })
     var score = candidate.overrides[input.id] ?? candidate.level
@@ -534,8 +538,8 @@ function scnLikelihoods(model, open) {
   var selected = candidates.find(function (candidate) { return candidate.id === model.selectedCase }) || candidates[0]
   var factors = scnScenarioFactors(selected, model.assumptions)
   var alternatives = candidates.filter(function (candidate) { return candidate !== selected })
-  return '<div class="scn-case-heading"><h3 id="scn-case-title" tabindex="-1">' + esc(selected.title) + '</h3><b title="Illustrative scenario likelihood">' +
-    selected.percent + '%</b></div><p class="scn-case-fit">2035 factors · fit to your sliders</p>' +
+  return '<div class="scn-case-heading"><h3 id="scn-case-title" tabindex="-1">' + esc(selected.title) + '</h3><b title="Illustrative 2035 scenario likelihood">' +
+    selected.percent + '%</b></div>' +
     factors.map(function (factor) {
       return '<div class="scn-lk"><span>' + esc(factor.label) + '</span><span class="scn-lk-track" aria-hidden="true"><span class="scn-lk-bar' +
         (factor.percent >= 85 ? ' top' : '') + '" style="width:' + factor.percent +
