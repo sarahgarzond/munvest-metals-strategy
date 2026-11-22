@@ -89,15 +89,6 @@ a { color: inherit; }
   border-radius: 4px 0 0 4px;
 }
 
-.brand {
-  padding: 8px 12px 28px;
-  font-size: 15px;
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.brand:hover { color: var(--copper); }
-
 .nav { display: flex; flex-direction: column; gap: 18px; padding-top: 8px; }
 
 .nav a {
@@ -148,7 +139,7 @@ main {
   scroll-margin-top: 24px;
 }
 
-h1, .brand, .name {
+h1, .name {
   font-family: Roboto, "Noto Sans", sans-serif;
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -1116,7 +1107,6 @@ dialog th { color: var(--muted); font-size: 12px; font-weight: 500; }
     gap: 4px;
     padding: calc(8px + env(safe-area-inset-top)) 12px 8px calc(12px + env(safe-area-inset-left));
   }
-  .brand { padding: 8px; }
   .nav { flex-direction: row; flex: 1; }
   .nav a[aria-current="page"] { box-shadow: none; }
   main { padding: 20px 16px calc(24px + env(safe-area-inset-bottom)); }
@@ -1197,7 +1187,6 @@ dialog th { color: var(--muted); font-size: 12px; font-weight: 500; }
 
 body.nav-closed { grid-template-columns: 52px minmax(0, 1fr); }
 
-body.nav-closed .brand,
 body.nav-closed .nav { display: none; }
 
 body.nav-closed .sidebar { padding-left: 8px; padding-right: 8px; }

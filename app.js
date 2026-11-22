@@ -176,7 +176,7 @@ function titles(page) {
     supply: "Total supply",
     wire: "Wire",
     plate: "Plate"
-  }[page] || "Atlas"
+  }[page] || "Market scenarios"
 }
 
 function markNav(page) {
@@ -542,7 +542,7 @@ function render(options) {
     var scenario = futureScenario(route.params.get("scenario"))
     if (scenario) title = scenario.name
   }
-  document.title = title + " · Atlas"
+  document.title = title
   syncNav()
   markNav(route.page)
   if (options && options.partial && route.page === "builder" && document.body.dataset.page === "builder") {
