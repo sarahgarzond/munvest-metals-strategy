@@ -413,7 +413,7 @@ function detailPanel(params) {
   var row = visibleObservation(params)
   if (!row) return '<section class="detail"><h2 class="name">None</h2><p class="unknown">Unknown</p></section>'
   var product = productById(row.productId)
-  return '<section class="detail">' + evVerdict(row, product) + '<h2 class="name">' + plain(product.grade) + '</h2><p class="meta-line"><span>' + esc(product.form) + "</span><span>" + esc(row.region) + "</span><span>" + esc(row.delivery) + '</span></p><p class="meta-evidence">' + esc(row.evidence) + '</p><div class="figures">' +
+  return '<section class="detail"><div class="detail-actions"><button type="button" class="reset" data-action="close-shortage">Close details</button></div>' + evVerdict(row, product) + '<h2 class="name">' + plain(product.grade) + '</h2><p class="meta-line"><span>' + esc(product.form) + "</span><span>" + esc(row.region) + "</span><span>" + esc(row.delivery) + '</span></p><p class="meta-evidence">' + esc(row.evidence) + '</p><div class="figures">' +
     figure("Demand", row.demand, row.unit) +
     figure("Supply", row.supply, row.unit) +
     figure("Gap", gapOf(row), row.unit) +
@@ -613,6 +613,12 @@ document.addEventListener("click", function (event) {
   var action = event.target.closest("[data-action]")
   if (action) {
     if (action.dataset.action === "reset") go(null, { industry: null, region: null, metal: null, form: null, evidence: null, id: null })
+    if (action.dataset.action === "close-shortage") {
+      var selectedRow = readRoute().params.get("id")
+      go("shortages", { id: null }, { replace: true })
+      document.getElementById("row-" + selectedRow)?.focus()
+      return
+    }
     if (action.dataset.action === "theme") {
       var night = document.documentElement.dataset.theme !== "night"
       if (night) document.documentElement.dataset.theme = "night"
