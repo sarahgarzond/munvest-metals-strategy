@@ -546,8 +546,7 @@ function summary(route) {
 
 function view(route, openScenarios) {
   if (route.page === "demand") return viewDemand(route)
-  if (route.page === "trends") return viewSimulator(route, openScenarios)
-  if (route.page === "metal-scenarios") return viewMetalScenarios(route)
+  if (route.page === "trends" || route.page === "metal-scenarios") return viewSimulator(route, openScenarios)
   if (route.page === "strategy") return viewStrategy(route)
   if (route.page === "builder") return viewScenarios(route)
   if (route.page === "supply") return viewChain(route)
@@ -584,7 +583,7 @@ function render(options) {
   }
   var focusId = document.activeElement && document.activeElement.id
   document.body.dataset.page = route.page
-  var openScenarios = route.page === "trends" ? scnOpenPathways() : undefined
+  var openScenarios = (route.page === "trends" || route.page === "metal-scenarios") ? scnOpenPathways() : undefined
   document.getElementById("main").innerHTML = view(route, openScenarios)
   loadMarketEvidence(route)
   if (focusId) {
@@ -633,16 +632,20 @@ document.addEventListener("click", function (event) {
       syncNav()
     }
     if (action.dataset.action === "scn-select-case") {
-      go("trends", { "scn-case": action.dataset.case }, { replace: true })
+      go(null, { "scn-case": action.dataset.case }, { replace: true })
       var alternatives = document.querySelector("#scn-likelihoods .scn-alternatives")
       if (alternatives) alternatives.open = false
       document.getElementById("scn-case-label").focus()
     }
-    if (action.dataset.action === "scn-reset") go("trends", scnResetUpdates())
+    if (action.dataset.action === "scn-reset") {
+      var updates = scnResetUpdates()
+      if (readRoute().page === "metal-scenarios") Object.assign(updates, { metal: null, grade: null, country: null, direction: null })
+      go(null, updates)
+    }
     if (action.dataset.action === "scn-toggle-filters") {
       event.preventDefault()
       var opening = readRoute().params.get("scn-filters") !== "1"
-      go("trends", { "scn-filters": opening ? "1" : null }, { replace: true })
+      go(null, { "scn-filters": opening ? "1" : null }, { replace: true })
       document.getElementById("scn-filters-button").focus({ preventScroll: true })
       return
     }
@@ -720,7 +723,7 @@ document.addEventListener("change", function (event) {
     if (Math.sign(Number(el.value)) !== Math.sign(scnIndustryAssumption(readRoute().params, industry).level)) {
       sliderUpdates[prefix + "path"] = null
     }
-    go("trends", sliderUpdates)
+    go(null, sliderUpdates)
     return
   }
   if (el.matches && el.matches("[data-trend]")) {
@@ -731,6 +734,7 @@ document.addEventListener("change", function (event) {
   if (!el.matches || !el.matches("[data-control]")) return
   var update = {}
   update[el.name] = el.value
+  if (el.id === "scn-filter-metal") update.grade = null
   if (el.name === "scn-region" || el.hasAttribute("data-advanced-slider")) update["scn-case"] = null
   go(null, update)
 })
@@ -738,7 +742,8 @@ document.addEventListener("change", function (event) {
 document.addEventListener("input", function (event) {
   var slider = event.target.closest && event.target.closest("[data-industry-slider], [data-advanced-slider]")
   if (slider) {
-    var params = new URLSearchParams(readRoute().params)
+    var route = readRoute()
+    var params = new URLSearchParams(route.params)
     params.delete("scn-case")
     if (slider.hasAttribute("data-advanced-slider")) {
       params.set(slider.name, slider.value)
@@ -747,7 +752,7 @@ document.addEventListener("input", function (event) {
       params.set("scn-" + slider.dataset.industrySlider + "-level", slider.value)
       slider.setAttribute("aria-valuetext", scnLevelLabel(Number(slider.value)))
     }
-    var model = scnModel(params)
+    var model = scnModel(params, route.page === "metal-scenarios")
     document.getElementById("scn-likelihoods").innerHTML = scnLikelihoods(model, scnOpenPathways())
     document.getElementById("scn-metals").innerHTML = scnMetalCards(model)
     return
