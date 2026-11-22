@@ -1690,17 +1690,20 @@ h1.chain-title {
 .scn-path > summary { cursor: pointer; list-style: none; }
 .scn-path > summary::-webkit-details-marker { display: none; }
 .scn-path-content { border-left: 2px solid var(--line); margin: 2px 0 8px; padding: 6px 10px; }
-.scn-path-example { font-size: 13px; }
-.scn-path-example strong { display: block; }
 .scn-path-note { color: var(--muted); font-size: 12px; margin: 4px 0 8px; }
 .scn-path-factors { padding: 0; list-style: none; font-size: 12px; }
 .scn-path-factors li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px; padding: 4px 0; }
-.scn-industry-fit { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
-.scn-industry-fit h3 { font-size: 14px; }
-.scn-industry-fit ul { list-style: none; padding: 0; }
-.scn-industry-fit li { margin: 8px 0; font-size: 13px; }
-.scn-industry-fit small { display: block; color: var(--muted); }
-.scn-industry-outcomes { margin-bottom: 8px; }
+.scn-story-title, .scn-story-event-title { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.scn-story-title h3 { font-size: 17px; }
+.scn-story-fit { font-size: 12px; margin-top: 4px; color: var(--muted); }
+.scn-story-text { margin: 8px 0 12px; font-size: 13px; }
+.scn-story h4 { margin: 0 0 4px; font-size: 13px; }
+.scn-story-events { margin: 0; padding: 0; list-style: none; }
+.scn-story-events li { border-top: 1px solid var(--line); padding: 7px 0; font-size: 12px; }
+.scn-story-events p { margin: 3px 0; }
+.scn-story-event-title span, .scn-story-events small, .scn-story-source { color: var(--muted); }
+.scn-story-events small { display: block; }
+.scn-alternatives > summary { cursor: pointer; color: var(--link); text-decoration: underline; font-size: 12px; margin: 6px 0; }
 .scn-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 124px), 1fr)); gap: 8px; }
 .scn-card { border: 1px solid var(--line); border-radius: 6px; padding: 10px; display: grid; gap: 6px; align-content: start; }
 .scn-card h3 { margin: 0; font-size: 13px; font-weight: 600; }
