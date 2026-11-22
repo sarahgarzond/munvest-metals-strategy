@@ -34,6 +34,48 @@ var SCN_INDUSTRIES = {
   og: { name: "Oil and gas", s: [0.3, 0.3, 0.5, 0, -0.5] }
 }
 
+/* What-if assumptions, applied to the report baseline. Region factors are model inputs. */
+var SCN_REGIONS = {
+  global: { name: "Global", factor: 1 },
+  europe: { name: "Europe", factor: 0.65 },
+  northamerica: { name: "North America", factor: 0.45 },
+  asia: { name: "Asia", factor: 0.55 }
+}
+
+var SCN_INDUSTRY_DRIVERS = [
+  { id: "ev", name: "EVs and batteries", grow: ["Affordable EV models scale up", "Fleet electrification accelerates", "Local battery plants expand"], fall: ["EV incentives expire", "Battery plants delay expansion", "Buyers switch to hybrids"] },
+  { id: "energy", name: "Energy and power", grow: ["Grid upgrades accelerate", "Renewables win more capacity", "Nuclear projects reach construction"], fall: ["Grid connections are delayed", "Power projects lose funding"] },
+  { id: "elec", name: "Electronics", grow: ["New chip plants open", "Data centre demand rises"], fall: ["Chipmakers delay investment", "Electronics orders weaken"] },
+  { id: "auto", name: "Automotive", grow: ["Vehicle production expands", "Manufacturers bring production home"], fall: ["Vehicle sales slow", "Plants cut output"] },
+  { id: "aero", name: "Aerospace", grow: ["Airlines replace older aircraft", "Aircraft makers increase deliveries"], fall: ["Airlines defer deliveries", "Aircraft makers cut output"] },
+  { id: "med", name: "Medical technology", grow: ["Implant procedures increase", "Hospitals upgrade equipment"], fall: ["Hospitals defer purchases", "Procedure volumes weaken"] },
+  { id: "chem", name: "Chemical processing", grow: ["Plants invest in retrofits", "Demand for specialty chemicals rises"], fall: ["High energy costs force closures", "Chemical orders weaken"] },
+  { id: "og", name: "Oil and gas", grow: ["LNG projects proceed", "Operators increase maintenance"], fall: ["Producers defer projects", "LNG investments slow"] },
+  { id: "steel", name: "Steel and construction", grow: ["Infrastructure projects accelerate", "Construction investment recovers"], fall: ["High borrowing costs delay projects", "Steel orders decline"] },
+  { id: "defence", name: "Defence", grow: ["Procurement budgets rise", "Manufacturers expand capacity"], fall: ["Procurement programmes slip", "Public budgets tighten"] }
+]
+
+function scnIndustryAssumption(params, industry) {
+  var prefix = "scn-" + industry.id + "-"
+  var region = params && params.get(prefix + "region")
+  if (!Object.prototype.hasOwnProperty.call(SCN_REGIONS, region)) region = "global"
+  var direction = params && params.get(prefix + "direction")
+  if (direction !== "grow" && direction !== "fall") direction = ""
+  var pathways = industry[direction] || []
+  var path = params && params.get(prefix + "path")
+  if (!pathways.includes(path)) path = ""
+  var sign = direction === "grow" ? 1 : direction === "fall" ? -1 : 0
+  return { region: region, direction: direction, path: path, shift: sign * SCN_REGIONS[region].factor }
+}
+
+function scnResetUpdates() {
+  var updates = { a: null, b: null, c: null, d: null, "scn-industry": null }
+  SCN_INDUSTRY_DRIVERS.forEach(function (industry) {
+    ["region", "direction", "path"].forEach(function (key) { updates["scn-" + industry.id + "-" + key] = null })
+  })
+  return updates
+}
+
 /* The seven sectors of the project brief. */
 var SCN_SECTORS = [
   { id: "aero", name: "Aerospace", key: "aero", note: "defence" },
@@ -104,7 +146,23 @@ function scnModel(params) {
       var score = sens[0] + sens[1] * st[0] + sens[2] * st[1] + sens[3] * st[2] + sens[4] * st[3]
       return Math.max(-2, Math.min(2, score))
     })
-    ind[key] = { per: per, index: scnWeighted(per, vis) }
+    ind[key] = { per: per }
+  })
+  var totalLikelihood = 0
+  SCN_VISIONS.forEach(function (vision, index) {
+    var tilt = SCN_INDUSTRY_DRIVERS.reduce(function (sum, industry) {
+      var shift = scnIndustryAssumption(params, industry).shift
+      return sum + 0.4 * shift * ind[industry.id].per[index]
+    }, 0)
+    vis[vision.id].p *= Math.exp(tilt)
+    totalLikelihood += vis[vision.id].p
+  })
+  SCN_VISIONS.forEach(function (vision) { vis[vision.id].p /= totalLikelihood })
+  SCN_INDUSTRY_DRIVERS.forEach(function (industry) {
+    var shift = scnIndustryAssumption(params, industry).shift
+    var result = ind[industry.id]
+    result.per = result.per.map(function (score) { return Math.max(-2, Math.min(2, score + 0.6 * shift)) })
+    result.index = scnWeighted(result.per, vis)
   })
   var products = SCN_PRODUCTS.map(function (pr) {
     var total = 0
@@ -162,21 +220,48 @@ function scnInk(v) { return Math.abs(v) > 0.65 ? "#fff" : "#24343c" }
 
 function scnKeep(params) {
   var q = new URLSearchParams()
-  SCN_DRIVERS.forEach(function (d) { if (params.get(d.key)) q.set(d.key, params.get(d.key)) })
+  Object.keys(scnResetUpdates()).forEach(function (key) { if (params.get(key)) q.set(key, params.get(key)) })
   var s = q.toString()
   return s ? "?" + s : ""
 }
 
 /* ---------- Market scenarios (simulator) ---------- */
 
-function scnDriverPanel(model) {
-  return '<section class="scn-panel" aria-labelledby="scn-drivers-heading"><div class="scn-reset"><h2 id="scn-drivers-heading" class="scn-heading">Drivers</h2><button type="button" class="ev-csv" data-action="scn-reset">Reset to evidence-based values</button></div>' +
-    '<div class="scn-drivers">' + SCN_DRIVERS.map(function (d) {
-      var v = model.drivers[d.key]
-      return '<label class="scn-driver"><span class="scn-driver-name">' + esc(d.name) + ' <b id="scn-val-' + d.key + '">' + v + "%</b></span>" +
-        '<input type="range" min="10" max="90" step="1" value="' + v + '" data-driver="' + d.key + '" id="scn-' + d.key + '" aria-label="' + esc(d.name) + '">' +
-        '<span class="scn-ends"><span>' + esc(d.low) + "</span><span>" + esc(d.high) + "</span></span></label>"
-    }).join("") + "</div></section>"
+function scnDriverPanel(params) {
+  var selected = params.get("scn-industry")
+  var industry = SCN_INDUSTRY_DRIVERS.find(function (item) { return item.id === selected })
+  var buttons = SCN_INDUSTRY_DRIVERS.map(function (item) {
+    var state = scnIndustryAssumption(params, item)
+    var expanded = item === industry
+    var status = state.direction && SCN_REGIONS[state.region].name + " · " + (state.direction === "grow" ? "Growth" : "Decline")
+    return '<button type="button" id="scn-industry-' + item.id + '" class="scn-industry" data-action="scn-industry" data-industry="' +
+      item.id + '" aria-expanded="' + expanded + '"><strong>' + esc(item.name) + '</strong>' +
+      (status ? '<small>' + esc(status) + '</small>' : '') + '</button>'
+  }).join("")
+  var editor = ""
+  if (industry) {
+    var state = scnIndustryAssumption(params, industry)
+    var prefix = "scn-" + industry.id + "-"
+    var regions = Object.keys(SCN_REGIONS).map(function (id) {
+      return '<option value="' + id + '"' + (state.region === id ? ' selected' : '') + '>' + SCN_REGIONS[id].name + '</option>'
+    }).join("")
+    var directions = [["", "Baseline"], ["grow", "Grows"], ["fall", "Declines"]].map(function (option) {
+      return '<option value="' + option[0] + '"' + (state.direction === option[0] ? ' selected' : '') + '>' + option[1] + '</option>'
+    }).join("")
+    var pathways = (industry[state.direction] || []).map(function (path, index) {
+      return '<button type="button" id="' + prefix + 'path-' + index + '" data-action="scn-path" data-industry="' +
+        industry.id + '" data-path="' + index + '" aria-pressed="' + (state.path === path) + '">' + esc(path) + '</button>'
+    }).join("")
+    editor = '<div class="scn-industry-editor" aria-label="' + esc(industry.name) + ' filters">' +
+      '<div class="scn-industry-controls"><strong>' + esc(industry.name) + '</strong>' +
+      '<label>Region<select id="' + prefix + 'region" name="' + prefix + 'region" data-control>' + regions + '</select></label>' +
+      '<label>Outlook<select id="' + prefix + 'direction" name="' + prefix + 'direction" data-control>' + directions + '</select></label></div>' +
+      (pathways ? '<div class="scn-pathways"><strong>How could this happen?</strong><div>' + pathways + '</div></div>' : '') +
+      '</div>'
+  }
+  return '<section class="scn-panel" aria-labelledby="scn-drivers-heading"><div class="scn-reset"><h2 id="scn-drivers-heading" class="scn-heading">Industry drivers</h2>' +
+    '<button type="button" class="ev-csv" data-action="scn-reset">Reset assumptions</button></div>' +
+    '<div class="scn-industries">' + buttons + '</div>' + editor + '</section>'
 }
 
 function scnLikelihoods(model) {
@@ -208,7 +293,7 @@ function scnMetalCards(model) {
 
 function scnCalcTable(model) {
   return '<details class="ev-box ev-wide scn-calc"><summary>Show calculation</summary>' +
-    '<p class="ev-why">The starting driver settings use 24 indicators from report sections 3–4. Each metal uses the model’s matching product line. ' +
+    '<p class="ev-why">The baseline uses 24 indicators from report sections 3–4. Industry assumptions adjust the weights of scenarios and the industry scores. Regional effects use illustrative weights. Selected pathways record your reasoning. Each metal uses the model’s matching product line. ' +
     'Its score in each scenario is a weighted average of the end markets for that product line. The overall index (−2 to +2) weights those scores by scenario likelihood. ' +
     'The five squares show the separate scenario scores (blue for growth, orange for decline). These scores describe the modeled market outlook.</p>' +
     '<div class="scn-table-wrap"><table class="ev-table"><thead><tr><th>Metal</th><th>Product line</th>' +
@@ -222,27 +307,10 @@ function scnCalcTable(model) {
     '<button type="button" class="ev-csv" data-action="scn-csv" data-kind="metals">Download CSV</button></details>'
 }
 
-function scnPaintTrends(model) {
-  var lk = document.getElementById("scn-likelihoods")
-  var cards = document.getElementById("scn-metals")
-  var calc = document.getElementById("scn-calc")
-  if (!lk || !cards || !calc) return false
-  lk.innerHTML = scnLikelihoods(model)
-  cards.innerHTML = scnMetalCards(model)
-  var open = calc.querySelector("details") && calc.querySelector("details").open
-  calc.innerHTML = scnCalcTable(model)
-  if (open) calc.querySelector("details").open = true
-  SCN_DRIVERS.forEach(function (d) {
-    var label = document.getElementById("scn-val-" + d.key)
-    if (label) label.textContent = model.drivers[d.key] + "%"
-  })
-  return true
-}
-
 function viewSimulator(route) {
   var model = scnModel(route.params)
   return '<div class="scn">' + pageHead("Market scenarios to 2035") +
-    scnDriverPanel(model) +
+    scnDriverPanel(route.params) +
     '<div class="scn-grid"><section class="scn-panel" aria-labelledby="scn-likelihoods-heading"><h2 id="scn-likelihoods-heading" class="scn-heading">Likelihood by scenario</h2><div id="scn-likelihoods" class="scn-body">' + scnLikelihoods(model) + "</div></section>" +
     '<section class="scn-panel" aria-labelledby="scn-metal-heading"><h2 id="scn-metal-heading" class="scn-heading">Market outlook by metal</h2>' +
     '<div id="scn-metals" class="scn-body scn-cards">' + scnMetalCards(model) + "</div></section></div>" +

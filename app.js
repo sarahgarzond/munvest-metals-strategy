@@ -587,7 +587,22 @@ document.addEventListener("click", function (event) {
       try { localStorage.setItem("atlas-nav", closed ? "open" : "closed") } catch (err) { /* storage blocked */ }
       syncNav()
     }
-    if (action.dataset.action === "scn-reset") go(null, { a: null, b: null, c: null, d: null })
+    if (action.dataset.action === "scn-reset") go("trends", scnResetUpdates())
+    if (action.dataset.action === "scn-industry") {
+      var industryId = action.dataset.industry
+      var activeIndustry = readRoute().params.get("scn-industry")
+      go("trends", { "scn-industry": activeIndustry === industryId ? null : industryId })
+    }
+    if (action.dataset.action === "scn-path") {
+      var industry = SCN_INDUSTRY_DRIVERS.find(function (item) { return item.id === action.dataset.industry })
+      if (industry) {
+        var assumption = scnIndustryAssumption(readRoute().params, industry)
+        var path = (industry[assumption.direction] || [])[Number(action.dataset.path)]
+        var change = {}
+        change["scn-" + industry.id + "-path"] = path === assumption.path ? null : path
+        go("trends", change)
+      }
+    }
     if (action.dataset.action === "scn-csv") scnCsv(action.dataset.kind)
     if (action.dataset.action === "clear-node") go("supply", { node: null })
     if (action.dataset.action === "zoom") {
@@ -653,20 +668,11 @@ document.addEventListener("change", function (event) {
   if (!el.matches || !el.matches("[data-control]")) return
   var update = {}
   update[el.name] = el.value
+  if (el.name.startsWith("scn-") && el.name.endsWith("-direction")) update[el.name.replace(/-direction$/, "-path")] = null
   go(null, update)
 })
 
 document.addEventListener("input", function (event) {
-  var driver = event.target.closest && event.target.closest("[data-driver]")
-  if (driver && readRoute().page === "trends") {
-    var params = new URLSearchParams(readRoute().params)
-    params.set(driver.dataset.driver, driver.value)
-    history.replaceState(null, "", hashFor("trends", params))
-    var model = scnModel(params)
-    if (!scnPaintTrends(model)) render()
-    announce(scnSummary(model))
-    return
-  }
   var input = event.target.closest && event.target.closest("[role='combobox']")
   if (!input) return
   var wrap = input.closest(".combo")
