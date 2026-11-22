@@ -49,12 +49,12 @@ var SCN_SECTORS = [
    The links are our mapping and need checking with the company. */
 var SCN_PRODUCTS = [
   { name: "AM powders", w: { aero: 2, med: 2 }, action: "Qualify nickel and cobalt powders for engine parts and implants (small base)." },
-  { name: "Cobalt alloys", w: { aero: 2, med: 2, energy: 1 }, action: "Engine wear parts and implants; secure cobalt through recycling, outside the DRC quota." },
-  { name: "Copper products", w: { elec: 2, energy: 2, ev: 1 }, action: "Grid, power electronics and EV busbars." },
-  { name: "Aluminium products", w: { aero: 2, auto: 2, ev: 1 }, action: "Move from combustion-engine parts to aerospace plate and EV parts." },
-  { name: "Nickel alloys", w: { aero: 2, energy: 2, og: 2, chem: 2 }, action: "New capacity to aerospace and energy grades; cap the share sold to European chemical plants." },
+  { name: "Cobalt alloys", metal: "Cobalt", w: { aero: 2, med: 2, energy: 1 }, action: "Engine wear parts and implants; secure cobalt through recycling, outside the DRC quota." },
+  { name: "Copper products", metal: "Copper", w: { elec: 2, energy: 2, ev: 1 }, action: "Grid, power electronics and EV busbars." },
+  { name: "Aluminium products", metal: "Aluminium", w: { aero: 2, auto: 2, ev: 1 }, action: "Move from combustion-engine parts to aerospace plate and EV parts." },
+  { name: "Nickel alloys", metal: "Nickel", w: { aero: 2, energy: 2, og: 2, chem: 2 }, action: "New capacity to aerospace and energy grades; cap the share sold to European chemical plants." },
   { name: "Welding consumables", w: { og: 2, chem: 2, energy: 2 }, action: "Volume follows energy and LNG projects." },
-  { name: "Zirconium", w: { chem: 2, energy: 2 }, action: "Move sales effort from EU chemicals to nuclear and energy." },
+  { name: "Zirconium", metal: "Zirconium", w: { chem: 2, energy: 2 }, action: "Move sales effort from EU chemicals to nuclear and energy." },
   { name: "Specialty stainless", w: { chem: 2, og: 2, energy: 1 }, action: "LNG, hydrogen and energy projects; no new capacity for European chemical new-build." }
 ]
 
@@ -117,7 +117,7 @@ function scnModel(params) {
     var chance = 0
     SCN_VISIONS.forEach(function (v, i) { if (per[i] > 0) chance += vis[v.id].p })
     var index = scnWeighted(per, vis)
-    return { name: pr.name, w: pr.w, action: pr.action, per: per, index: index, chance: chance, strategy: scnProductStrategy(index) }
+    return { name: pr.name, metal: pr.metal, w: pr.w, action: pr.action, per: per, index: index, chance: chance, strategy: scnProductStrategy(index) }
   })
   return { drivers: dr, visions: vis, industries: ind, products: products }
 }
@@ -170,7 +170,7 @@ function scnKeep(params) {
 /* ---------- Market scenarios (simulator) ---------- */
 
 function scnDriverPanel(model) {
-  return '<section class="scn-panel"><header class="scn-bar"><h2>Drivers</h2><button type="button" class="ev-csv" data-action="scn-reset">Reset to evidence-based values</button></header>' +
+  return '<section class="scn-panel" aria-label="Scenario drivers"><div class="scn-reset"><button type="button" class="ev-csv" data-action="scn-reset">Reset to evidence-based values</button></div>' +
     '<div class="scn-drivers">' + SCN_DRIVERS.map(function (d) {
       var v = model.drivers[d.key]
       return '<label class="scn-driver"><span class="scn-driver-name">' + esc(d.name) + ' <b id="scn-val-' + d.key + '">' + v + "%</b></span>" +
@@ -194,42 +194,41 @@ function scnSquares(per) {
   }).join("") + "</span>"
 }
 
-function scnSectorCards(model) {
-  var ind = model.industries
-  return SCN_SECTORS.map(function (sec) {
-    var x = ind[sec.key]
-    var st = scnSectorStrategy(sec, ind)
-    var note = sec.note === "ev" ? '<span class="scn-note">EV chain ' + scnSigned(ind.ev.index) + "</span>"
-      : sec.note === "defence" ? '<span class="scn-note">Defence ' + scnSigned(ind.defence.index) + "</span>" : ""
-    return '<article class="scn-card"><h3>' + esc(sec.name) + '</h3><p class="scn-ix">' + scnSigned(x.index) + " " + note + "</p>" +
-      scnSquares(x.per) + '<span class="scn-badge scn-' + st.cls + '">' + esc(st.label) + "</span></article>"
+function scnMetalProducts(model) {
+  return model.products.filter(function (product) { return product.metal })
+    .sort(function (a, b) { return a.metal.localeCompare(b.metal) })
+}
+
+function scnMetalCards(model) {
+  return scnMetalProducts(model).map(function (product) {
+    return '<article class="scn-card"><h3>' + esc(product.metal) + '</h3><p class="scn-ix">' + scnSigned(product.index) + "</p>" +
+      scnSquares(product.per) + "</article>"
   }).join("")
 }
 
 function scnCalcTable(model) {
-  var keys = Object.keys(SCN_INDUSTRIES)
   return '<details class="ev-box ev-wide scn-calc"><summary>Show calculation</summary>' +
-    '<p class="ev-why">Driver probability = 50% + average indicator score ÷ 4. Vision likelihood = sum of its driver combinations. ' +
-    "Industry score = base trend + Σ sensitivity × average driver state in that vision, capped at ±2. Index = likelihood-weighted average.</p>" +
-    '<table class="ev-table"><thead><tr><th>Industry</th><th class="num">Base</th><th class="num">A</th><th class="num">B</th><th class="num">C</th><th class="num">D</th>' +
-    SCN_VISIONS.map(function (v) { return '<th class="num">' + esc(v.short) + "</th>" }).join("") + '<th class="num">Index</th></tr></thead><tbody>' +
-    keys.map(function (k) {
-      var s = SCN_INDUSTRIES[k].s, x = model.industries[k]
-      return "<tr><td>" + esc(SCN_INDUSTRIES[k].name) + "</td>" + s.map(function (n) { return '<td class="num">' + scnSigned(n).replace(".00", ".0") + "</td>" }).join("") +
-        x.per.map(function (n) { return '<td class="num">' + scnSigned(n) + "</td>" }).join("") + '<td class="num"><b>' + scnSigned(x.index) + "</b></td></tr>"
-    }).join("") + "</tbody></table>" +
-    '<p class="ev-why">Indicator scores per driver (report section 3): ' + SCN_DRIVERS.map(function (d) { return esc(d.name.split(" · ")[0]) + " " + esc(d.scores) }).join(" · ") +
-    '. Oil and gas inputs are our judgement and not yet in the 5,000-run simulation.</p>' +
-    '<button type="button" class="ev-csv" data-action="scn-csv" data-kind="industries">Download CSV</button></details>'
+    '<p class="ev-why">The starting driver settings use 24 indicators from report sections 3–4. Each metal uses the model’s matching product line. ' +
+    'Its score in each scenario is a weighted average of the end markets for that product line. The overall index (−2 to +2) weights those scores by scenario likelihood. ' +
+    'The five squares show the separate scenario scores (blue for growth, orange for decline). These scores describe the modeled market outlook.</p>' +
+    '<div class="scn-table-wrap"><table class="ev-table"><thead><tr><th>Metal</th><th>Product line</th>' +
+    SCN_VISIONS.map(function (vision) { return '<th class="num">' + esc(vision.short) + "</th>" }).join("") +
+    '<th class="num">Index</th></tr></thead><tbody>' +
+    scnMetalProducts(model).map(function (product) {
+      return "<tr><td>" + esc(product.metal) + "</td><td>" + esc(product.name) + "</td>" +
+        product.per.map(function (score) { return '<td class="num">' + scnSigned(score) + "</td>" }).join("") +
+        '<td class="num"><b>' + scnSigned(product.index) + "</b></td></tr>"
+    }).join("") + "</tbody></table></div>" +
+    '<button type="button" class="ev-csv" data-action="scn-csv" data-kind="metals">Download CSV</button></details>'
 }
 
 function scnPaintTrends(model) {
   var lk = document.getElementById("scn-likelihoods")
-  var cards = document.getElementById("scn-sectors")
+  var cards = document.getElementById("scn-metals")
   var calc = document.getElementById("scn-calc")
   if (!lk || !cards || !calc) return false
   lk.innerHTML = scnLikelihoods(model)
-  cards.innerHTML = scnSectorCards(model)
+  cards.innerHTML = scnMetalCards(model)
   var open = calc.querySelector("details") && calc.querySelector("details").open
   calc.innerHTML = scnCalcTable(model)
   if (open) calc.querySelector("details").open = true
@@ -243,11 +242,10 @@ function scnPaintTrends(model) {
 function viewSimulator(route) {
   var model = scnModel(route.params)
   return '<div class="scn">' + pageHead("Market scenarios to 2035") +
-    '<p class="scn-sub">Move a driver and every number below recalculates. Starting values come from 24 sourced indicators (report sections 3–4).</p>' +
     scnDriverPanel(model) +
-    '<div class="scn-grid"><section class="scn-panel"><header class="scn-bar"><h2>Scenario likelihoods</h2></header><div id="scn-likelihoods" class="scn-body">' + scnLikelihoods(model) + "</div></section>" +
-    '<section class="scn-panel"><header class="scn-bar"><h2>Strategy by sector for the client</h2><span>index −2 to +2 · squares = 5 visions (blue grows, orange falls)</span></header>' +
-    '<div id="scn-sectors" class="scn-body scn-cards">' + scnSectorCards(model) + "</div></section></div>" +
+    '<div class="scn-grid"><section class="scn-panel" aria-label="Scenario likelihoods"><div id="scn-likelihoods" class="scn-body">' + scnLikelihoods(model) + "</div></section>" +
+    '<section class="scn-panel" aria-label="Market outlook by metal">' +
+    '<div id="scn-metals" class="scn-body scn-cards">' + scnMetalCards(model) + "</div></section></div>" +
     '<div id="scn-calc">' + scnCalcTable(model) + "</div>" +
     '<p class="scn-link"><a href="#/strategy' + scnKeep(route.params) + '">See what this means for each product line →</a></p></div>'
 }
@@ -319,10 +317,10 @@ function scnCsv(kind) {
         .concat(p.per.map(function (v) { return v.toFixed(2) })).concat([p.index.toFixed(2), Math.round(p.chance * 100) + "%", p.strategy.label]))
     })
   } else {
-    rows = [["Industry", "Base", "A", "B", "C", "D"].concat(SCN_VISIONS.map(function (v) { return v.short })).concat(["Index"])]
-    Object.keys(SCN_INDUSTRIES).forEach(function (k) {
-      var x = model.industries[k]
-      rows.push([SCN_INDUSTRIES[k].name].concat(SCN_INDUSTRIES[k].s).concat(x.per.map(function (v) { return v.toFixed(2) })).concat([x.index.toFixed(2)]))
+    rows = [["Metal", "Product line"].concat(SCN_VISIONS.map(function (v) { return v.short })).concat(["Index"])]
+    scnMetalProducts(model).forEach(function (product) {
+      rows.push([product.metal, product.name].concat(product.per.map(function (score) { return score.toFixed(2) }))
+        .concat([product.index.toFixed(2)]))
     })
     rows.push([])
     rows.push(["Vision", "Likelihood"])

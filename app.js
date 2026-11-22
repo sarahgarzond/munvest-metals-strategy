@@ -173,7 +173,7 @@ function titles(page) {
     strategy: "Board strategy",
     demand: "Scenarios",
     builder: "Scenario builder",
-    supply: "Total supply",
+    supply: "Metal market",
     wire: "Wire",
     plate: "Plate"
   }[page] || "Market scenarios"

@@ -9,24 +9,22 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Noto+Sans:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=scn4">
+  <link rel="stylesheet" href="styles.css?v=scn5">
 </head>
 <body>
   <a class="skip" href="#main">Skip</a>
   <aside id="site-nav" class="sidebar">
-    <button type="button" id="nav-toggle" class="nav-toggle" data-action="nav" aria-expanded="true" aria-controls="site-nav">
-      <span class="nav-chevron" aria-hidden="true"></span>
-      <span class="visually-hidden">Hide sections</span>
-    </button>
     <nav class="nav" aria-label="Sections">
       <a id="nav-trends" href="#/trends">Market scenarios</a>
       <a id="nav-shortages" href="#/shortages">Current shortages</a>
       <a id="nav-strategy" href="#/strategy">Board strategy</a>
-      <a id="nav-supply" class="nav-dot" href="#/supply" title="Total supply">
-        <span class="visually-hidden">Total supply</span>
-      </a>
     </nav>
+    <button type="button" id="nav-toggle" class="nav-toggle" data-action="nav" aria-expanded="true" aria-controls="site-nav">
+      <span class="nav-chevron" aria-hidden="true"></span>
+      <span class="visually-hidden">Hide sections</span>
+    </button>
   </aside>
+  <a id="nav-supply" class="metal-market" href="#/supply">Metal market</a>
   <main id="main" tabindex="-1"></main>
   <div id="live" class="visually-hidden" aria-live="polite"></div>
   <noscript><p>Enable JavaScript</p></noscript>
@@ -37,7 +35,7 @@
   <script src="trends.js?v=sim20"></script>
   <script src="chains.js?v=sim21"></script>
   <script src="evidence.js?v=scn1"></script>
-  <script src="scenarios.js?v=scn1"></script>
-  <script src="app.js?v=scn4"></script>
+  <script src="scenarios.js?v=scn5"></script>
+  <script src="app.js?v=scn5"></script>
 </body>
 </html>
