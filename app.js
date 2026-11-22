@@ -515,9 +515,9 @@ function summary(route) {
   return titles(route.page)
 }
 
-function view(route) {
+function view(route, openScenarios) {
   if (route.page === "demand") return viewDemand(route)
-  if (route.page === "trends") return viewSimulator(route)
+  if (route.page === "trends") return viewSimulator(route, openScenarios)
   if (route.page === "strategy") return viewStrategy(route)
   if (route.page === "builder") return viewScenarios(route)
   if (route.page === "supply") return viewChain(route)
@@ -554,7 +554,8 @@ function render(options) {
   }
   var focusId = document.activeElement && document.activeElement.id
   document.body.dataset.page = route.page
-  document.getElementById("main").innerHTML = view(route)
+  var openScenarios = route.page === "trends" ? scnOpenPathways() : undefined
+  document.getElementById("main").innerHTML = view(route, openScenarios)
   loadMarketEvidence(route)
   if (focusId) {
     var el = document.getElementById(focusId)
@@ -686,7 +687,7 @@ document.addEventListener("input", function (event) {
       slider.setAttribute("aria-valuetext", scnLevelLabel(Number(slider.value)))
     }
     var model = scnModel(params)
-    document.getElementById("scn-likelihoods").innerHTML = scnLikelihoods(model)
+    document.getElementById("scn-likelihoods").innerHTML = scnLikelihoods(model, scnOpenPathways())
     document.getElementById("scn-metals").innerHTML = scnMetalCards(model)
     return
   }

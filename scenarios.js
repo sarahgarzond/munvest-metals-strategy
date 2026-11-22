@@ -26,6 +26,21 @@ var SCN_VISIONS = [
   { id: "ren", name: "Engineering Renaissance", short: "Renaissance" }
 ]
 
+var SCN_PATHWAYS = {
+  open: { industry: "elec", example: "European buyers could diversify suppliers while imports stay open." },
+  stag: { industry: "chem", example: "Governments could tighten trade rules as chemical producers defer new plants." },
+  super: { industry: "ev", example: "Tesla or another automaker could sign larger battery-material contracts as governments expand charging investment." },
+  fort: { industry: "steel", example: "European governments could favour local procurement while manufacturers build regional supply chains." },
+  ren: { industry: "energy", example: "With materials more available, governments and utilities could accelerate grid upgrades and new technology investment." }
+}
+
+var SCN_PATH_FACTORS = [
+  ["European industry remains weak", "European industry strengthens"],
+  ["Trade with China remains open", "Trade with China tightens"],
+  ["Critical-metal supply eases", "Critical-metal supply stays tight"],
+  ["Technology adoption stays slow", "Technology adoption accelerates"]
+]
+
 /* Industry score = base trend + Σ sensitivity × average driver state, capped at ±2 (report section 6).
    Oil and gas is scored with the same formula (report section 10). */
 var SCN_INDUSTRIES = {
@@ -188,18 +203,38 @@ function scnModel(params) {
   var dr = scnDrivers(params)
   var p = [dr.a / 100, dr.b / 100, dr.c / 100, dr.d / 100]
   var vis = {}
-  SCN_VISIONS.forEach(function (v) { vis[v.id] = { p: 0, st: [0, 0, 0, 0] } })
+  SCN_VISIONS.forEach(function (v) { vis[v.id] = { p: 0, st: [0, 0, 0, 0], paths: [] } })
   for (var m = 0; m < 16; m += 1) {
     var s = [m & 8 ? 1 : 0, m & 4 ? 1 : 0, m & 2 ? 1 : 0, m & 1 ? 1 : 0]
     var prob = 1
     for (var k = 0; k < 4; k += 1) prob *= s[k] ? p[k] : 1 - p[k]
     var v = vis[scnVisionOf(s[0], s[1], s[2], s[3])]
     v.p += prob
+    v.paths.push({ states: s, probability: prob })
     for (var j = 0; j < 4; j += 1) v.st[j] += prob * (s[j] ? 1 : -1)
   }
   SCN_VISIONS.forEach(function (v) {
     var x = vis[v.id]
     x.st = x.st.map(function (t) { return x.p ? t / x.p : 0 })
+    var mostLikely = x.paths.reduce(function (best, path) { return path.probability > best.probability ? path : best })
+    x.factors = mostLikely.states.map(function (state, index) {
+      var probability = (1 + x.st[index]) / 2
+      return { label: SCN_PATH_FACTORS[index][state], probability: state ? probability : 1 - probability }
+    })
+    x.pathShare = mostLikely.probability / x.p
+    var industry = SCN_PATHWAYS[v.id].industry
+    var sensitivity = SCN_INDUSTRIES[industry].s
+    var shift = 0.6 * scnIndustryAssumption(params, { id: industry }).shift
+    var growth = x.paths.reduce(function (sum, path) {
+      var score = path.states.reduce(function (value, state, index) {
+        return value + sensitivity[index + 1] * (state ? 1 : -1)
+      }, sensitivity[0] + shift)
+      return sum + (score > 1e-9 ? path.probability : 0)
+    }, 0) / x.p
+    x.factors.push({
+      label: SCN_INDUSTRIES[industry].name + (growth >= 0.5 ? " grows" : " stalls or declines"),
+      probability: growth >= 0.5 ? growth : 1 - growth
+    })
   })
   var ind = {}
   Object.keys(SCN_INDUSTRIES).forEach(function (key) {
@@ -359,13 +394,28 @@ function scnAdjustmentLabel(value) {
   return ["Much lower", "Lower", "Baseline", "Higher", "Much higher"][value + 2]
 }
 
-function scnLikelihoods(model) {
-  var max = 0
-  SCN_VISIONS.forEach(function (v) { max = Math.max(max, model.visions[v.id].p) })
-  return SCN_VISIONS.map(function (v) {
-    var p = model.visions[v.id].p
-    return '<div class="scn-lk"><span>' + esc(v.name) + '</span><span class="scn-lk-track"><span class="scn-lk-bar' + (p === max ? " top" : "") + '" style="width:' + (p / max * 100).toFixed(1) + '%"></span></span><b>' + scnPct(p) + "</b></div>"
-  }).join("")
+function scnOpenPathways() {
+  var panel = document.getElementById("scn-likelihoods")
+  if (!panel) return undefined
+  return Array.from(panel.querySelectorAll("details[open]")).map(function (details) { return details.dataset.vision })
+}
+
+function scnLikelihoods(model, open) {
+  var ranked = SCN_VISIONS.slice().sort(function (a, b) { return model.visions[b.id].p - model.visions[a.id].p })
+  var top = ranked[0]
+  return '<p class="scn-path-note">Expand a scenario to see its most likely path in the model.</p>' +
+    ranked.map(function (v) {
+      var result = model.visions[v.id]
+      var expanded = open ? open.includes(v.id) : v === top
+      return '<details class="scn-path" data-vision="' + v.id + '"' + (expanded ? ' open' : '') + '>' +
+        '<summary class="scn-lk"><span>' + esc(v.name) + '</span><b>' + scnPct(result.p) + '</b></summary>' +
+        '<div class="scn-path-content"><p class="scn-path-example"><strong>What it could look like</strong> ' +
+        esc(SCN_PATHWAYS[v.id].example) + '</p><p class="scn-path-note">Top driver combination: ' + scnPct(result.pathShare) +
+        ' of this scenario. Factor probabilities are conditional on this scenario.</p><ul class="scn-path-factors">' +
+        result.factors.map(function (factor) {
+          return '<li><span>' + esc(factor.label) + '</span><b>' + scnPct(factor.probability) + '</b></li>'
+        }).join("") + '</ul></div></details>'
+    }).join("")
 }
 
 function scnSquares(per) {
@@ -402,11 +452,11 @@ function scnCalcTable(model) {
     '<button type="button" class="ev-csv" data-action="scn-csv" data-kind="metals">Download CSV</button></details>'
 }
 
-function viewSimulator(route) {
+function viewSimulator(route, openScenarios) {
   var model = scnModel(route.params)
   return '<div class="scn">' + pageHead("Market scenarios to 2035") +
     scnDriverPanel(route.params) +
-    '<div class="scn-grid"><section class="scn-panel" aria-labelledby="scn-likelihoods-heading"><h2 id="scn-likelihoods-heading" class="scn-heading">Likelihood by scenario</h2><div id="scn-likelihoods" class="scn-body">' + scnLikelihoods(model) + "</div></section>" +
+    '<div class="scn-grid"><section class="scn-panel" aria-labelledby="scn-likelihoods-heading"><h2 id="scn-likelihoods-heading" class="scn-heading">Scenario</h2><div id="scn-likelihoods" class="scn-body">' + scnLikelihoods(model, openScenarios) + "</div></section>" +
     '<section class="scn-panel" aria-labelledby="scn-metal-heading"><h2 id="scn-metal-heading" class="scn-heading">Market outlook by metal</h2>' +
     '<div id="scn-metals" class="scn-body scn-cards">' + scnMetalCards(model) + "</div></section></div>" +
     '<div id="scn-calc">' + scnCalcTable(model) + "</div>" + marketEvidencePanel() +

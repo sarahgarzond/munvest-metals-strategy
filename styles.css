@@ -1681,11 +1681,17 @@ h1.chain-title {
 .scn-slide-ends { display: flex; justify-content: space-between; font-size: 11px; }
 .scn-heading { padding: 12px 16px 0; font-size: 16px; font-weight: 600; }
 .scn-grid { display: grid; margin-top: 36px; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 16px; }
-.scn-lk { display: grid; grid-template-columns: 9.5em minmax(0, 1fr) 3em; gap: 8px; align-items: center; padding: 5px 0; font-size: 13px; }
-.scn-lk b { text-align: right; }
-.scn-lk-track { height: 14px; background: rgba(53, 84, 100, 0.08); border-radius: 3px; }
-.scn-lk-bar { display: block; height: 100%; background: #8fa9b8; border-radius: 3px; transition: width .15s; }
-.scn-lk-bar.top { background: var(--slate); }
+.scn-lk { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 9px 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.scn-lk span::before { content: "▸"; margin-right: 6px; }
+.scn-path[open] .scn-lk span::before { content: "▾"; }
+.scn-path { border: 1px solid var(--line); border-radius: 6px; margin-top: 6px; }
+.scn-path[open] .scn-lk { border-bottom: 1px solid var(--line); }
+.scn-path-content { padding: 8px 10px; }
+.scn-path-example { font-size: 13px; }
+.scn-path-example strong { display: block; }
+.scn-path-note { color: var(--muted); font-size: 12px; margin: 4px 0 8px; }
+.scn-path-factors { padding: 0; list-style: none; font-size: 12px; }
+.scn-path-factors li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px; padding: 4px 0; }
 .scn-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 124px), 1fr)); gap: 8px; }
 .scn-card { border: 1px solid var(--line); border-radius: 6px; padding: 10px; display: grid; gap: 6px; align-content: start; }
 .scn-card h3 { margin: 0; font-size: 13px; font-weight: 600; }
