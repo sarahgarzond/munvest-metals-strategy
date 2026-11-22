@@ -1,7 +1,6 @@
 """Monthly data refresh for the Munvest Metal Atlas.
 
-Pulls publisher data and writes data/live.json, which metal-atlas.html
-reads on load (the page keeps its built-in data as a fallback).
+Pulls publisher data and writes data/live.json for the Data sources page.
 
 1. World Bank Commodity Price Data ("Pink Sheet"), monthly workbook: no key.
    Nickel, aluminium and copper in USD per tonne.

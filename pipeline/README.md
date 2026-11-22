@@ -2,7 +2,7 @@
 
 Run `pip install -r pipeline/requirements.txt` and `python pipeline/fetch_data.py`.
 The workflow runs monthly and opens a review pull request with the resulting
-`data/live.json`. Both atlas entry points link to the Data sources page, where
+`data/live.json`. The dashboard links to the Data sources page, where
 observations are searchable by metric, geography, period and scenario.
 
 The automatic sources cover selected series. World Bank supplies monthly nickel,
@@ -11,8 +11,7 @@ index and selected PRODCOM sold-production values. WHO supplies country-level
 medical-device policy responses. ICAO supplies historical traffic through World
 Bank WDI. Comtrade uses the repository's `COMTRADE_KEY` Actions secret for three
 selected trade series. The last successful snapshot is retained when a refresh
-fails. The standalone atlas continues to use the existing World Bank and Comtrade
-fields, and the dashboard's scenario assumptions are edited separately.
+fails. The dashboard's scenario assumptions are edited separately.
 
 ## Publisher exports
 
