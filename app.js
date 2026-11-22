@@ -660,6 +660,20 @@ document.addEventListener("click", function (event) {
 
 document.addEventListener("change", function (event) {
   var el = event.target
+  if (el.matches && el.matches("[data-industry-slider]")) {
+    var id = el.dataset.industrySlider
+    var prefix = "scn-" + id + "-"
+    var params = readRoute().params
+    var industry = SCN_INDUSTRY_DRIVERS.find(function (item) { return item.id === id })
+    var previous = scnIndustryAssumption(params, industry)
+    var level = Number(el.value)
+    var sliderUpdates = { "scn-industry": id }
+    sliderUpdates[prefix + "level"] = level || null
+    sliderUpdates[prefix + "direction"] = null
+    if (Math.sign(level) !== Math.sign(previous.level)) sliderUpdates[prefix + "path"] = null
+    go("trends", sliderUpdates)
+    return
+  }
   if (el.matches && el.matches("[data-trend]")) {
     var same = readRoute().params.get("industry") === el.dataset.trend
     go("trends", { industry: el.dataset.trend, level: el.value, form: same ? readRoute().params.get("form") : null })
@@ -668,11 +682,20 @@ document.addEventListener("change", function (event) {
   if (!el.matches || !el.matches("[data-control]")) return
   var update = {}
   update[el.name] = el.value
-  if (el.name.startsWith("scn-") && el.name.endsWith("-direction")) update[el.name.replace(/-direction$/, "-path")] = null
   go(null, update)
 })
 
 document.addEventListener("input", function (event) {
+  var slider = event.target.closest && event.target.closest("[data-industry-slider]")
+  if (slider) {
+    var params = new URLSearchParams(readRoute().params)
+    params.set("scn-" + slider.dataset.industrySlider + "-level", slider.value)
+    slider.setAttribute("aria-valuetext", scnLevelLabel(Number(slider.value)))
+    var model = scnModel(params)
+    document.getElementById("scn-likelihoods").innerHTML = scnLikelihoods(model)
+    document.getElementById("scn-metals").innerHTML = scnMetalCards(model)
+    return
+  }
   var input = event.target.closest && event.target.closest("[role='combobox']")
   if (!input) return
   var wrap = input.closest(".combo")

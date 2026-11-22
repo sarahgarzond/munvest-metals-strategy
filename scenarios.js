@@ -59,19 +59,23 @@ function scnIndustryAssumption(params, industry) {
   var prefix = "scn-" + industry.id + "-"
   var region = params && params.get(prefix + "region")
   if (!Object.prototype.hasOwnProperty.call(SCN_REGIONS, region)) region = "global"
-  var direction = params && params.get(prefix + "direction")
-  if (direction !== "grow" && direction !== "fall") direction = ""
+  var legacy = params && params.get(prefix + "direction")
+  var rawLevel = params && params.get(prefix + "level")
+  var level = Number(rawLevel)
+  if (rawLevel == null || !Number.isInteger(level) || Math.abs(level) > 2) {
+    level = legacy === "grow" ? 2 : legacy === "fall" ? -2 : 0
+  }
+  var direction = level > 0 ? "grow" : level < 0 ? "fall" : ""
   var pathways = industry[direction] || []
   var path = params && params.get(prefix + "path")
   if (!pathways.includes(path)) path = ""
-  var sign = direction === "grow" ? 1 : direction === "fall" ? -1 : 0
-  return { region: region, direction: direction, path: path, shift: sign * SCN_REGIONS[region].factor }
+  return { region: region, direction: direction, level: level, path: path, shift: level / 2 * SCN_REGIONS[region].factor }
 }
 
 function scnResetUpdates() {
   var updates = { a: null, b: null, c: null, d: null, "scn-industry": null }
   SCN_INDUSTRY_DRIVERS.forEach(function (industry) {
-    ["region", "direction", "path"].forEach(function (key) { updates["scn-" + industry.id + "-" + key] = null })
+    ["region", "direction", "level", "path"].forEach(function (key) { updates["scn-" + industry.id + "-" + key] = null })
   })
   return updates
 }
@@ -227,16 +231,23 @@ function scnKeep(params) {
 
 /* ---------- Market scenarios (simulator) ---------- */
 
+function scnLevelLabel(level) {
+  return ["Strong decline", "Decline", "Baseline", "Growth", "Strong growth"][level + 2]
+}
+
 function scnDriverPanel(params) {
   var selected = params.get("scn-industry")
   var industry = SCN_INDUSTRY_DRIVERS.find(function (item) { return item.id === selected })
   var buttons = SCN_INDUSTRY_DRIVERS.map(function (item) {
     var state = scnIndustryAssumption(params, item)
     var expanded = item === industry
-    var status = state.direction && SCN_REGIONS[state.region].name + " · " + (state.direction === "grow" ? "Growth" : "Decline")
-    return '<button type="button" id="scn-industry-' + item.id + '" class="scn-industry" data-action="scn-industry" data-industry="' +
-      item.id + '" aria-expanded="' + expanded + '"><strong>' + esc(item.name) + '</strong>' +
-      (status ? '<small>' + esc(status) + '</small>' : '') + '</button>'
+    var prefix = "scn-" + item.id + "-"
+    return '<div class="scn-industry-card"><button type="button" id="scn-industry-' + item.id + '" class="scn-industry" data-action="scn-industry" data-industry="' +
+      item.id + '" aria-expanded="' + expanded + '"><strong>' + esc(item.name) + '</strong><small>' +
+      esc(SCN_REGIONS[state.region].name) + '</small></button>' +
+      '<input type="range" id="' + prefix + 'level" min="-2" max="2" step="1" value="' + state.level + '" data-industry-slider="' + item.id +
+      '" aria-label="' + esc(item.name + " outlook") + '" aria-valuetext="' + scnLevelLabel(state.level) + '">' +
+      '<div class="scn-slide-ends" aria-hidden="true"><span>Decline</span><span>Grow</span></div></div>'
   }).join("")
   var editor = ""
   if (industry) {
@@ -245,9 +256,6 @@ function scnDriverPanel(params) {
     var regions = Object.keys(SCN_REGIONS).map(function (id) {
       return '<option value="' + id + '"' + (state.region === id ? ' selected' : '') + '>' + SCN_REGIONS[id].name + '</option>'
     }).join("")
-    var directions = [["", "Baseline"], ["grow", "Grows"], ["fall", "Declines"]].map(function (option) {
-      return '<option value="' + option[0] + '"' + (state.direction === option[0] ? ' selected' : '') + '>' + option[1] + '</option>'
-    }).join("")
     var pathways = (industry[state.direction] || []).map(function (path, index) {
       return '<button type="button" id="' + prefix + 'path-' + index + '" data-action="scn-path" data-industry="' +
         industry.id + '" data-path="' + index + '" aria-pressed="' + (state.path === path) + '">' + esc(path) + '</button>'
@@ -255,7 +263,7 @@ function scnDriverPanel(params) {
     editor = '<div class="scn-industry-editor" aria-label="' + esc(industry.name) + ' filters">' +
       '<div class="scn-industry-controls"><strong>' + esc(industry.name) + '</strong>' +
       '<label>Region<select id="' + prefix + 'region" name="' + prefix + 'region" data-control>' + regions + '</select></label>' +
-      '<label>Outlook<select id="' + prefix + 'direction" name="' + prefix + 'direction" data-control>' + directions + '</select></label></div>' +
+      '<span>' + scnLevelLabel(state.level) + '</span></div>' +
       (pathways ? '<div class="scn-pathways"><strong>How could this happen?</strong><div>' + pathways + '</div></div>' : '') +
       '</div>'
   }

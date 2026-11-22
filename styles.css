@@ -1644,6 +1644,23 @@ h1.chain-title {
   background: var(--ink);
   color: white;
 }
+.scn-industry-card {
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 10px 8px;
+}
+.scn-industry-card .scn-industry { border-color: transparent; margin: 0 -10px; }
+.scn-industry-card .scn-industry:hover { border-color: var(--ink); }
+.scn-industry-card input {
+  width: 100%;
+  min-height: 30px;
+  margin: 0;
+  accent-color: var(--ink);
+}
+.scn-slide-ends { display: flex; justify-content: space-between; font-size: 11px; }
 .scn-industry small { display: block; margin-top: 2px; font-size: 11px; }
 .scn-industry-editor { border-top: 1px solid var(--line); padding: 14px 16px; }
 .scn-industry-controls, .scn-pathways > div {
