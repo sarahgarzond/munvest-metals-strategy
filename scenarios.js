@@ -590,7 +590,7 @@ function scnCalcTable(model) {
 
 function viewSimulator(route, openScenarios) {
   var model = scnModel(route.params)
-  return '<div class="scn">' + pageHead("Market scenarios to 2035") +
+  return '<div class="scn">' + pageHead("Scenario generator 2035") +
     scnDriverPanel(route.params) +
     '<div class="scn-grid"><section class="scn-panel" aria-labelledby="scn-likelihoods-heading"><h2 id="scn-likelihoods-heading" class="scn-heading">Scenario</h2><div id="scn-likelihoods" class="scn-body">' + scnLikelihoods(model, openScenarios) + "</div></section>" +
     '<section class="scn-panel" aria-labelledby="scn-metal-heading"><h2 id="scn-metal-heading" class="scn-heading">Market outlook by metal</h2>' +

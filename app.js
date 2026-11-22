@@ -65,7 +65,7 @@ function readRoute() {
   var params = new URLSearchParams(q === -1 ? "" : raw.slice(q + 1))
   var alias = { scenarios: "builder", reactors: "builder", duplex: "builder" }
   if (alias[path]) path = alias[path]
-  var known = { shortages: 1, trends: 1, strategy: 1, demand: 1, builder: 1, supply: 1, wire: 1, plate: 1 }
+  var known = { shortages: 1, trends: 1, "metal-scenarios": 1, strategy: 1, demand: 1, builder: 1, supply: 1, wire: 1, plate: 1 }
   return { page: known[path] ? path : "shortages", params: params }
 }
 
@@ -169,18 +169,19 @@ function normalize(route) {
 function titles(page) {
   return {
     shortages: "Current shortages",
-    trends: "Market scenarios",
+    trends: "Scenario generator 2035",
+    "metal-scenarios": "Scenario by metal",
     strategy: "Board strategy",
     demand: "Scenarios",
     builder: "Scenario builder",
     supply: "Metal market",
     wire: "Wire",
     plate: "Plate"
-  }[page] || "Market scenarios"
+  }[page] || "Scenario generator 2035"
 }
 
 function markNav(page) {
-  ["shortages", "trends", "strategy", "demand", "builder", "supply"].forEach(function (id) {
+  ["shortages", "trends", "metal-scenarios", "strategy", "demand", "builder", "supply"].forEach(function (id) {
     var link = document.getElementById("nav-" + id)
     if (!link) return
     if (page === id) link.setAttribute("aria-current", "page")
@@ -546,6 +547,7 @@ function summary(route) {
 function view(route, openScenarios) {
   if (route.page === "demand") return viewDemand(route)
   if (route.page === "trends") return viewSimulator(route, openScenarios)
+  if (route.page === "metal-scenarios") return viewMetalScenarios(route)
   if (route.page === "strategy") return viewStrategy(route)
   if (route.page === "builder") return viewScenarios(route)
   if (route.page === "supply") return viewChain(route)
@@ -615,7 +617,7 @@ document.addEventListener("click", function (event) {
       var night = document.documentElement.dataset.theme !== "night"
       if (night) document.documentElement.dataset.theme = "night"
       else delete document.documentElement.dataset.theme
-      action.setAttribute("aria-pressed", String(night))
+      syncThemeToggle(action, night)
       try { localStorage.setItem("munvest-theme", night ? "night" : "day") } catch (err) { /* storage blocked */ }
     }
     if (action.dataset.action === "nav") {
@@ -810,5 +812,11 @@ window.addEventListener("hashchange", function () { render() })
 try {
   if (localStorage.getItem("atlas-nav") === "closed") document.body.classList.add("nav-closed")
 } catch (err) { /* keep the sidebar open when storage is blocked */ }
-document.getElementById("theme-toggle").setAttribute("aria-pressed", String(document.documentElement.dataset.theme === "night"))
+function syncThemeToggle(button, night) {
+  button.setAttribute("aria-pressed", String(night))
+  button.setAttribute("aria-label", night ? "Light mode" : "Night mode")
+  button.title = night ? "Light mode" : "Night mode"
+}
+
+syncThemeToggle(document.getElementById("theme-toggle"), document.documentElement.dataset.theme === "night")
 render()
