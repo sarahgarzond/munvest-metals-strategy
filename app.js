@@ -59,7 +59,7 @@ function unique(list) {
 }
 
 function readRoute() {
-  var raw = (location.hash || "#/shortages").replace(/^#/, "")
+  var raw = (location.hash || "#/trends").replace(/^#/, "")
   var q = raw.indexOf("?")
   var path = (q === -1 ? raw : raw.slice(0, q)).replace(/^\//, "")
   var params = new URLSearchParams(q === -1 ? "" : raw.slice(q + 1))
