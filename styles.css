@@ -1694,6 +1694,12 @@ h1.chain-title {
 .scn-path-note { color: var(--muted); font-size: 12px; margin: 4px 0 8px; }
 .scn-path-factors { padding: 0; list-style: none; font-size: 12px; }
 .scn-path-factors li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px; padding: 4px 0; }
+.scn-industry-fit { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
+.scn-industry-fit h3 { font-size: 14px; }
+.scn-industry-fit ul { list-style: none; padding: 0; }
+.scn-industry-fit li { margin: 8px 0; font-size: 13px; }
+.scn-industry-fit small { display: block; color: var(--muted); }
+.scn-industry-outcomes { margin-bottom: 8px; }
 .scn-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 124px), 1fr)); gap: 8px; }
 .scn-card { border: 1px solid var(--line); border-radius: 6px; padding: 10px; display: grid; gap: 6px; align-content: start; }
 .scn-card h3 { margin: 0; font-size: 13px; font-weight: 600; }

@@ -202,6 +202,11 @@ function scnDrivers(params) {
 function scnModel(params) {
   var dr = scnDrivers(params)
   var p = [dr.a / 100, dr.b / 100, dr.c / 100, dr.d / 100]
+  var assumptions = SCN_INDUSTRY_DRIVERS.map(function (industry) {
+    var input = scnIndustryAssumption(params, industry)
+    return { id: industry.id, name: industry.name, level: input.level, shift: input.shift }
+  })
+  var activeIndustries = assumptions.filter(function (industry) { return industry.level !== 0 })
   var vis = {}
   SCN_VISIONS.forEach(function (v) { vis[v.id] = { p: 0, st: [0, 0, 0, 0], paths: [] } })
   for (var m = 0; m < 16; m += 1) {
@@ -248,18 +253,16 @@ function scnModel(params) {
   })
   var totalLikelihood = 0
   SCN_VISIONS.forEach(function (vision, index) {
-    var tilt = SCN_INDUSTRY_DRIVERS.reduce(function (sum, industry) {
-      var shift = scnIndustryAssumption(params, industry).shift
-      return sum + 0.4 * shift * ind[industry.id].per[index]
+    var tilt = assumptions.reduce(function (sum, industry) {
+      return sum + 0.4 * industry.shift * ind[industry.id].per[index]
     }, 0)
     vis[vision.id].p *= Math.exp(tilt)
     totalLikelihood += vis[vision.id].p
   })
   SCN_VISIONS.forEach(function (vision) { vis[vision.id].p /= totalLikelihood })
-  SCN_INDUSTRY_DRIVERS.forEach(function (industry) {
-    var shift = scnIndustryAssumption(params, industry).shift
+  assumptions.forEach(function (industry) {
     var result = ind[industry.id]
-    result.per = result.per.map(function (score) { return Math.max(-2, Math.min(2, score + 0.6 * shift)) })
+    result.per = result.per.map(function (score) { return Math.max(-2, Math.min(2, score + 0.6 * industry.shift)) })
     result.index = scnWeighted(result.per, vis)
   })
   var results = SCN_PRODUCTS.concat(SCN_METAL_OUTLOOKS).map(function (pr) {
@@ -275,7 +278,7 @@ function scnModel(params) {
     var index = scnWeighted(per, vis)
     return { name: pr.name, metal: pr.metal, w: pr.w, action: pr.action, per: per, index: index, chance: chance, strategy: scnProductStrategy(index) }
   })
-  return { drivers: dr, visions: vis, industries: ind, products: results.slice(0, SCN_PRODUCTS.length), metalOutlooks: results }
+  return { drivers: dr, visions: vis, industries: ind, activeIndustries: activeIndustries, products: results.slice(0, SCN_PRODUCTS.length), metalOutlooks: results }
 }
 
 function scnWeighted(per, vis) {
@@ -400,21 +403,68 @@ function scnOpenPathways() {
   return Array.from(panel.querySelectorAll("details[open]")).map(function (details) { return details.dataset.vision })
 }
 
+function scnIndustryScenarioFit(model, industry) {
+  var scores = model.industries[industry.id].per
+  var highest = industry.level > 0
+  var extreme = (highest ? Math.max : Math.min).apply(null, scores)
+  var matches = SCN_VISIONS.filter(function (vision, index) {
+    return Math.abs(scores[index] - extreme) < 1e-9
+  })
+  return { matches: matches, score: extreme, comparison: highest ? "Strongest" : "Weakest" }
+}
+
+function scnDemandLabel(score) {
+  if (score >= 1) return "Strong growth"
+  if (score >= 0.05) return "Growth"
+  if (score <= -1) return "Strong decline"
+  if (score <= -0.05) return "Decline"
+  return "Broadly stable"
+}
+
+function scnIndustryMetalLinks(model, industry) {
+  return scnMetalProducts(model).filter(function (metal) { return Object.hasOwn(metal.w, industry.id) })
+    .map(function (metal) { return metal.metal }).join(", ")
+}
+
+function scnIndustryFits(model) {
+  if (!model.activeIndustries.length) return ""
+  var fits = model.activeIndustries.map(function (industry) {
+    var fit = scnIndustryScenarioFit(model, industry)
+    var titles = fit.matches.map(function (item) { return item.name }).join(" / ")
+    var links = scnIndustryMetalLinks(model, industry)
+    return '<li><strong>' + esc(industry.name) + '</strong> <span class="scn-path-note">· ' +
+      esc(scnLevelLabel(industry.level)) + ' assumption</span><br>' + fit.comparison + ' outlook: ' + esc(titles) +
+      ' · ' + scnDemandLabel(fit.score) + ' (' + scnSigned(fit.score) + ')' +
+      (links ? '<small>Linked metals: ' + esc(links) + '</small>' : '<small>No direct metal weighting for this industry.</small>') + '</li>'
+  }).join("")
+  return '<section class="scn-industry-fit" aria-label="Industry outlook by scenario"><h3>Industry outlook by scenario</h3>' +
+    '<ul>' + fits + '</ul><p class="scn-path-note">Scores use a −2 to +2 model index. Listed metals share a modeled end-market link.</p></section>'
+}
+
+function scnIndustryOutcomes(model, scenarioIndex) {
+  if (!model.activeIndustries.length) return ""
+  return '<ul class="scn-path-factors scn-industry-outcomes">' + model.activeIndustries.map(function (industry) {
+    var score = model.industries[industry.id].per[scenarioIndex]
+    return '<li><span>' + esc(industry.name) + '</span><b>' + scnDemandLabel(score) + ' ' + scnSigned(score) + '</b></li>'
+  }).join("") + '</ul>'
+}
+
 function scnLikelihoods(model, open) {
   var max = Math.max.apply(null, SCN_VISIONS.map(function (v) { return model.visions[v.id].p }))
-  return SCN_VISIONS.map(function (v) {
+  return SCN_VISIONS.map(function (v, index) {
       var result = model.visions[v.id]
       var expanded = open && open.includes(v.id)
       return '<details class="scn-path" data-vision="' + v.id + '"' + (expanded ? ' open' : '') + '>' +
         '<summary class="scn-lk"><span>' + esc(v.name) + '</span><span class="scn-lk-track" aria-hidden="true"><span class="scn-lk-bar' +
         (result.p === max ? ' top' : '') + '" style="width:' + (result.p / max * 100).toFixed(1) + '%"></span></span><b>' +
         scnPct(result.p) + '</b></summary>' +
-        '<div class="scn-path-content"><p class="scn-path-example"><strong>What it could look like</strong> ' +
-        esc(SCN_PATHWAYS[v.id].example) + '</p><p class="scn-path-note">Top driver combination: ' + scnPct(result.pathShare) +
+        '<div class="scn-path-content">' + (model.activeIndustries.length ? scnIndustryOutcomes(model, index) :
+        '<p class="scn-path-example"><strong>What it could look like</strong> ' + esc(SCN_PATHWAYS[v.id].example) + '</p>') +
+        '<p class="scn-path-note">Top driver combination: ' + scnPct(result.pathShare) +
         ' of this scenario. Factor probabilities are conditional on this scenario.</p><ul class="scn-path-factors">' +
         result.factors.map(function (factor) {
           return '<li><span>' + esc(factor.label) + '</span><b>' + scnPct(factor.probability) + '</b></li>'
-        }).join("") + '</ul></div></details>'
+        }).join("") + scnIndustryFits(model) + '</ul></div></details>'
     }).join("")
 }
 
