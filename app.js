@@ -527,7 +527,7 @@ function summary(route) {
   if (route.page === "builder") return scenarioSummary(simModel(route.params))
   if (route.page === "trends") {
     var best = scnDemandScenarios(scnModel(route.params))[0]
-    return best.text + " " + best.percent + "% modeled likelihood."
+    return best.title + " " + best.percent + "% modeled likelihood."
   }
   if (route.page === "strategy") return scnSummary(scnModel(route.params))
   if (route.page === "demand") {
@@ -624,6 +624,12 @@ document.addEventListener("click", function (event) {
       try { localStorage.setItem("atlas-nav", closed ? "open" : "closed") } catch (err) { /* storage blocked */ }
       syncNav()
     }
+    if (action.dataset.action === "scn-select-case") {
+      go("trends", { "scn-case": action.dataset.case }, { replace: true })
+      var alternatives = document.querySelector("#scn-likelihoods .scn-alternatives")
+      if (alternatives) alternatives.open = false
+      document.getElementById("scn-case-title").focus()
+    }
     if (action.dataset.action === "scn-reset") go("trends", scnResetUpdates())
     if (action.dataset.action === "scn-open-filters" || action.dataset.action === "scn-close-filters") {
       var opening = action.dataset.action === "scn-open-filters" && readRoute().params.get("scn-filters") !== "1"
@@ -697,7 +703,7 @@ document.addEventListener("change", function (event) {
   var el = event.target
   if (el.matches && el.matches("[data-industry-slider]")) {
     var prefix = "scn-" + el.dataset.industrySlider + "-"
-    var sliderUpdates = {}
+    var sliderUpdates = { "scn-case": null }
     sliderUpdates[prefix + "level"] = Number(el.value) || null
     sliderUpdates[prefix + "direction"] = null
     var industry = SCN_INDUSTRY_DRIVERS.find(function (item) { return item.id === el.dataset.industrySlider })
@@ -715,6 +721,7 @@ document.addEventListener("change", function (event) {
   if (!el.matches || !el.matches("[data-control]")) return
   var update = {}
   update[el.name] = el.value
+  if (el.name === "scn-region" || el.hasAttribute("data-advanced-slider")) update["scn-case"] = null
   go(null, update)
 })
 
@@ -722,6 +729,7 @@ document.addEventListener("input", function (event) {
   var slider = event.target.closest && event.target.closest("[data-industry-slider], [data-advanced-slider]")
   if (slider) {
     var params = new URLSearchParams(readRoute().params)
+    params.delete("scn-case")
     if (slider.hasAttribute("data-advanced-slider")) {
       params.set(slider.name, slider.value)
       if (slider.hasAttribute("aria-valuetext")) slider.setAttribute("aria-valuetext", scnAdjustmentLabel(Number(slider.value)))

@@ -1687,6 +1687,12 @@ h1.chain-title {
 .scn-lk-track { height: 14px; background: rgba(53, 84, 100, 0.08); border-radius: 3px; }
 .scn-lk-bar { display: block; height: 100%; background: #8fa9b8; border-radius: 3px; transition: width .15s; }
 .scn-lk-bar.top { background: var(--slate); }
+.scn-case-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.scn-case-heading h3 { font-size: 16px; }
+.scn-case-fit { margin: 4px 0; color: var(--muted); font-size: 12px; }
+.scn-alternatives ul { list-style: none; padding: 0; }
+.scn-alternatives li { margin-top: 5px; }
+.scn-alternatives .ev-csv { text-align: left; }
 .scn-alternatives > summary { cursor: pointer; color: var(--link); text-decoration: underline; font-size: 12px; margin: 6px 0; }
 .scn-scenario-sources { margin: 8px 0; font-size: 13px; }
 .scn-scenario-sources li { margin: 4px 0; }
