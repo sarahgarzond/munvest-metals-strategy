@@ -217,7 +217,7 @@ function marketEvidenceRows(snapshot, catalog, route) {
     if (reporter) rows.push(["comtrade", series.label.replace(/, \d{4}$/, ""),
       snapshot.trade.names[reporter[0]] || reporter[0], series.year, reporter[1], series.unit])
   })
-  catalog.filter(function (provider) { return provider.id !== "world-bank" && provider.id !== "comtrade" }).forEach(function (provider) {
+  catalog.filter(function (provider) { return provider.id !== "world-bank" && provider.id !== "comtrade" && provider.id !== "iea-minerals" }).forEach(function (provider) {
     var id = provider.id
     var latest = (providers[id]?.rows || []).filter(function (row) {
       return !normalizedMetal || row.metric.toLowerCase().replace("aluminium", "aluminum").includes(normalizedMetal)
@@ -236,5 +236,39 @@ function marketEvidenceRows(snapshot, catalog, route) {
         esc(String(row[3])) + "</td><td>" + esc(value + " " + row[5]) +
         '</td><td><a href="data-sources.html?provider=' + encodeURIComponent(row[0]) + '">' + esc(names[row[0]]) + "</a></td></tr>"
     }).join("") + "</tbody></table></div>" : "<p>No matching market observations are loaded for this metal.</p>"
-  return intro + table + '<a href="data-sources.html">Browse all datasets and coverage</a>'
+  return intro + marketIeaBalances(providers['iea-minerals']?.rows || [], normalizedMetal, format) + table + '<a href="data-sources.html">Browse all datasets and coverage</a>'
+}
+
+
+function marketIeaBalances(observations, metalFilter, format) {
+  var scenarios = ["CPS", "STEPS", "HDS"]
+  var rows = ["Cobalt", "Copper", "Nickel"].map(function (metal) {
+    if (metalFilter && metal.toLowerCase() !== metalFilter) return ""
+    var match = observations.filter(function (row) {
+      return row.geography === "World" && row.period === "2035" && row.metric.startsWith(metal + " — ") &&
+        Number.isFinite(row.value)
+    })
+    var supply = match.find(function (row) {
+      return row.metric.endsWith("Expected mine supply") && row.scenario === "Base case"
+    })
+    if (!supply) return ""
+    var demand = scenarios.map(function (scenario) {
+      return match.find(function (row) {
+        return row.metric.endsWith("Primary supply requirements") && row.scenario === scenario &&
+          row.unit === supply.unit && row.source_url === supply.source_url
+      })
+    })
+    if (demand.some(function (row) { return !row })) return ""
+    return "<tr><td>" + esc(metal) + " (" + esc(supply.unit) + ")</td><td>" + format.format(supply.value) +
+      "</td>" + demand.map(function (row) {
+        var gap = row.value - supply.value
+        return "<td>" + (gap > 0 ? "+" : "") + format.format(gap) + "</td>"
+      }).join("") + "</tr>"
+  }).join("")
+  if (!rows) return ""
+  return '<h3>IEA projected mineral gaps in 2035</h3><p>Global primary requirements minus base-case mine supply. Positive values indicate a projected shortfall.</p>' +
+    '<div class="scn-table-wrap"><table class="ev-table"><thead><tr><th>Metal</th><th>Base mine supply</th>' +
+    scenarios.map(function (scenario) { return "<th>" + scenario + " gap</th>" }).join("") +
+    "</tr></thead><tbody>" + rows + '</tbody></table></div>' +
+    '<p><a href="data-sources.html?provider=iea-minerals">IEA outlook and underlying values</a> · Global Critical Minerals Outlook 2026, CC BY 4.0</p>'
 }

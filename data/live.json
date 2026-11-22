@@ -40672,7 +40672,145 @@
    "status": "Awaiting export"
   },
   "iea-minerals": {
-   "status": "Awaiting export"
+   "fetched": "2026-11-22",
+   "rows": [
+    {
+     "metric": "Copper — Expected mine supply",
+     "geography": "World",
+     "period": "2035",
+     "value": 20.7,
+     "unit": "Mt",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/expected-mine-supply-from-existing-and-announced-projects-and-primary-supply-requirements-for-copper-by-scenario-2035",
+     "scenario": "Base case"
+    },
+    {
+     "metric": "Copper — Expected mine supply",
+     "geography": "World",
+     "period": "2035",
+     "value": 24.5,
+     "unit": "Mt",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/expected-mine-supply-from-existing-and-announced-projects-and-primary-supply-requirements-for-copper-by-scenario-2035",
+     "scenario": "High-production case"
+    },
+    {
+     "metric": "Copper — Primary supply requirements",
+     "geography": "World",
+     "period": "2035",
+     "value": 26.1,
+     "unit": "Mt",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/expected-mine-supply-from-existing-and-announced-projects-and-primary-supply-requirements-for-copper-by-scenario-2035",
+     "scenario": "CPS"
+    },
+    {
+     "metric": "Copper — Primary supply requirements",
+     "geography": "World",
+     "period": "2035",
+     "value": 27.3,
+     "unit": "Mt",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/expected-mine-supply-from-existing-and-announced-projects-and-primary-supply-requirements-for-copper-by-scenario-2035",
+     "scenario": "STEPS"
+    },
+    {
+     "metric": "Copper — Primary supply requirements",
+     "geography": "World",
+     "period": "2035",
+     "value": 28.1,
+     "unit": "Mt",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/expected-mine-supply-from-existing-and-announced-projects-and-primary-supply-requirements-for-copper-by-scenario-2035",
+     "scenario": "HDS"
+    },
+    {
+     "metric": "Cobalt — Expected mine supply",
+     "geography": "World",
+     "period": "2035",
+     "value": 225.0,
+     "unit": "kt",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/expected-mine-supply-from-existing-and-announced-projects-and-primary-supply-requirements-for-cobalt-by-scenario-2035",
+     "scenario": "Base case"
+    },
+    {
+     "metric": "Cobalt — Expected mine supply",
+     "geography": "World",
+     "period": "2035",
+     "value": 262.0,
+     "unit": "kt",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/expected-mine-supply-from-existing-and-announced-projects-and-primary-supply-requirements-for-cobalt-by-scenario-2035",
+     "scenario": "High-production case"
+    },
+    {
+     "metric": "Cobalt — Primary supply requirements",
+     "geography": "World",
+     "period": "2035",
+     "value": 277.0,
+     "unit": "kt",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/expected-mine-supply-from-existing-and-announced-projects-and-primary-supply-requirements-for-cobalt-by-scenario-2035",
+     "scenario": "CPS"
+    },
+    {
+     "metric": "Cobalt — Primary supply requirements",
+     "geography": "World",
+     "period": "2035",
+     "value": 306.0,
+     "unit": "kt",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/expected-mine-supply-from-existing-and-announced-projects-and-primary-supply-requirements-for-cobalt-by-scenario-2035",
+     "scenario": "STEPS"
+    },
+    {
+     "metric": "Cobalt — Primary supply requirements",
+     "geography": "World",
+     "period": "2035",
+     "value": 323.0,
+     "unit": "kt",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/expected-mine-supply-from-existing-and-announced-projects-and-primary-supply-requirements-for-cobalt-by-scenario-2035",
+     "scenario": "HDS"
+    },
+    {
+     "metric": "Nickel — Expected mine supply",
+     "geography": "World",
+     "period": "2035",
+     "value": 4.95,
+     "unit": "Mt",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/expected-mine-supply-from-existing-and-announced-projects-and-primary-supply-requirements-for-nickel-by-scenario-2035",
+     "scenario": "Base case"
+    },
+    {
+     "metric": "Nickel — Expected mine supply",
+     "geography": "World",
+     "period": "2035",
+     "value": 5.67,
+     "unit": "Mt",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/expected-mine-supply-from-existing-and-announced-projects-and-primary-supply-requirements-for-nickel-by-scenario-2035",
+     "scenario": "High-production case"
+    },
+    {
+     "metric": "Nickel — Primary supply requirements",
+     "geography": "World",
+     "period": "2035",
+     "value": 5.04,
+     "unit": "Mt",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/expected-mine-supply-from-existing-and-announced-projects-and-primary-supply-requirements-for-nickel-by-scenario-2035",
+     "scenario": "CPS"
+    },
+    {
+     "metric": "Nickel — Primary supply requirements",
+     "geography": "World",
+     "period": "2035",
+     "value": 5.37,
+     "unit": "Mt",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/expected-mine-supply-from-existing-and-announced-projects-and-primary-supply-requirements-for-nickel-by-scenario-2035",
+     "scenario": "STEPS"
+    },
+    {
+     "metric": "Nickel — Primary supply requirements",
+     "geography": "World",
+     "period": "2035",
+     "value": 5.76,
+     "unit": "Mt",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/expected-mine-supply-from-existing-and-announced-projects-and-primary-supply-requirements-for-nickel-by-scenario-2035",
+     "scenario": "HDS"
+    }
+   ],
+   "status": "Updated"
   },
   "oica": {
    "status": "Awaiting export"

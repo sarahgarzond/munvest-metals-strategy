@@ -7,7 +7,7 @@
   {"id":"oecd-stan","name":"OECD STAN","scope":"Industrial output and trade","url":"https://www.oecd.org/en/data/datasets/structural-analysis-database.html","method":"CSV import"},
   {"id":"oecd-icio","name":"OECD ICIO","scope":"Inter-country and inter-industry flows","url":"https://www.oecd.org/en/data/datasets/inter-country-input-output-tables.html","method":"CSV import"},
   {"id":"unido","name":"UNIDO INDSTAT","scope":"Global manufacturing output and industrial structure","url":"https://stat.unido.org/","method":"CSV import"},
-  {"id":"iea-minerals","name":"IEA Critical Minerals Data Explorer","scope":"Critical-mineral supply and demand scenarios","url":"https://www.iea.org/data-and-statistics/data-tools/critical-minerals-data-explorer","method":"CSV import"},
+  {"id":"iea-minerals","name":"IEA Critical Minerals Data Explorer","scope":"2035 mine supply and primary supply requirements for copper, cobalt and nickel","url":"https://www.iea.org/reports/global-critical-minerals-outlook-2026/outlook","method":"Public chart data and CSV import"},
   {"id":"oica","name":"OICA","scope":"Vehicle production","url":"https://www.oica.net/category/production-statistics/","method":"CSV import"},
   {"id":"acea","name":"ACEA","scope":"European automotive production and outlook","url":"https://www.acea.auto/figure/","method":"CSV import"},
   {"id":"icao","name":"ICAO","scope":"Historical passenger traffic and departures via World Bank WDI; fleet outlook via export","url":"https://data.worldbank.org/indicator/IS.AIR.PSGR","method":"Public API and CSV import"},

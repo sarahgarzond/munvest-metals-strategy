@@ -5,6 +5,7 @@ import csv
 import datetime as dt
 import json
 import math
+from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -105,6 +106,53 @@ def fetch_icao():
     return rows
 
 
+def fetch_iea_minerals():
+    outlook = "https://www.iea.org/reports/global-critical-minerals-outlook-2026/outlook"
+    prefix = "expected-mine-supply-from-existing-and-announced-projects-and-primary-supply-requirements-for-"
+    units = {"Copper": "Mt", "Cobalt": "kt", "Nickel": "Mt"}
+    charts = {}
+
+    class ChartParser(HTMLParser):
+        def handle_starttag(self, tag, attributes):
+            attrs = dict(attributes)
+            identifier = attrs.get("data-chart-identifier", "")
+            if identifier.startswith(prefix) and attrs.get("data-chart-csv"):
+                charts[identifier] = attrs
+
+    response = requests.get(outlook, timeout=45)
+    response.raise_for_status()
+    ChartParser().feed(response.text)
+    rows = []
+    for metal, unit in units.items():
+        identifier = prefix + metal.lower() + "-by-scenario-2035"
+        chart = charts[identifier]
+        if chart.get("data-chart-units") != unit:
+            raise ValueError(f"unexpected IEA chart unit for {metal}")
+        csv_rows = list(csv.reader(chart["data-chart-csv"].splitlines(), delimiter=";"))
+        titles = [column.strip() for column in csv_rows[0]]
+        data = {row[0].strip(): dict(zip(titles[1:], map(lambda cell: float(cell.strip()), row[1:])))
+                for row in csv_rows[1:] if row}
+        supply = data["Expected supply"]
+        requirement = data["Primary supply requirements"]
+        base = supply["Base case"]
+        cps = requirement["CPS"]
+        steps = cps + requirement["Additional in STEPS"]
+        hds = steps + requirement["Additional in HDS"]
+        source = "https://www.iea.org/data-and-statistics/charts/" + identifier
+        values = [
+            ("Expected mine supply", "Base case", base),
+            ("Expected mine supply", "High-production case", base + supply["High-production case"]),
+            ("Primary supply requirements", "CPS", cps),
+            ("Primary supply requirements", "STEPS", steps),
+            ("Primary supply requirements", "HDS", hds),
+        ]
+        if any(not math.isfinite(value) or value <= 0 for _, _, value in values):
+            raise ValueError(f"unexpected value in IEA chart for {metal}")
+        rows.extend(observation(f"{metal} — {metric}", "World", "2035", round(value, 3), unit, source, scenario)
+                    for metric, scenario, value in values)
+    return rows
+
+
 def import_csv(path):
     required = ("metric", "geography", "period", "value", "unit", "source_url")
     seen = set()
@@ -150,7 +198,8 @@ def refresh_providers(previous, live, status):
         ]
 
     automatic = {"eurostat": fetch_eurostat, "prodcom": fetch_prodcom, "who": fetch_who,
-                 "world-bank": prices, "comtrade": trade, "icao": fetch_icao}
+                 "world-bank": prices, "comtrade": trade, "icao": fetch_icao,
+                 "iea-minerals": fetch_iea_minerals}
     existing_status = {"world-bank": "World Bank Pink Sheet", "comtrade": "UN Comtrade"}
     result = {}
     for provider in json.loads(CATALOG.read_text()):
