@@ -202,7 +202,7 @@ function scnMetalProducts(model) {
 function scnMetalCards(model) {
   return scnMetalProducts(model).map(function (product) {
     return '<article class="scn-card"><h3>' + esc(product.metal) + '</h3><p class="scn-ix">' + scnSigned(product.index) + "</p>" +
-      scnSquares(product.per) + "</article>"
+      scnSquares(product.per) + '<span class="scn-badge scn-' + product.strategy.cls + '">' + esc(product.strategy.label) + "</span></article>"
   }).join("")
 }
 
