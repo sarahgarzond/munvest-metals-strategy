@@ -381,7 +381,7 @@ function viewShortages(route) {
       }
     })
   })
-  return pageHead("Shortages") + marketBalancePanel() + '<p class="shortage-method">Product-grade gaps are project estimates and depend on the availability of both demand and supply figures.</p>' + filters + '<div class="work' + (profile ? "" : " solo") + '">' + table + (profile ? detailPanel(route.params) : "") + "</div>" + marketEvidencePanel()
+  return pageHead("Shortages") + filters + '<div class="work' + (profile ? "" : " solo") + '">' + table + (profile ? detailPanel(route.params) : "") + "</div>" + marketEvidencePanel()
 }
 
 function detailPanel(params) {

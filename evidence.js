@@ -178,15 +178,9 @@ function marketEvidencePanel() {
     '<div id="market-evidence-content">Loading publisher observations…</div></details>'
 }
 
-function marketBalancePanel() {
-  return '<section class="ev-box ev-wide market-balance" aria-label="IEA projected mineral gaps">' +
-    '<div id="market-balance-content">Loading IEA projections…</div></section>'
-}
-
 function loadMarketEvidence(route) {
   var container = document.getElementById("market-evidence-content")
-  var balances = document.getElementById("market-balance-content")
-  if (!container && !balances) return
+  if (!container) return
   if (!marketSnapshotRequest) {
     marketSnapshotRequest = Promise.all(["data/live.json", "data/providers.json"].map(function (file) {
       return fetch(file).then(function (response) {
@@ -199,15 +193,9 @@ function loadMarketEvidence(route) {
     })
   }
   marketSnapshotRequest.then(function (result) {
-    if (container?.isConnected) container.innerHTML = marketEvidenceRows(result[0], result[1], route)
-    if (balances?.isConnected) {
-      var rows = result[0].providers?.["iea-minerals"]?.rows || []
-      var format = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 })
-      balances.innerHTML = marketIeaBalances(rows, "", format) || "<p>IEA projections are unavailable.</p>"
-    }
+    if (container.isConnected) container.innerHTML = marketEvidenceRows(result[0], result[1], route)
   }).catch(function () {
-    if (container?.isConnected) container.textContent = "Publisher observations are temporarily unavailable."
-    if (balances?.isConnected) balances.textContent = "IEA projections are temporarily unavailable."
+    if (container.isConnected) container.textContent = "Publisher observations are temporarily unavailable."
   })
 }
 
@@ -239,7 +227,7 @@ function marketEvidenceRows(snapshot, catalog, route) {
   var available = catalog.filter(function (provider) { return providers[provider.id]?.rows?.length }).length
   var format = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 })
   var intro = '<p>Publisher coverage: ' + available + ' of ' + catalog.length + ' sources. ' +
-    (route.page === "shortages" ? "These series provide market context. Product-grade gaps need matched demand and available supply." :
+    (route.page === "shortages" ? "Product-grade gaps are project estimates. The publisher observations below provide market context." :
       "These observations provide context for the 2035 assumptions. The scenario scores use the model’s illustrative weights.") + '</p>'
   var table = rows.length ? '<div class="scn-table-wrap"><table class="ev-table"><thead><tr><th>Observation</th><th>Geography</th>' +
     '<th>Period</th><th>Value</th><th>Publisher</th></tr></thead><tbody>' + rows.map(function (row) {

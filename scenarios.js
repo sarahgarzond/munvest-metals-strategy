@@ -401,14 +401,14 @@ function scnOpenPathways() {
 }
 
 function scnLikelihoods(model, open) {
-  var ranked = SCN_VISIONS.slice().sort(function (a, b) { return model.visions[b.id].p - model.visions[a.id].p })
-  var top = ranked[0]
-  return '<p class="scn-path-note">Expand a scenario to see its most likely path in the model.</p>' +
-    ranked.map(function (v) {
+  var max = Math.max.apply(null, SCN_VISIONS.map(function (v) { return model.visions[v.id].p }))
+  return SCN_VISIONS.map(function (v) {
       var result = model.visions[v.id]
-      var expanded = open ? open.includes(v.id) : v === top
+      var expanded = open && open.includes(v.id)
       return '<details class="scn-path" data-vision="' + v.id + '"' + (expanded ? ' open' : '') + '>' +
-        '<summary class="scn-lk"><span>' + esc(v.name) + '</span><b>' + scnPct(result.p) + '</b></summary>' +
+        '<summary class="scn-lk"><span>' + esc(v.name) + '</span><span class="scn-lk-track" aria-hidden="true"><span class="scn-lk-bar' +
+        (result.p === max ? ' top' : '') + '" style="width:' + (result.p / max * 100).toFixed(1) + '%"></span></span><b>' +
+        scnPct(result.p) + '</b></summary>' +
         '<div class="scn-path-content"><p class="scn-path-example"><strong>What it could look like</strong> ' +
         esc(SCN_PATHWAYS[v.id].example) + '</p><p class="scn-path-note">Top driver combination: ' + scnPct(result.pathShare) +
         ' of this scenario. Factor probabilities are conditional on this scenario.</p><ul class="scn-path-factors">' +
