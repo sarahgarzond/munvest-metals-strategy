@@ -2,8 +2,8 @@
 
 Run `pip install -r pipeline/requirements.txt` and `python pipeline/fetch_data.py`.
 The workflow runs monthly and opens a review pull request with the resulting
-`data/live.json`. The dashboard links to the Data sources page, where
-observations are searchable by metric, geography, period and scenario.
+`data/live.json`. The Data sources page (`data-sources.html`) lets you search by metric,
+geography, period and scenario.
 
 The automatic sources cover selected series. World Bank supplies monthly nickel,
 aluminium and copper prices. Eurostat supplies the EU basic-metals production

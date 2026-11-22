@@ -121,6 +121,27 @@ a { color: inherit; }
   background: #111;
 }
 
+.nav a.nav-dot {
+  align-self: flex-start;
+  justify-content: center;
+  width: 44px;
+  padding: 0;
+  margin-left: 1px;
+}
+
+.nav a.nav-dot::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.nav a.nav-dot[aria-current="page"]::before {
+  background: transparent;
+}
+
 main {
   min-width: 0;
   padding: 32px;
