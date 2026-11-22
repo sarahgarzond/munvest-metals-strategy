@@ -40663,7 +40663,1730 @@
    "status": "Awaiting export"
   },
   "oecd-stan": {
-   "status": "Awaiting export"
+   "fetched": "2026-11-22",
+   "rows": [
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2012",
+     "value": 23179.6179,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2011",
+     "value": 23723.9904,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "1995",
+     "value": 16575.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "1994",
+     "value": 17233.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "1993",
+     "value": 17722.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "1992",
+     "value": 20574.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "1991",
+     "value": 19719.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2007",
+     "value": 33120.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2006",
+     "value": 30464.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2005",
+     "value": 28706.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2004",
+     "value": 25859.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2003",
+     "value": 27128.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2002",
+     "value": 26801.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2001",
+     "value": 28589.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2000",
+     "value": 25606.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "1999",
+     "value": 24520.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "1998",
+     "value": 22022.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "1997",
+     "value": 20918.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "1996",
+     "value": 19043.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2007",
+     "value": 48511.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2006",
+     "value": 50618.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2005",
+     "value": 44663.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2004",
+     "value": 39128.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2003",
+     "value": 37506.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2002",
+     "value": 37827.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2001",
+     "value": 42078.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2000",
+     "value": 37603.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "1999",
+     "value": 35868.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "1998",
+     "value": 30849.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "1997",
+     "value": 27846.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "1996",
+     "value": 23954.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "1995",
+     "value": 22735.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "1994",
+     "value": 22120.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "1993",
+     "value": 22784.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2019",
+     "value": 53139.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2018",
+     "value": 48905.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2017",
+     "value": 52416.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2016",
+     "value": 45626.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2015",
+     "value": 43607.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2014",
+     "value": 41972.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2013",
+     "value": 39700.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2012",
+     "value": 38056.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2011",
+     "value": 35897.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2010",
+     "value": 35945.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2009",
+     "value": 33630.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Germany",
+     "period": "2008",
+     "value": 34938.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2010",
+     "value": 23834.9299,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2009",
+     "value": 26118.7711,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2008",
+     "value": 29641.6574,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2007",
+     "value": 28617.0111,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2006",
+     "value": 26656.7264,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2005",
+     "value": 24117.7273,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2004",
+     "value": 24435.9634,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2003",
+     "value": 23116.3089,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2002",
+     "value": 24788.5254,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2001",
+     "value": 24082.5417,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2000",
+     "value": 23714.2111,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "1999",
+     "value": 21762.8727,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "1998",
+     "value": 22179.378,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "1997",
+     "value": 20551.7128,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "1996",
+     "value": 19451.3401,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "1995",
+     "value": 19632.1231,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2019",
+     "value": 30473.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2018",
+     "value": 31369.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2017",
+     "value": 31334.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2016",
+     "value": 29651.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2015",
+     "value": 30588.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2014",
+     "value": 30393.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2013",
+     "value": 30520.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2012",
+     "value": 30956.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2011",
+     "value": 32869.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2010",
+     "value": 32566.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2009",
+     "value": 29393.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2008",
+     "value": 35748.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2007",
+     "value": 38140.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2006",
+     "value": 37856.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2005",
+     "value": 37129.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2004",
+     "value": 36994.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2003",
+     "value": 37658.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2002",
+     "value": 38429.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2001",
+     "value": 38719.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "2000",
+     "value": 38131.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "1999",
+     "value": 37308.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "1998",
+     "value": 37835.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "1997",
+     "value": 36772.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "1996",
+     "value": 33155.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "1995",
+     "value": 32850.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "1994",
+     "value": 30431.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "1993",
+     "value": 29022.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2019",
+     "value": 78549.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2018",
+     "value": 74579.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2017",
+     "value": 74667.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2016",
+     "value": 70997.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2015",
+     "value": 69137.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2014",
+     "value": 67068.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2013",
+     "value": 63870.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2012",
+     "value": 58817.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2011",
+     "value": 52151.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2010",
+     "value": 51624.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2009",
+     "value": 49268.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "2008",
+     "value": 50928.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2019",
+     "value": 97285.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2018",
+     "value": 100368.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2017",
+     "value": 99808.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2016",
+     "value": 96178.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2015",
+     "value": 98352.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2014",
+     "value": 96936.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2013",
+     "value": 95982.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2012",
+     "value": 99227.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2011",
+     "value": 101411.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2010",
+     "value": 90838.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2009",
+     "value": 78682.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2008",
+     "value": 105001.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2007",
+     "value": 106830.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2006",
+     "value": 100437.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2005",
+     "value": 93513.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2004",
+     "value": 93090.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2003",
+     "value": 87140.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2002",
+     "value": 89431.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2001",
+     "value": 88635.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "2000",
+     "value": 86078.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "1999",
+     "value": 80098.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "1998",
+     "value": 83766.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "1997",
+     "value": 80836.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "1996",
+     "value": 76036.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "1995",
+     "value": 79036.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "1994",
+     "value": 69259.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "1993",
+     "value": 68984.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "1992",
+     "value": 76901.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Germany",
+     "period": "1991",
+     "value": 78770.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2019",
+     "value": 58520.523,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2018",
+     "value": 60135.5173,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2017",
+     "value": 57660.1824,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2016",
+     "value": 53135.1,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2015",
+     "value": 52438.4,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2014",
+     "value": 53445.6947,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2013",
+     "value": 53203.2586,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2012",
+     "value": 54140.111,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2011",
+     "value": 59852.7914,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2010",
+     "value": 53237.9974,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2009",
+     "value": 43537.5356,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2008",
+     "value": 64935.2392,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2007",
+     "value": 67049.0728,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2006",
+     "value": 60995.5605,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2005",
+     "value": 55640.9315,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2004",
+     "value": 50976.0563,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2003",
+     "value": 50299.9018,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2002",
+     "value": 47443.389,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2001",
+     "value": 48302.7981,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "2000",
+     "value": 48696.1626,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "1999",
+     "value": 47616.1407,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "1998",
+     "value": 48512.3288,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "1997",
+     "value": 47782.3485,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "1996",
+     "value": 44394.6239,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "1995",
+     "value": 49279.7096,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2019",
+     "value": 28668.1775,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2018",
+     "value": 27696.2138,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2017",
+     "value": 26635.6715,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2016",
+     "value": 24779.2,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2015",
+     "value": 25387.2,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2014",
+     "value": 24695.1127,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "1994",
+     "value": 19581.4937,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "E"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "1993",
+     "value": 19334.196,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "E"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "1992",
+     "value": 18920.4799,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "E"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "France",
+     "period": "1992",
+     "value": 30696.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "E"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "1992",
+     "value": 24007.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "E"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "1991",
+     "value": 24919.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "E"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "France",
+     "period": "1990",
+     "value": 27172.0,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "E"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "1994",
+     "value": 45134.4195,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "E"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "1993",
+     "value": 39340.1456,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "E"
+    },
+    {
+     "metric": "Other transport equipment gross output",
+     "geography": "Italy",
+     "period": "2013",
+     "value": 22663.4701,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "A"
+    },
+    {
+     "metric": "Basic metals gross output",
+     "geography": "Italy",
+     "period": "1992",
+     "value": 39696.1848,
+     "unit": "national currency, 10^6, chain-linked (2015)",
+     "source_url": "https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/A.DEU+FRA+ITA.C24+C30.P1.L.XDC",
+     "scenario": "",
+     "flag": "E"
+    }
+   ],
+   "status": "Updated"
   },
   "oecd-icio": {
    "status": "Awaiting export"
@@ -41842,7 +43565,307 @@
    "status": "Awaiting export"
   },
   "iea-energy": {
-   "status": "Awaiting export"
+   "fetched": "2026-11-22",
+   "rows": [
+    {
+     "metric": "Solar PV capacity additions",
+     "geography": "World",
+     "period": "2015",
+     "value": 56.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Wind capacity additions",
+     "geography": "World",
+     "period": "2015",
+     "value": 66.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Other renewables capacity additions",
+     "geography": "World",
+     "period": "2015",
+     "value": 45.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Solar PV capacity additions",
+     "geography": "World",
+     "period": "2016",
+     "value": 83.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Wind capacity additions",
+     "geography": "World",
+     "period": "2016",
+     "value": 52.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Other renewables capacity additions",
+     "geography": "World",
+     "period": "2016",
+     "value": 43.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Solar PV capacity additions",
+     "geography": "World",
+     "period": "2017",
+     "value": 108.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Wind capacity additions",
+     "geography": "World",
+     "period": "2017",
+     "value": 48.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Other renewables capacity additions",
+     "geography": "World",
+     "period": "2017",
+     "value": 30.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Solar PV capacity additions",
+     "geography": "World",
+     "period": "2018",
+     "value": 108.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Wind capacity additions",
+     "geography": "World",
+     "period": "2018",
+     "value": 50.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Other renewables capacity additions",
+     "geography": "World",
+     "period": "2018",
+     "value": 33.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Solar PV capacity additions",
+     "geography": "World",
+     "period": "2019",
+     "value": 123.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Wind capacity additions",
+     "geography": "World",
+     "period": "2019",
+     "value": 59.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Other renewables capacity additions",
+     "geography": "World",
+     "period": "2019",
+     "value": 28.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Solar PV capacity additions",
+     "geography": "World",
+     "period": "2020",
+     "value": 149.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Wind capacity additions",
+     "geography": "World",
+     "period": "2020",
+     "value": 108.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Other renewables capacity additions",
+     "geography": "World",
+     "period": "2020",
+     "value": 33.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Solar PV capacity additions",
+     "geography": "World",
+     "period": "2021",
+     "value": 166.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Wind capacity additions",
+     "geography": "World",
+     "period": "2021",
+     "value": 93.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Other renewables capacity additions",
+     "geography": "World",
+     "period": "2021",
+     "value": 39.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Solar PV capacity additions",
+     "geography": "World",
+     "period": "2022",
+     "value": 224.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Wind capacity additions",
+     "geography": "World",
+     "period": "2022",
+     "value": 76.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Other renewables capacity additions",
+     "geography": "World",
+     "period": "2022",
+     "value": 38.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Solar PV capacity additions",
+     "geography": "World",
+     "period": "2023",
+     "value": 428.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Wind capacity additions",
+     "geography": "World",
+     "period": "2023",
+     "value": 115.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Other renewables capacity additions",
+     "geography": "World",
+     "period": "2023",
+     "value": 19.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Solar PV capacity additions",
+     "geography": "World",
+     "period": "2024",
+     "value": 542.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Wind capacity additions",
+     "geography": "World",
+     "period": "2024",
+     "value": 114.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Other renewables capacity additions",
+     "geography": "World",
+     "period": "2024",
+     "value": 29.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Solar PV capacity additions",
+     "geography": "World",
+     "period": "2025",
+     "value": 605.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Wind capacity additions",
+     "geography": "World",
+     "period": "2025",
+     "value": 159.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    },
+    {
+     "metric": "Other renewables capacity additions",
+     "geography": "World",
+     "period": "2025",
+     "value": 33.0,
+     "unit": "GW",
+     "source_url": "https://www.iea.org/data-and-statistics/charts/total-renewable-capacity-additions-by-technology-2015-2025",
+     "scenario": ""
+    }
+   ],
+   "status": "Updated"
   },
   "irena": {
    "status": "Awaiting export"

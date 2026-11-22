@@ -106,22 +106,61 @@ def fetch_icao():
     return rows
 
 
-def fetch_iea_minerals():
-    outlook = "https://www.iea.org/reports/global-critical-minerals-outlook-2026/outlook"
-    prefix = "expected-mine-supply-from-existing-and-announced-projects-and-primary-supply-requirements-for-"
-    units = {"Copper": "Mt", "Cobalt": "kt", "Nickel": "Mt"}
+def iea_charts(url):
     charts = {}
 
     class ChartParser(HTMLParser):
         def handle_starttag(self, tag, attributes):
             attrs = dict(attributes)
-            identifier = attrs.get("data-chart-identifier", "")
-            if identifier.startswith(prefix) and attrs.get("data-chart-csv"):
-                charts[identifier] = attrs
+            if attrs.get("data-chart-identifier") and attrs.get("data-chart-csv"):
+                charts[attrs["data-chart-identifier"]] = attrs
 
-    response = requests.get(outlook, timeout=45)
+    response = requests.get(url, timeout=45)
     response.raise_for_status()
     ChartParser().feed(response.text)
+    return charts
+
+
+def fetch_iea_energy():
+    chart_id = "total-renewable-capacity-additions-by-technology-2015-2025"
+    url = "https://www.iea.org/data-and-statistics/charts/" + chart_id
+    chart = iea_charts(url)[chart_id]
+    if chart.get("data-chart-units") != "GW":
+        raise ValueError("unexpected IEA renewable capacity unit")
+    chart_rows = csv.reader(chart["data-chart-csv"].splitlines(), delimiter=";")
+    columns = next(chart_rows)[1:]
+    rows = []
+    for row in chart_rows:
+        if len(row) != len(columns) + 1 or not row[0].isdigit():
+            raise ValueError("unexpected IEA renewable capacity row")
+        rows.extend(observation(f"{technology.strip()} capacity additions", "World", row[0], float(value), "GW", url)
+                    for technology, value in zip(columns, row[1:]))
+    return rows
+
+
+def fetch_oecd_stan():
+    url = ("https://sdmx.oecd.org/public/rest/v1/data/OECD.STI.PIE,DSD_STAN@DF_STAN,1.0/"
+           "A.DEU+FRA+ITA.C24+C30.P1.L.XDC")
+    response = requests.get(url, headers={"Accept": "text/csv"}, timeout=45)
+    response.raise_for_status()
+    industries = {"C24": "Basic metals", "C30": "Other transport equipment"}
+    countries = {"DEU": "Germany", "FRA": "France", "ITA": "Italy"}
+    rows = []
+    for item in csv.DictReader(response.text.splitlines()):
+        if item["MEASURE"] != "P1" or item["PRICE_BASE"] != "L" or item["UNIT_MEASURE"] != "XDC":
+            raise ValueError("unexpected OECD STAN series")
+        unit = f"national currency, 10^{item['UNIT_MULT']}, chain-linked ({item['BASE_PER']})"
+        rows.append({**observation(industries[item["ACTIVITY"]] + " gross output", countries[item["REF_AREA"]],
+                                   item["TIME_PERIOD"], float(item["OBS_VALUE"]), unit, url),
+                     "flag": item["OBS_STATUS"]})
+    return rows
+
+
+def fetch_iea_minerals():
+    outlook = "https://www.iea.org/reports/global-critical-minerals-outlook-2026/outlook"
+    prefix = "expected-mine-supply-from-existing-and-announced-projects-and-primary-supply-requirements-for-"
+    units = {"Copper": "Mt", "Cobalt": "kt", "Nickel": "Mt"}
+    charts = iea_charts(outlook)
     rows = []
     for metal, unit in units.items():
         identifier = prefix + metal.lower() + "-by-scenario-2035"
@@ -199,7 +238,8 @@ def refresh_providers(previous, live, status):
 
     automatic = {"eurostat": fetch_eurostat, "prodcom": fetch_prodcom, "who": fetch_who,
                  "world-bank": prices, "comtrade": trade, "icao": fetch_icao,
-                 "iea-minerals": fetch_iea_minerals}
+                 "iea-minerals": fetch_iea_minerals, "iea-energy": fetch_iea_energy,
+                 "oecd-stan": fetch_oecd_stan}
     existing_status = {"world-bank": "World Bank Pink Sheet", "comtrade": "UN Comtrade"}
     result = {}
     for provider in json.loads(CATALOG.read_text()):
