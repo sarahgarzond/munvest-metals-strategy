@@ -1749,3 +1749,96 @@ h1.chain-title {
 .market-evidence { margin-top: 18px; }
 .market-evidence p { margin: 8px 0; }
 .market-evidence .scn-table-wrap { margin-bottom: 10px; }
+
+.theme-toggle {
+  position: fixed;
+  z-index: 5;
+  right: calc(166px + env(safe-area-inset-right));
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+.theme-toggle:hover { border-color: var(--ink); }
+
+:root[data-theme="night"] {
+  color-scheme: dark;
+  --canvas: #101d25;
+  --surface: #182933;
+  --ink: #e2ebef;
+  --muted: #a6bbc5;
+  --line: #405661;
+  --olive: #36535a;
+  --slate: #366172;
+  --copper: #efad83;
+  --link: #83d3dc;
+  --focus: #83d3dc;
+}
+
+[data-theme="night"] body {
+  background: radial-gradient(ellipse at 95% 0%, #24404a 0%, transparent 46%),
+    linear-gradient(145deg, #172832, var(--canvas) 58%, #15242e);
+}
+
+[data-theme="night"] .sidebar {
+  background: linear-gradient(165deg, #172b35, #0b151e 70%);
+  border-right: 1px solid var(--line);
+}
+
+[data-theme="night"] .scn-panel,
+[data-theme="night"] .ledger-wrap,
+[data-theme="night"] .chain-card {
+  background: linear-gradient(155deg, #21343e, #15242e 66%);
+  border-color: var(--line);
+}
+
+[data-theme="night"] .scn-card,
+[data-theme="night"] .scn-industry-card {
+  background: linear-gradient(155deg, #243a46, #192a34);
+}
+
+[data-theme="night"] .nav a:hover,
+[data-theme="night"] .nav a[aria-current="page"],
+[data-theme="night"] .metal-market:hover,
+[data-theme="night"] .metal-market[aria-current="page"],
+[data-theme="night"] .theme-toggle[aria-pressed="true"] {
+  background: #2f5260;
+  color: var(--ink);
+}
+
+[data-theme="night"] .nav-toggle:hover { border-color: var(--link); color: var(--link); }
+[data-theme="night"] .reset:hover { background: var(--slate); }
+[data-theme="night"] .detail { border-color: var(--slate); }
+[data-theme="night"] .form-hit,
+[data-theme="night"] .ev-calc { color: var(--link); }
+[data-theme="night"] .scn-lk-track { background: #304650; }
+[data-theme="night"] .scn-lk-bar { background: #788f9f; }
+[data-theme="night"] .scn-lk-bar.top { background: #77cbd0; }
+[data-theme="night"] .scn-grow-ink { color: #94cafa; }
+[data-theme="night"] .scn-shift-ink { color: var(--copper); }
+[data-theme="night"] .scn-industry-card input[type="range"] { accent-color: #83d3dc; }
+[data-theme="night"] .chain-map { border-color: var(--line); }
+[data-theme="night"] #chain-land > path:first-child { fill: #385461; }
+[data-theme="night"] .chain-flow-svg > rect { fill: #20353f; }
+[data-theme="night"] .chain-flow-svg > rect:nth-of-type(even) { fill: #263f49; }
+[data-theme="night"] .chain-stage { fill: var(--muted); }
+
+@media (min-width: 861px) and (min-height: 510px) {
+  [data-theme="night"] body:not(.nav-closed) .sidebar::before {
+    content: "";
+    position: absolute;
+    inset: auto 2px 72px;
+    aspect-ratio: 1;
+    background: url("assets/metal-world.webp") center / contain no-repeat;
+    pointer-events: none;
+  }
+}
+
+@media (max-width: 360px) {
+  .theme-toggle { right: calc(151px + env(safe-area-inset-right)); padding-inline: 9px; }
+  .metal-market { right: calc(12px + env(safe-area-inset-right)); }
+}

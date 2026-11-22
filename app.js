@@ -607,6 +607,13 @@ document.addEventListener("click", function (event) {
   var action = event.target.closest("[data-action]")
   if (action) {
     if (action.dataset.action === "reset") go(null, { industry: null, region: null, metal: null, form: null, evidence: null, id: null })
+    if (action.dataset.action === "theme") {
+      var night = document.documentElement.dataset.theme !== "night"
+      if (night) document.documentElement.dataset.theme = "night"
+      else delete document.documentElement.dataset.theme
+      action.setAttribute("aria-pressed", String(night))
+      try { localStorage.setItem("munvest-theme", night ? "night" : "day") } catch (err) { /* storage blocked */ }
+    }
     if (action.dataset.action === "nav") {
       var closed = document.body.classList.contains("nav-closed")
       document.body.classList.toggle("nav-closed", !closed)
@@ -791,4 +798,5 @@ window.addEventListener("hashchange", function () { render() })
 try {
   if (localStorage.getItem("atlas-nav") === "closed") document.body.classList.add("nav-closed")
 } catch (err) { /* keep the sidebar open when storage is blocked */ }
+document.getElementById("theme-toggle").setAttribute("aria-pressed", String(document.documentElement.dataset.theme === "night"))
 render()
