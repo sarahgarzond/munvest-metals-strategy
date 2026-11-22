@@ -636,7 +636,7 @@ document.addEventListener("click", function (event) {
       go("trends", { "scn-case": action.dataset.case }, { replace: true })
       var alternatives = document.querySelector("#scn-likelihoods .scn-alternatives")
       if (alternatives) alternatives.open = false
-      document.getElementById("scn-case-title").focus()
+      document.getElementById("scn-case-label").focus()
     }
     if (action.dataset.action === "scn-reset") go("trends", scnResetUpdates())
     if (action.dataset.action === "scn-open-filters" || action.dataset.action === "scn-close-filters") {

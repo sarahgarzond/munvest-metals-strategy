@@ -515,21 +515,15 @@ function scnDemandScenarios(model) {
 }
 
 function scnScenarioFactors(candidate, settings) {
-  var active = settings.filter(function (item) { return Math.abs(item.shift) >= 0.08 })
-  var preferred = settings.filter(function (item) { return ["ev", "energy", "chem"].includes(item.id) })
-  var sectors = [...new Set(active.concat(preferred, settings))]
-  var factors = candidate.factors.slice()
-  sectors.forEach(function (item) {
+  return settings.map(function (item) {
     var score = candidate.overrides[item.id] ?? candidate.level
+    var scenarioAction = candidate.factors.find(function (factor) { return factor[1] === item.id })
     var actions = SCN_SECTOR_FACTORS[item.id]
     var action = score >= 0.2 ? actions[0][0] : score <= -0.2 ? actions[1][0] : actions[2]
-    var represented = factors.some(function (factor) { return factor[1] === item.id })
-    if (!represented && (active.includes(item) || factors.length < 5)) factors.push([action, item.id])
-  })
-  return factors.map(function (factor) {
-    var input = settings.find(function (item) { return item.id === factor[1] })
-    var score = candidate.overrides[input.id] ?? candidate.level
-    return { label: factor[0], percent: Math.round(100 * (1 - Math.abs(score - input.shift) / 2)) }
+    return {
+      label: scenarioAction ? scenarioAction[0] : action,
+      percent: Math.round(100 * (1 - Math.abs(score - item.shift) / 2))
+    }
   })
 }
 
@@ -538,7 +532,7 @@ function scnLikelihoods(model, open) {
   var selected = candidates.find(function (candidate) { return candidate.id === model.selectedCase }) || candidates[0]
   var factors = scnScenarioFactors(selected, model.assumptions)
   var alternatives = candidates.filter(function (candidate) { return candidate !== selected })
-  return '<div class="scn-case-heading"><h3 id="scn-case-title" tabindex="-1">' + esc(selected.title) + '</h3><b title="Illustrative 2035 scenario likelihood">' +
+  return '<div class="scn-case-heading"><span id="scn-case-label" tabindex="-1">Probabilities of occurring</span><b title="Illustrative likelihood: ' + esc(selected.title) + '">' +
     selected.percent + '%</b></div>' +
     factors.map(function (factor) {
       return '<div class="scn-lk"><span>' + esc(factor.label) + '</span><span class="scn-lk-track" aria-hidden="true"><span class="scn-lk-bar' +
