@@ -1624,6 +1624,8 @@ h1.chain-title {
 .scn-reset .scn-heading { padding: 0; }
 .scn-body { padding: 12px 16px; }
 .scn-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.scn-toolbar select { width: clamp(140px, 18vw, 250px); }
+.scn-toolbar button { min-height: 36px; }
 .scn-toolbar select, .scn-side-filters select {
   min-height: 38px;
   max-width: 100%;
@@ -1662,7 +1664,6 @@ h1.chain-title {
   gap: 8px;
   padding: 14px 16px;
 }
-.scn-filters-trigger { grid-column: -2 / -1; justify-self: start; margin-left: 10px; }
 .scn-industry-card {
   display: grid;
   grid-template-rows: 1fr auto auto;

@@ -143,9 +143,24 @@ var SCN_REGION_GROUPS = [
 var SCN_REGIONS = { global: { name: "Global", factor: 1 } }
 SCN_REGION_GROUPS.forEach(function (group) {
   group.regions.forEach(function (entry) {
-    SCN_REGIONS[entry[0]] = { name: entry[1], factor: entry.length === 3 ? entry[2] : group.factor }
+    SCN_REGIONS[entry[0]] = { name: entry[1], factor: entry.length === 3 ? entry[2] : group.factor, group: group.name }
   })
 })
+
+/* Illustrative regional demand tilts, shared by subregions unless specified. */
+var SCN_REGIONAL_BASELINES = {
+  Africa: { energy: 0.38, steel: 0.25, og: 0.25, auto: -0.12 },
+  Americas: { energy: 0.25, elec: 0.30, aero: 0.24, og: 0.15 },
+  Asia: { ev: 0.35, elec: 0.40, steel: 0.22, energy: 0.24 },
+  Europe: { energy: 0.32, chem: -0.27, auto: -0.12, aero: 0.22 },
+  Oceania: { energy: 0.28, og: 0.20, steel: 0.12, elec: -0.16 }
+}
+
+var SCN_NORTH_AFRICA_ACTIONS = {
+  energy: ["Morocco’s ONEE awards new grid contracts", "Morocco’s ONEE defers grid expansion", "Morocco’s ONEE renews grid equipment"],
+  og: ["Sonatrach orders equipment for new gas capacity", "Sonatrach delays gas expansion orders", "Sonatrach replaces equipment at existing gas plants"],
+  chem: ["OCP upgrades phosphate processing lines", "OCP postpones a processing-line expansion", "OCP renews equipment at existing plants"]
+}
 
 var SCN_INDUSTRY_DRIVERS = [
   { id: "ev", name: "EVs and batteries", grow: ["Affordable EV models scale up", "Fleet electrification accelerates", "Local battery plants expand"], fall: ["EV incentives expire", "Battery plants delay expansion", "Buyers switch to hybrids"] },
@@ -179,7 +194,10 @@ function scnIndustryAssumption(params, industry) {
   if (rawLevel == null || !Number.isFinite(level) || Math.abs(level) > 2) {
     level = legacy === "grow" ? 2 : legacy === "fall" ? -2 : 0
   }
-  return { region: region, level: level, shift: level / 2 * SCN_REGIONS[region].factor }
+  var profile = SCN_REGIONS[region]
+  var baseline = SCN_REGIONAL_BASELINES[profile.group]?.[industry.id] || 0
+  var shift = Math.max(-1, Math.min(1, baseline + level / 2 * profile.factor))
+  return { region: region, level: level, shift: shift }
 }
 
 function scnResetUpdates() {
@@ -221,7 +239,12 @@ var SCN_METAL_OUTLOOKS = [
   { metal: "Molybdenum", name: "Alloy and stainless steels", w: { steel: 2, og: 1, chem: 1 } },
   { metal: "Tantalum", name: "Capacitors and sputtering targets", w: { elec: 2 } },
   { metal: "Titanium", name: "Aircraft and implant alloys", w: { aero: 2, med: 1 } },
-  { metal: "Tungsten", name: "Carbide tooling and specialty materials", w: { steel: 2, auto: 1, aero: 1 } }
+  { metal: "Tungsten", name: "Carbide tooling and specialty materials", w: { steel: 2, auto: 1, aero: 1 } },
+  { metal: "Lithium", name: "Rechargeable battery materials", w: { ev: 3, energy: 1 } },
+  { metal: "Manganese", name: "Steelmaking and battery materials", w: { steel: 3, ev: 1 } },
+  { metal: "Tin", name: "Electronics solder and tinplate", w: { elec: 3, steel: 1 } },
+  { metal: "Zinc", name: "Galvanised steel and die castings", w: { steel: 3, auto: 1 } },
+  { metal: "Vanadium", name: "High-strength steel and flow batteries", w: { steel: 3, energy: 1 } }
 ]
 
 /* Which sector each project scenario on the Future demand page belongs to. */
@@ -316,7 +339,7 @@ function scnModel(params) {
     var index = scnWeighted(per, vis)
     return { name: pr.name, metal: pr.metal, w: pr.w, action: pr.action, per: per, index: index, chance: chance, strategy: scnProductStrategy(index) }
   })
-  return { drivers: dr, visions: vis, industries: ind, assumptions: assumptions, selectedCase: params?.get("scn-case"), products: results.slice(0, SCN_PRODUCTS.length), metalOutlooks: results }
+  return { region: scnRegion(params), drivers: dr, visions: vis, industries: ind, assumptions: assumptions, selectedCase: params?.get("scn-case"), products: results.slice(0, SCN_PRODUCTS.length), metalOutlooks: results }
 }
 
 function scnWeighted(per, vis) {
@@ -391,11 +414,10 @@ function scnDriverPanel(params) {
   }).join("")
   var filtersOpen = params.get("scn-filters") === "1"
   return '<section class="scn-panel" aria-labelledby="scn-drivers-heading"><div class="scn-reset"><h2 id="scn-drivers-heading" class="scn-heading">Industry drivers</h2>' +
-    '<div class="scn-toolbar"><label>Region <select id="scn-region" name="scn-region" data-control>' + regions + '</select></label>' +
+    '<div class="scn-toolbar"><label for="scn-region">Region</label><select id="scn-region" name="scn-region" data-control>' + regions + '</select>' +
+    '<button id="scn-filters-button" type="button" class="ev-csv" data-action="scn-open-filters" aria-expanded="' + filtersOpen + '">Advanced filters</button>' +
     '<button id="scn-reset" type="button" class="ev-csv" data-action="scn-reset">Reset assumptions</button></div></div>' +
-    '<div class="scn-industries">' + sliders +
-    '<button id="scn-filters-button" type="button" class="ev-csv scn-filters-trigger" data-action="scn-open-filters" aria-expanded="' + filtersOpen + '">Advanced filters</button>' +
-    '</div></section>' + (filtersOpen ? scnSideFilters(params) : "")
+    '<div class="scn-industries">' + sliders + '</div></section>' + (filtersOpen ? scnSideFilters(params) : "")
 }
 
 function scnSideFilters(params) {
@@ -514,14 +536,16 @@ function scnDemandScenarios(model) {
   return relevant
 }
 
-function scnScenarioFactors(candidate, settings) {
+function scnScenarioFactors(candidate, settings, region) {
   return settings.map(function (item) {
     var score = candidate.overrides[item.id] ?? candidate.level
     var scenarioAction = candidate.factors.find(function (factor) { return factor[1] === item.id })
     var actions = SCN_SECTOR_FACTORS[item.id]
     var action = score >= 0.2 ? actions[0][0] : score <= -0.2 ? actions[1][0] : actions[2]
+    var regionalActions = region === "north-africa" && SCN_NORTH_AFRICA_ACTIONS[item.id]
+    var regionalAction = regionalActions && regionalActions[score >= 0.2 ? 0 : score <= -0.2 ? 1 : 2]
     return {
-      label: scenarioAction ? scenarioAction[0] : action,
+      label: regionalAction || (scenarioAction ? scenarioAction[0] : action),
       percent: Math.round(100 * (1 - Math.abs(score - item.shift) / 2))
     }
   })
@@ -530,7 +554,7 @@ function scnScenarioFactors(candidate, settings) {
 function scnLikelihoods(model, open) {
   var candidates = scnDemandScenarios(model)
   var selected = candidates.find(function (candidate) { return candidate.id === model.selectedCase }) || candidates[0]
-  var factors = scnScenarioFactors(selected, model.assumptions)
+  var factors = scnScenarioFactors(selected, model.assumptions, model.region)
   var alternatives = candidates.filter(function (candidate) { return candidate !== selected })
   return '<div class="scn-case-heading"><span id="scn-case-label" tabindex="-1">Probabilities of occurring</span><b title="Illustrative likelihood: ' + esc(selected.title) + '">' +
     selected.percent + '%</b></div>' +
@@ -567,7 +591,7 @@ function scnMetalCards(model) {
 
 function scnCalcTable(model) {
   return '<details class="ev-box ev-wide scn-calc"><summary>Show calculation</summary>' +
-    '<p class="ev-why">The baseline uses 24 indicators from report sections 3–4. Industry assumptions adjust scenario weights and scores. Advanced market conditions shift the corresponding baseline driver by up to 20 percentage points using illustrative settings. One region applies to all industry drivers using illustrative weights. Most subregions share their group’s weight. Antarctica has no modeled industry exposure. Optional reasons record your assumptions. Each metal uses a representative application or product line. End-market weights for the additional metals are illustrative. ' +
+    '<p class="ev-why">The baseline uses 24 indicators from report sections 3–4. Industry assumptions adjust scenario weights and scores. Advanced market conditions shift the corresponding baseline driver by up to 20 percentage points using illustrative settings. Regions shift baseline demand using illustrative industry assumptions and scale the effect of slider changes. Subregions generally share their group’s baseline. Antarctica has no regional adjustment. Optional reasons record your assumptions. Each metal uses a representative application or product line. End-market weights for the additional metals are illustrative. ' +
     'Its score in each scenario is a weighted average of the end markets for that product line. The overall index (−2 to +2) weights those scores by scenario likelihood. The Scenario card compares all ten sliders with plausible demand paths. It gives more weight to paths that match the selected direction and strength, then normalizes the retained paths to 100%. These illustrative likelihoods are conditional on the settings and the candidate paths. Factor bars show how closely each associated industry’s modeled level matches its slider. Several factors may refer to the same industry. ' +
     'The five squares show the separate outlook model’s scores (blue for growth, orange for decline).</p>' +
     '<details class="scn-scenario-sources"><summary>Sources behind the scenario examples</summary><ul>' +
