@@ -618,13 +618,6 @@ document.addEventListener("click", function (event) {
       document.getElementById("row-" + selectedRow)?.focus()
       return
     }
-    if (action.dataset.action === "theme") {
-      var night = document.documentElement.dataset.theme !== "night"
-      if (night) document.documentElement.dataset.theme = "night"
-      else delete document.documentElement.dataset.theme
-      syncThemeToggle(action, night)
-      try { localStorage.setItem("munvest-theme", night ? "night" : "day") } catch (err) { /* storage blocked */ }
-    }
     if (action.dataset.action === "nav") {
       var closed = document.body.classList.contains("nav-closed")
       document.body.classList.toggle("nav-closed", !closed)
@@ -833,11 +826,4 @@ window.addEventListener("hashchange", function () { render() })
 try {
   if (localStorage.getItem("atlas-nav") === "closed") document.body.classList.add("nav-closed")
 } catch (err) { /* keep the sidebar open when storage is blocked */ }
-function syncThemeToggle(button, night) {
-  button.setAttribute("aria-pressed", String(night))
-  button.setAttribute("aria-label", night ? "Light mode" : "Night mode")
-  button.title = night ? "Light mode" : "Night mode"
-}
-
-syncThemeToggle(document.getElementById("theme-toggle"), document.documentElement.dataset.theme === "night")
 render()
