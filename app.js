@@ -639,10 +639,12 @@ document.addEventListener("click", function (event) {
       document.getElementById("scn-case-label").focus()
     }
     if (action.dataset.action === "scn-reset") go("trends", scnResetUpdates())
-    if (action.dataset.action === "scn-open-filters" || action.dataset.action === "scn-close-filters") {
-      var opening = action.dataset.action === "scn-open-filters" && readRoute().params.get("scn-filters") !== "1"
+    if (action.dataset.action === "scn-toggle-filters") {
+      event.preventDefault()
+      var opening = readRoute().params.get("scn-filters") !== "1"
       go("trends", { "scn-filters": opening ? "1" : null }, { replace: true })
-      document.getElementById(opening ? "scn-advanced-a" : "scn-filters-button").focus()
+      document.getElementById("scn-filters-button").focus({ preventScroll: true })
+      return
     }
     if (action.dataset.action === "scn-csv") scnCsv(action.dataset.kind)
     if (action.dataset.action === "clear-node") go("supply", { node: null })

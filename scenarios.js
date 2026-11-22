@@ -13,8 +13,10 @@ var SCN_DRIVERS = [
 
 var SCN_ADVANCED = [
   { key: "investment", name: "Industrial investment", low: "Slower", high: "Faster", driver: "a", effect: 10 },
+  { key: "financing", name: "Industrial financing costs", low: "Lower", high: "Higher", driver: "a", effect: -5 },
   { key: "tariffs", name: "Trade barriers", low: "Lower", high: "Higher", driver: "b", effect: 10 },
   { key: "recycling", name: "Metal recycling", low: "Slower", high: "Faster", driver: "c", effect: -10 },
+  { key: "export-controls", name: "Critical-metal export controls", low: "Looser", high: "Tighter", driver: "c", effect: 5 },
   { key: "adoption", name: "Clean technology adoption", low: "Slower", high: "Faster", driver: "d", effect: 10 }
 ]
 
@@ -415,30 +417,13 @@ function scnDriverPanel(params) {
   var filtersOpen = params.get("scn-filters") === "1"
   return '<section class="scn-panel" aria-labelledby="scn-drivers-heading"><div class="scn-reset"><h2 id="scn-drivers-heading" class="scn-heading">Industry drivers</h2>' +
     '<div class="scn-toolbar"><label for="scn-region">Region</label><select id="scn-region" name="scn-region" data-control>' + regions + '</select>' +
-    '<button id="scn-filters-button" type="button" class="ev-csv" data-action="scn-open-filters" aria-expanded="' + filtersOpen + '">Advanced filters</button>' +
     '<button id="scn-reset" type="button" class="ev-csv" data-action="scn-reset">Reset assumptions</button></div></div>' +
-    '<div class="scn-industries">' + sliders + '</div></section>' + (filtersOpen ? scnSideFilters(params) : "")
-}
-
-function scnSideFilters(params) {
-  var industry = SCN_INDUSTRY_DRIVERS.find(function (item) { return item.id === params.get("scn-industry") }) || SCN_INDUSTRY_DRIVERS[0]
-  var level = scnIndustryAssumption(params, industry).level
-  var industries = SCN_INDUSTRY_DRIVERS.map(function (item) {
-    return '<option value="' + item.id + '"' + (industry === item ? ' selected' : '') + '>' + esc(item.name) + '</option>'
-  }).join("")
-  var field = "scn-" + industry.id + "-path"
-  var paths = level > 0 ? industry.grow : level < 0 ? industry.fall : []
-  var options = paths.map(function (path) {
-    return '<option' + (params.get(field) === path ? ' selected' : '') + '>' + esc(path) + '</option>'
-  }).join("")
-  return '<aside class="scn-side-filters" aria-labelledby="scn-filters-title"><div class="scn-filter-heading">' +
-    '<h2 id="scn-filters-title">Advanced filters</h2><button type="button" class="ev-csv" data-action="scn-close-filters">Close</button></div>' +
-    scnAdvancedGroup("Scenario assumptions", SCN_DRIVERS, params, false) +
-    scnAdvancedGroup("Market conditions", SCN_ADVANCED, params, true) +
-    '<details class="scn-reasons"><summary>Industry reasons</summary>' +
-    '<label>Industry<select id="scn-filter-industry" name="scn-industry" data-control>' + industries + '</select></label>' +
-    (paths.length ? '<label>How could this happen?<select id="scn-filter-path" name="' + field + '" data-control><option value="">Choose a reason</option>' + options + '</select></label>' :
-      '<p>Move this industry’s slider to explore possible reasons.</p>') + '</details></aside>'
+    '<div class="scn-industries">' + sliders + '</div>' +
+    '<details class="scn-inline-filters"' + (filtersOpen ? ' open' : '') + '><summary id="scn-filters-button" data-action="scn-toggle-filters">Advanced filters</summary>' +
+    (filtersOpen ? '<div class="scn-filter-fields">' +
+      scnAdvancedGroup("Scenario assumptions", SCN_DRIVERS, params, false) +
+      scnAdvancedGroup("Market conditions", SCN_ADVANCED, params, true) + '</div>' : '') +
+    '</details></section>'
 }
 
 function scnAdvancedGroup(title, items, params, relative) {
@@ -447,10 +432,17 @@ function scnAdvancedGroup(title, items, params, relative) {
       var value = relative ? scnAdvancedValue(params, item) : scnDriverValue(params, item)
       var id = "scn-advanced-" + item.key
       var name = relative ? item.name : item.name.slice(4)
+      if (relative) {
+        var labels = ["Much " + item.low.toLowerCase(), item.low, "Baseline", item.high, "Much " + item.high.toLowerCase()]
+        return '<label class="scn-filter-select" for="' + id + '">' + esc(name) +
+          '<select id="' + id + '" name="' + item.key + '" data-advanced-slider data-control>' +
+          [-2, -1, 0, 1, 2].map(function (level, index) {
+            return '<option value="' + level + '"' + (level === value ? ' selected' : '') + '>' + esc(labels[index]) + '</option>'
+          }).join("") + '</select></label>'
+      }
       return '<div class="scn-industry-card"><label for="' + id + '">' + esc(name) + '</label>' +
         '<input type="range" id="' + id + '" name="' + item.key + '" min="' + (relative ? -2 : 10) +
-        '" max="' + (relative ? 2 : 90) + '" step="1" value="' + value + '" data-advanced-slider data-control' +
-        (relative ? ' aria-valuetext="' + scnAdjustmentLabel(value) + '"' : '') + '>' +
+        '" max="' + (relative ? 2 : 90) + '" step="1" value="' + value + '" data-advanced-slider data-control>' +
         '<div class="scn-slide-ends" aria-hidden="true"><span>' + esc(item.low) + '</span><span>' + esc(item.high) + '</span></div></div>'
     }).join("") + '</div></fieldset>'
 }
@@ -591,7 +583,7 @@ function scnMetalCards(model) {
 
 function scnCalcTable(model) {
   return '<details class="ev-box ev-wide scn-calc"><summary>Show calculation</summary>' +
-    '<p class="ev-why">The baseline uses 24 indicators from report sections 3–4. Industry assumptions adjust scenario weights and scores. Advanced market conditions shift the corresponding baseline driver by up to 20 percentage points using illustrative settings. Regions shift baseline demand using illustrative industry assumptions and scale the effect of slider changes. Subregions generally share their group’s baseline. Antarctica has no regional adjustment. Optional reasons record your assumptions. Each metal uses a representative application or product line. End-market weights for the additional metals are illustrative. ' +
+    '<p class="ev-why">The baseline uses 24 indicators from report sections 3–4. Industry assumptions adjust scenario weights and scores. Advanced market conditions shift the corresponding baseline driver by up to 20 percentage points using illustrative settings. Regions shift baseline demand using illustrative industry assumptions and scale the effect of slider changes. Subregions generally share their group’s baseline. Antarctica has no regional adjustment. Each metal uses a representative application or product line. End-market weights for the additional metals are illustrative. ' +
     'Its score in each scenario is a weighted average of the end markets for that product line. The overall index (−2 to +2) weights those scores by scenario likelihood. The Scenario card compares all ten sliders with plausible demand paths. It gives more weight to paths that match the selected direction and strength, then normalizes the retained paths to 100%. These illustrative likelihoods are conditional on the settings and the candidate paths. Factor bars show how closely each associated industry’s modeled level matches its slider. Several factors may refer to the same industry. ' +
     'The five squares show the separate outlook model’s scores (blue for growth, orange for decline).</p>' +
     '<details class="scn-scenario-sources"><summary>Sources behind the scenario examples</summary><ul>' +

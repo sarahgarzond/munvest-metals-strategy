@@ -1626,7 +1626,7 @@ h1.chain-title {
 .scn-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
 .scn-toolbar select { width: clamp(140px, 18vw, 250px); }
 .scn-toolbar button { min-height: 36px; }
-.scn-toolbar select, .scn-side-filters select {
+.scn-toolbar select, .scn-filter-select select {
   min-height: 38px;
   max-width: 100%;
   padding: 5px 8px;
@@ -1634,30 +1634,14 @@ h1.chain-title {
   border-radius: 6px;
   background: var(--canvas);
 }
-.scn-side-filters {
-  position: fixed;
-  z-index: 6;
-  top: calc(16px + env(safe-area-inset-top));
-  right: calc(16px + env(safe-area-inset-right));
-  display: grid;
-  gap: 14px;
-  width: min(465px, calc(100vw - 32px));
-  max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  overflow-y: auto;
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--canvas);
-  box-shadow: 0 8px 24px rgba(53, 84, 100, .18);
-}
-.scn-side-filters label { display: grid; gap: 4px; }
-.scn-filter-heading { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.scn-filter-heading h2 { font-size: 16px; }
+.scn-inline-filters { padding: 0 16px 12px; }
+.scn-inline-filters > summary { width: fit-content; margin-inline-start: auto; }
+.scn-filter-fields { display: grid; gap: 16px; margin-top: 12px; padding-top: 14px; border-top: 1px solid var(--line); }
 .scn-advanced-group { min-width: 0; margin: 0; border: 0; padding: 0; }
 .scn-advanced-group legend { margin-bottom: 8px; font-weight: 600; }
-.scn-advanced-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.scn-reasons label, .scn-reasons p { margin-top: 8px; }
-.scn-reasons summary { cursor: pointer; }
+.scn-advanced-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: 8px 12px; }
+.scn-filter-select { display: grid; align-content: space-between; gap: 4px; font-size: 13px; }
+.scn-filter-select select { width: 100%; }
 .scn-industries {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -1692,7 +1676,7 @@ h1.chain-title {
 .scn-alternatives ul { list-style: none; padding: 0; }
 .scn-alternatives li { margin-top: 5px; }
 .scn-alternatives .ev-csv { text-align: left; }
-.scn-alternatives > summary { cursor: pointer; color: var(--link); text-decoration: underline; font-size: 12px; margin: 6px 0; }
+.scn-alternatives > summary, .scn-inline-filters > summary { cursor: pointer; color: var(--link); text-decoration: underline; font-size: 12px; margin: 6px 0; }
 .scn-scenario-sources { margin: 8px 0; font-size: 13px; }
 .scn-scenario-sources li { margin: 4px 0; }
 .scn-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 124px), 1fr)); gap: 8px; }
