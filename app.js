@@ -525,7 +525,11 @@ function summary(route) {
     return product.grade + ", demand " + (num(row.demand) || "unknown") + ", supply " + (num(row.supply) || "unknown") + ", gap " + (gap == null ? "unknown" : num(gap))
   }
   if (route.page === "builder") return scenarioSummary(simModel(route.params))
-  if (route.page === "trends" || route.page === "strategy") return scnSummary(scnModel(route.params))
+  if (route.page === "trends") {
+    var best = scnDemandScenarios(scnModel(route.params))[0]
+    return best.text + " " + best.percent + "% modeled likelihood."
+  }
+  if (route.page === "strategy") return scnSummary(scnModel(route.params))
   if (route.page === "demand") {
     var scenario = futureScenario(route.params.get("scenario"))
     return scenario ? scenario.name : "Scenarios"

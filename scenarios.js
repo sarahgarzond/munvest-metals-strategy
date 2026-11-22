@@ -26,8 +26,6 @@ var SCN_VISIONS = [
   { id: "ren", name: "Engineering Renaissance", short: "Renaissance" }
 ]
 
-var SCN_PATH_INDUSTRIES = { open: "elec", stag: "chem", super: "ev", fort: "steel", ren: "energy" }
-
 var SCN_NEWS = {
   ev: {
     source: "IEA · 2026", url: "https://www.iea.org/reports/global-ev-outlook-2026/trends-in-electric-cars",
@@ -35,94 +33,70 @@ var SCN_NEWS = {
     followup: "Tesla reported shipping its first Megapack with Nevada-made LFP cells in Q3 2026. LFP cells do not use nickel or cobalt in the cathode.",
     followupUrl: "https://www.sec.gov/Archives/edgar/data/1318605/000162828026066775/tsla-20260930.htm",
     followupSource: "Tesla SEC filing · Q3 2026",
-    up: "Automakers would need to turn rising sales into larger cell and battery-material orders. Nickel and cobalt exposure depends on the battery chemistry.",
-    down: "Automakers would need to cut EV production plans or delay battery orders despite recent sales growth."
   },
   energy: {
     source: "U.S. Department of Energy · October 2024", url: "https://www.energy.gov/oe/grid-resilience-and-innovation-partnerships-grip-program-projects",
     event: "The U.S. Department of Energy announced about $4.2 billion in grid investments across 46 projects.",
-    up: "Utilities and governments would need to move more projects from funding to construction, then order conductors, transformers and other grid equipment.",
-    down: "Permitting, financing or interconnection delays would need to postpone construction and equipment orders."
   },
   elec: {
     source: "SIA · February 2026", url: "https://www.semiconductors.org/global-annual-semiconductor-sales-increase-25-6-to-791-7-billion-in-2025/",
     event: "SIA reported that 2025 semiconductor sales rose 25.6% to $791.7 billion.",
-    up: "Chipmakers would need to convert growth into new fabrication and packaging capacity, supporting demand for electronics materials.",
-    down: "A chip-order slowdown or excess capacity would need to delay new fabs and equipment purchases."
   },
   auto: {
     source: "ACEA · April 2026", url: "https://www.acea.auto/publication/economic-and-market-report-global-and-eu-auto-industry-full-year-2025/",
     event: "ACEA reported that global new-car registrations rose 3.5% in 2025.",
-    up: "Sustained orders would need to translate into more vehicles produced and higher demand for sheet, castings and components.",
-    down: "Manufacturers would need to cut output as vehicle demand slows or inventories rise."
   },
   aero: {
     source: "Airbus · January 2026", url: "https://www.airbus.com/en/newsroom/press-releases/2026-01-airbus-reports-793-commercial-aircraft-deliveries-in-2025",
     event: "Airbus reported 793 aircraft deliveries and 1,000 gross orders in 2025.",
-    up: "Airframers and engine suppliers would need to convert order backlogs into higher delivery rates and qualified alloy orders.",
-    down: "Delivery delays or airline deferrals would need to reduce near-term production and alloy orders."
   },
   med: {
     source: "European Commission · December 2025", url: "https://health.ec.europa.eu/publications/proposal-regulation-simplify-rules-medical-and-vitro-diagnostic-devices_en",
     event: "The European Commission proposed simplifying its medical-device rules.",
-    up: "Regulatory changes would need to help products reach market, while hospitals increase device and implant purchasing.",
-    down: "Budget pressure, slower procedures or approval delays would need to reduce device and implant purchasing."
   },
   chem: {
     source: "Cefic · Q3 2026", url: "https://cefic.org/news/cefics-chemical-trends-report-q3-2026-is-out/",
     event: "Cefic reported weak demand, falling output and upstream overcapacity in European chemicals.",
-    up: "Stronger orders and lower energy costs would need to revive plant investment, reversing the recent weakness.",
-    down: "Persistent energy-cost pressure and weak orders could delay projects and reduce demand for corrosion-resistant equipment."
   },
   og: {
     source: "IEA · 2026", url: "https://www.iea.org/data-and-statistics/data-tools/global-lng-capacity-tracker",
     event: "The IEA recorded four LNG project investment decisions from January to October 2026 in the United States and Canada.",
-    up: "Project sponsors would need to convert investment decisions into construction, equipment purchases and maintenance contracts.",
-    down: "More projects would need to be deferred as prices, financing or construction costs worsen."
   },
   steel: {
     source: "worldsteel · October 2026", url: "https://worldsteel.org/media/press-releases/2026/worldsteel-short-range-outlook-october-2026/",
     event: "Worldsteel projected broadly flat global steel demand for 2026 and 1.7% growth in 2027.",
-    up: "Construction and infrastructure orders would need to strengthen beyond that gradual recovery.",
-    down: "Weak building starts or delayed public projects would need to outweigh infrastructure demand."
   },
   defence: {
     source: "NATO · June 2025", url: "https://nato.int/en/about-us/official-texts-and-resources/official-texts/2025/06/25/the-hague-summit-declaration",
     event: "NATO allies adopted a 2035 spending commitment, including at least 3.5% of GDP for core defence.",
-    up: "Governments would need to turn spending commitments into funded procurement and suppliers would need capacity to deliver.",
-    down: "Governments would need to delay appropriations or procurement despite the commitment."
   }
 }
 
-var SCN_STORIES = {
-  open: {
-    text: "Trade stays open, so buyers can diversify and source equipment internationally. Demand can expand where buyers keep spending, even while weak European industrial output limits a broad recovery.",
-    industries: ["ev", "elec", "auto", "aero", "med"]
-  },
-  stag: {
-    text: "Trade tightens before European industry recovers. Defence and resilience orders can grow, but higher costs and deferred investment weigh on chemicals, construction and equipment demand.",
-    industries: ["defence", "chem", "steel", "auto", "og"]
-  },
-  super: {
-    text: "Utilities fund grid projects and automakers ramp battery orders at the same time. Chip and equipment orders follow. Demand grows fastest where project funding turns into purchase orders, while competition for material can raise costs for other industries.",
-    industries: ["energy", "ev", "elec", "steel", "chem"]
-  },
-  fort: {
-    text: "Governments prioritise regional suppliers and turn security commitments into orders. Domestic production grows where capacity is available. More expensive inputs and tighter trade can still hold back import-dependent buyers.",
-    industries: ["defence", "steel", "auto", "aero", "chem"]
-  },
-  ren: {
-    text: "Materials become easier to source as technology adoption accelerates. Grid, digital and industrial projects move from investment decisions into equipment orders, creating demand across several end markets.",
-    industries: ["energy", "elec", "ev", "aero", "med"]
-  }
-}
-
-var SCN_PATH_FACTORS = [
-  ["European industry remains weak", "European industry strengthens"],
-  ["Trade with China remains open", "Trade with China tightens"],
-  ["Critical-metal supply eases", "Critical-metal supply stays tight"],
-  ["Technology adoption stays slow", "Technology adoption accelerates"]
+/* Profiles use the same −1 to +1 scale as the rescaled industry controls. */
+var SCN_DEMAND_PATHS = [
+  { text: "Government orders and private investment lift demand across industries.", level: 0.85, driver: "a", direction: 1 },
+  { text: "Cheap financing lifts factory, infrastructure and equipment orders across industries.", level: 0.95, driver: "a", direction: 1 },
+  { text: "Falling power costs and faster technology adoption spur investment across industries.", level: 0.75, driver: "d", direction: 1 },
+  { text: "High borrowing costs force companies and governments to defer orders across industries.", level: -0.95, driver: "a", direction: -1 },
+  { text: "Energy shortages and tight credit lead buyers across industries to cancel projects.", level: -0.85, driver: "c", direction: 1 },
+  { text: "Trade disruption stalls investment and squeezes public budgets across industries.", level: -0.75, driver: "b", direction: 1 },
+  { text: "Replacement orders keep factories busy while businesses hold off on expansion.", level: 0, driver: "d", direction: -1 },
+  { text: "Steady household spending offsets weaker industrial investment.", level: 0, driver: "a", direction: -1 },
+  { text: "Incremental productivity gains offset higher costs and keep demand near trend.", level: 0, driver: "d", direction: 1 }
 ]
+
+var SCN_SECTOR_CATALYSTS = {
+  ev: ["Affordable EVs and more charging stations lift battery orders", "Weaker EV sales lead automakers to cut battery orders"],
+  energy: ["Utilities start funded grid projects and order more equipment", "Delayed grid projects cut equipment orders"],
+  elec: ["Chipmakers expand fabrication capacity as orders rise", "Chipmakers defer new fabs as orders weaken"],
+  auto: ["Stronger car orders lift vehicle production", "Weak car sales lead manufacturers to cut output"],
+  aero: ["Airframers raise deliveries as airlines replace older fleets", "Airlines defer aircraft deliveries as travel demand slows"],
+  med: ["Hospitals increase device and implant purchases", "Hospital budget pressure delays device and implant orders"],
+  chem: ["Lower energy costs and stronger orders revive chemical plant investment", "Weak orders and high power costs delay chemical projects"],
+  og: ["LNG projects reach construction and equipment orders rise", "LNG projects slip as financing and construction costs rise"],
+  steel: ["Infrastructure construction raises steel orders", "Weak construction and delayed public projects reduce steel orders"],
+  defence: ["Governments turn defence budgets into funded orders", "Governments defer defence orders as budgets tighten"]
+}
 
 /* Industry score = base trend + Σ sensitivity × average driver state, capped at ±2 (report section 6).
    Oil and gas is scored with the same formula (report section 10). */
@@ -201,7 +175,7 @@ function scnIndustryAssumption(params, industry) {
   var legacy = params && params.get(prefix + "direction")
   var rawLevel = params && params.get(prefix + "level")
   var level = Number(rawLevel)
-  if (rawLevel == null || !Number.isInteger(level) || Math.abs(level) > 2) {
+  if (rawLevel == null || !Number.isFinite(level) || Math.abs(level) > 2) {
     level = legacy === "grow" ? 2 : legacy === "fall" ? -2 : 0
   }
   return { region: region, level: level, shift: level / 2 * SCN_REGIONS[region].factor }
@@ -287,42 +261,22 @@ function scnModel(params) {
   var p = [dr.a / 100, dr.b / 100, dr.c / 100, dr.d / 100]
   var assumptions = SCN_INDUSTRY_DRIVERS.map(function (industry) {
     var input = scnIndustryAssumption(params, industry)
-    return { id: industry.id, name: industry.name, level: input.level, shift: input.shift }
+    return { id: industry.id, grow: industry.grow, fall: industry.fall, shift: input.shift }
   })
-  var activeIndustries = assumptions.filter(function (industry) { return industry.level !== 0 })
   var vis = {}
-  SCN_VISIONS.forEach(function (v) { vis[v.id] = { p: 0, st: [0, 0, 0, 0], paths: [] } })
+  SCN_VISIONS.forEach(function (v) { vis[v.id] = { p: 0, st: [0, 0, 0, 0] } })
   for (var m = 0; m < 16; m += 1) {
     var s = [m & 8 ? 1 : 0, m & 4 ? 1 : 0, m & 2 ? 1 : 0, m & 1 ? 1 : 0]
     var prob = 1
     for (var k = 0; k < 4; k += 1) prob *= s[k] ? p[k] : 1 - p[k]
     var v = vis[scnVisionOf(s[0], s[1], s[2], s[3])]
     v.p += prob
-    v.paths.push({ states: s, probability: prob })
     for (var j = 0; j < 4; j += 1) v.st[j] += prob * (s[j] ? 1 : -1)
   }
   SCN_VISIONS.forEach(function (v) {
     var x = vis[v.id]
     x.st = x.st.map(function (t) { return x.p ? t / x.p : 0 })
-    var mostLikely = x.paths.reduce(function (best, path) { return path.probability > best.probability ? path : best })
-    x.factors = mostLikely.states.map(function (state, index) {
-      var probability = (1 + x.st[index]) / 2
-      return { label: SCN_PATH_FACTORS[index][state], probability: state ? probability : 1 - probability }
-    })
-    x.pathShare = mostLikely.probability / x.p
-    var industry = SCN_PATH_INDUSTRIES[v.id]
-    var sensitivity = SCN_INDUSTRIES[industry].s
-    var shift = 0.6 * scnIndustryAssumption(params, { id: industry }).shift
-    var growth = x.paths.reduce(function (sum, path) {
-      var score = path.states.reduce(function (value, state, index) {
-        return value + sensitivity[index + 1] * (state ? 1 : -1)
-      }, sensitivity[0] + shift)
-      return sum + (score > 1e-9 ? path.probability : 0)
-    }, 0) / x.p
-    x.factors.push({
-      label: SCN_INDUSTRIES[industry].name + (growth >= 0.5 ? " grows" : " stalls or declines"),
-      probability: growth >= 0.5 ? growth : 1 - growth
-    })
+
   })
   var ind = {}
   Object.keys(SCN_INDUSTRIES).forEach(function (key) {
@@ -361,7 +315,7 @@ function scnModel(params) {
     var index = scnWeighted(per, vis)
     return { name: pr.name, metal: pr.metal, w: pr.w, action: pr.action, per: per, index: index, chance: chance, strategy: scnProductStrategy(index) }
   })
-  return { drivers: dr, visions: vis, industries: ind, activeIndustries: activeIndustries, products: results.slice(0, SCN_PRODUCTS.length), metalOutlooks: results }
+  return { drivers: dr, visions: vis, industries: ind, assumptions: assumptions, products: results.slice(0, SCN_PRODUCTS.length), metalOutlooks: results }
 }
 
 function scnWeighted(per, vis) {
@@ -412,7 +366,8 @@ function scnKeep(params) {
 /* ---------- Market scenarios (simulator) ---------- */
 
 function scnLevelLabel(level) {
-  return ["Strong decline", "Decline", "Baseline", "Growth", "Strong growth"][level + 2]
+  if (level === 0) return "Baseline"
+  return Math.round(Math.abs(level) * 50) + "% toward " + (level > 0 ? "growth" : "decline")
 }
 
 function scnDriverPanel(params) {
@@ -420,7 +375,7 @@ function scnDriverPanel(params) {
     var state = scnIndustryAssumption(params, item)
     var id = "scn-" + item.id + "-level"
     return '<div class="scn-industry-card"><label for="' + id + '">' + esc(item.name) + '</label>' +
-      '<input type="range" id="' + id + '" min="-2" max="2" step="1" value="' + state.level + '" data-industry-slider="' + item.id +
+      '<input type="range" id="' + id + '" min="-2" max="2" step="0.04" value="' + state.level + '" data-industry-slider="' + item.id +
       '" aria-valuetext="' + scnLevelLabel(state.level) + '">' +
       '<div class="scn-slide-ends" aria-hidden="true"><span>Decline</span><span>Grow</span></div></div>'
   }).join("")
@@ -482,89 +437,86 @@ function scnAdjustmentLabel(value) {
 }
 
 function scnOpenPathways() {
-  var panel = document.getElementById("scn-likelihoods")
-  if (!panel) return undefined
-  return Array.from(panel.querySelectorAll("details[open]")).map(function (details) { return details.dataset.vision })
+  return Boolean(document.querySelector("#scn-likelihoods .scn-alternatives[open]"))
 }
 
-function scnDemandLabel(score) {
-  if (score >= 1) return "Strong growth"
-  if (score >= 0.05) return "Growth"
-  if (score <= -1) return "Strong decline"
-  if (score <= -0.05) return "Decline"
-  return "Broadly stable"
-}
-
-function scnIndustryMetalLinks(model, industry) {
-  return scnMetalProducts(model).filter(function (metal) { return Object.hasOwn(metal.w, industry.id) })
-    .map(function (metal) { return metal.metal }).join(", ")
-}
-
-function scnMatchesSetting(industry, score) {
-  var threshold = Math.abs(industry.level) === 2 ? 1 : 0.05
-  return score * Math.sign(industry.level) >= threshold
-}
-
-function scnRankJointScenarios(model) {
-  return SCN_VISIONS.map(function (vision, index) {
-    var matches = model.activeIndustries.filter(function (industry) {
-      var score = model.industries[industry.id].per[index]
-      return scnMatchesSetting(industry, score)
-    }).length
-    return { vision: vision, index: index, matches: matches, probability: model.visions[vision.id].p }
-  }).sort(function (a, b) {
-    return b.matches - a.matches || b.probability - a.probability
+function scnDemandScenarios(model) {
+  var settings = model.assumptions
+  var average = settings.reduce(function (sum, item) { return sum + item.shift }, 0) / settings.length
+  var candidates = SCN_DEMAND_PATHS.map(function (path) {
+    var prior = model.drivers[path.driver] / 100
+    return { text: path.text, level: path.level, overrides: {}, prior: path.direction > 0 ? prior : 1 - prior }
   })
-}
+  var active = settings.filter(function (item) { return Math.abs(item.shift) >= 0.08 })
+    .sort(function (a, b) { return Math.abs(b.shift) - Math.abs(a.shift) })
+  var rising = active.filter(function (item) { return item.shift > 0 })
+  var falling = active.filter(function (item) { return item.shift < 0 })
+  var concentrated = Math.abs(average) < 0.5
 
-function scnScenarioStory(model, fit, primary) {
-  var story = SCN_STORIES[fit.vision.id]
-  var active = model.activeIndustries
-  var industries = active.length ? active : story.industries.map(function (id) {
-    return SCN_INDUSTRY_DRIVERS.find(function (industry) { return industry.id === id })
+  if (concentrated) {
+    active.slice(0, 5).forEach(function (item) {
+      var level = item.shift > 0 ? 0.85 : -0.85
+      var alternatives = level > 0 ? item.grow : item.fall
+      var mechanisms = [SCN_SECTOR_CATALYSTS[item.id][level > 0 ? 0 : 1], alternatives[1]]
+      mechanisms.forEach(function (text, index) {
+        candidates.push({
+          text: text + ", with smaller changes elsewhere.",
+          level: average * 0.5, overrides: { [item.id]: level }, prior: index === 0 ? 0.5 : 0.4
+        })
+      })
+    })
+  }
+  rising.slice(0, 3).forEach(function (up) {
+    falling.slice(0, 3).forEach(function (down) {
+      var pairs = [
+        [SCN_SECTOR_CATALYSTS[up.id][0], SCN_SECTOR_CATALYSTS[down.id][1], 0.55],
+        [up.grow[1], SCN_SECTOR_CATALYSTS[down.id][1], 0.42],
+        [SCN_SECTOR_CATALYSTS[up.id][0], down.fall[1], 0.38]
+      ]
+      pairs.forEach(function (pair) {
+        candidates.push({
+          text: pair[0] + " while " + pair[1].charAt(0).toLowerCase() + pair[1].slice(1) + ".",
+          level: average * 0.65, overrides: { [up.id]: 0.85, [down.id]: -0.85 }, prior: pair[2]
+        })
+      })
+    })
   })
-  var status = active.length
-    ? (fit.matches === active.length ? "Matches all " + active.length + " adjusted industries." :
-      (primary ? "No modeled scenario meets all your settings. " : "") + "Matches " + fit.matches + " of " + active.length + " adjusted industries.")
-    : (primary ? "Most likely with the baseline settings." : "")
-  return '<article class="scn-story"><div class="scn-story-title"><h3>' + esc(fit.vision.name) + '</h3><b>' +
-    scnPct(fit.probability) + '</b></div>' + (status ? '<p class="scn-story-fit">' + esc(status) + '</p>' : '') +
-    '<p class="scn-story-text">' + esc(story.text) + '</p><h4>What would have to happen</h4><ol class="scn-story-events">' +
-    industries.map(function (industry) {
-      var news = SCN_NEWS[industry.id]
-      var score = model.industries[industry.id].per[fit.index]
-      var condition = (industry.level ? industry.level > 0 : score >= 0) ? news.up : news.down
-      var metals = scnIndustryMetalLinks(model, industry)
-      return '<li><div class="scn-story-event-title"><strong>' + esc(industry.name) + '</strong><span>' +
-        scnDemandLabel(score) + ' ' + scnSigned(score) + '</span></div>' +
-        (industry.level ? '<small>Your setting: ' + esc(scnLevelLabel(industry.level)) + (scnMatchesSetting(industry, score) ? ' · Matches' : ' · Falls short of this setting') + '</small>' : '') +
-        '<p>' + esc(condition) + '</p><p class="scn-story-source">' + esc(news.event) + ' <a href="' + esc(news.url) + '">' +
-        esc(news.source) + '</a></p>' + (news.followup ? '<p class="scn-story-source">' + esc(news.followup) +
-        ' <a href="' + esc(news.followupUrl) + '">' + esc(news.followupSource) + '</a></p>' : '') + (metals ? '<small>Linked metals: ' + esc(metals) + '</small>' : '') + '</li>'
-    }).join("") + '</ol><p class="scn-path-note">Percentages and scores come from the scenario model. Dated sources show what was reported. The steps above describe what would need to happen.</p></article>'
+
+  candidates.forEach(function (candidate) {
+    var error = settings.reduce(function (sum, item) {
+      var expected = candidate.overrides[item.id] ?? candidate.level
+      return sum + Math.pow(expected - item.shift, 2)
+    }, 0)
+    candidate.weight = candidate.prior * Math.exp(-1.8 * error)
+  })
+  candidates.sort(function (a, b) { return b.weight - a.weight })
+  var relevant = candidates.filter(function (candidate) { return candidate.weight >= candidates[0].weight * 0.16 }).slice(0, 10)
+  var total = relevant.reduce(function (sum, candidate) { return sum + candidate.weight }, 0)
+  // Largest-remainder rounding makes the visible and expandable rows sum to 100%.
+  var remainder = 100
+  relevant.forEach(function (candidate) {
+    var percent = candidate.weight / total * 100
+    candidate.percent = Math.floor(percent)
+    candidate.fraction = percent - candidate.percent
+    remainder -= candidate.percent
+  })
+  relevant.slice().sort(function (a, b) { return b.fraction - a.fraction })
+    .slice(0, remainder).forEach(function (candidate) { candidate.percent += 1 })
+  return relevant
 }
 
 function scnLikelihoods(model, open) {
-  var ranked = scnRankJointScenarios(model)
-  var best = ranked[0]
-  var max = Math.max.apply(null, ranked.map(function (fit) { return fit.probability }))
-  return scnScenarioStory(model, best, true) + '<details class="scn-alternatives" data-vision="alternatives"' +
-    (open && open.includes("alternatives") ? ' open' : '') + '><summary>More scenarios</summary>' +
-    ranked.slice(1).map(function (fit) {
-      var v = fit.vision
-      var result = model.visions[v.id]
-      var expanded = open && open.includes(v.id)
-      return '<details class="scn-path" data-vision="' + v.id + '"' + (expanded ? ' open' : '') + '>' +
-        '<summary class="scn-lk"><span>' + esc(v.name) + '</span><span class="scn-lk-track" aria-hidden="true"><span class="scn-lk-bar' +
-        (result.p === max ? ' top' : '') + '" style="width:' + (result.p / max * 100).toFixed(1) + '%"></span></span><b>' +
-        scnPct(result.p) + '</b></summary>' +
-        '<div class="scn-path-content">' + scnScenarioStory(model, fit, false) +
-        '<p class="scn-path-note">Top driver combination: ' + scnPct(result.pathShare) +
-        ' of this scenario. Factor probabilities are conditional on this scenario.</p><ul class="scn-path-factors">' +
-        result.factors.map(function (factor) {
-          return '<li><span>' + esc(factor.label) + '</span><b>' + scnPct(factor.probability) + '</b></li>'
-        }).join("") + "</details>" + '</ul></div></details>'
-    }).join("")
+  var candidates = scnDemandScenarios(model)
+  function row(candidate) {
+    return '<div class="scn-lk"><span>' + esc(candidate.text) + '</span><span class="scn-lk-track" aria-hidden="true"><span class="scn-lk-bar' +
+      (candidate === candidates[0] ? ' top' : '') + '" style="width:' + (candidate.weight / candidates[0].weight * 100).toFixed(1) +
+      '%"></span></span><b title="Illustrative likelihood among these scenarios">' + candidate.percent + '%</b></div>'
+  }
+  var shown = candidates.length > 2 ? Math.min(3, candidates.length - 1) : candidates.length
+  return candidates.slice(0, shown).map(row).join("") + (shown < candidates.length
+    ? '<details class="scn-alternatives"' + (open ? ' open' : '') + '><summary>More scenarios</summary>' +
+        candidates.slice(shown).map(row).join("") + '</details>'
+    : "")
 }
 
 function scnSquares(per) {
@@ -588,8 +540,13 @@ function scnMetalCards(model) {
 function scnCalcTable(model) {
   return '<details class="ev-box ev-wide scn-calc"><summary>Show calculation</summary>' +
     '<p class="ev-why">The baseline uses 24 indicators from report sections 3–4. Industry assumptions adjust scenario weights and scores. Advanced market conditions shift the corresponding baseline driver by up to 20 percentage points using illustrative settings. One region applies to all industry drivers using illustrative weights. Most subregions share their group’s weight. Antarctica has no modeled industry exposure. Optional reasons record your assumptions. Each metal uses a representative application or product line. End-market weights for the additional metals are illustrative. ' +
-    'Its score in each scenario is a weighted average of the end markets for that product line. The overall index (−2 to +2) weights those scores by scenario likelihood. Joint scenarios rank by how many adjusted industry settings they match, then by likelihood. Strong settings need a score of at least +1 or at most −1. Mild settings need +0.05 or −0.05. ' +
-    'The five squares show the separate scenario scores (blue for growth, orange for decline). These scores describe the modeled market outlook.</p>' +
+    'Its score in each scenario is a weighted average of the end markets for that product line. The overall index (−2 to +2) weights those scores by scenario likelihood. The Scenario card compares all ten sliders with plausible demand paths. It gives more weight to paths that match the selected direction and strength, then normalizes the retained paths to 100%. These illustrative likelihoods are conditional on the settings and the candidate paths. ' +
+    'The five squares show the separate outlook model’s scores (blue for growth, orange for decline).</p>' +
+    '<details class="scn-scenario-sources"><summary>Sources behind the scenario examples</summary><ul>' +
+    Object.values(SCN_NEWS).map(function (news) {
+      return '<li>' + esc(news.event) + ' <a href="' + esc(news.url) + '">' + esc(news.source) + '</a>' +
+        (news.followup ? ' ' + esc(news.followup) + ' <a href="' + esc(news.followupUrl) + '">' + esc(news.followupSource) + '</a>' : '') + '</li>'
+    }).join("") + '</ul></details>' +
     '<div class="scn-table-wrap"><table class="ev-table"><thead><tr><th>Metal</th><th>Product line</th>' +
     SCN_VISIONS.map(function (vision) { return '<th class="num">' + esc(vision.short) + "</th>" }).join("") +
     '<th class="num">Index</th></tr></thead><tbody>' +
