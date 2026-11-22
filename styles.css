@@ -1731,3 +1731,8 @@ h1.chain-title {
 .market-evidence { margin-top: 18px; }
 .market-evidence p { margin: 8px 0; }
 .market-evidence .scn-table-wrap { margin-bottom: 10px; }
+
+.market-balance { margin: 0 0 16px; }
+.market-balance h3 { font-size: 16px; }
+.market-balance p { margin: 6px 0; }
+.market-balance .ev-table { margin: 0; }

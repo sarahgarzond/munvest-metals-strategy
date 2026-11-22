@@ -178,9 +178,15 @@ function marketEvidencePanel() {
     '<div id="market-evidence-content">Loading publisher observations…</div></details>'
 }
 
+function marketBalancePanel() {
+  return '<section class="ev-box ev-wide market-balance" aria-label="IEA projected mineral gaps">' +
+    '<div id="market-balance-content">Loading IEA projections…</div></section>'
+}
+
 function loadMarketEvidence(route) {
   var container = document.getElementById("market-evidence-content")
-  if (!container) return
+  var balances = document.getElementById("market-balance-content")
+  if (!container && !balances) return
   if (!marketSnapshotRequest) {
     marketSnapshotRequest = Promise.all(["data/live.json", "data/providers.json"].map(function (file) {
       return fetch(file).then(function (response) {
@@ -193,9 +199,15 @@ function loadMarketEvidence(route) {
     })
   }
   marketSnapshotRequest.then(function (result) {
-    if (container.isConnected) container.innerHTML = marketEvidenceRows(result[0], result[1], route)
+    if (container?.isConnected) container.innerHTML = marketEvidenceRows(result[0], result[1], route)
+    if (balances?.isConnected) {
+      var rows = result[0].providers?.["iea-minerals"]?.rows || []
+      var format = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 })
+      balances.innerHTML = marketIeaBalances(rows, "", format) || "<p>IEA projections are unavailable.</p>"
+    }
   }).catch(function () {
-    if (container.isConnected) container.textContent = "Publisher observations are temporarily unavailable."
+    if (container?.isConnected) container.textContent = "Publisher observations are temporarily unavailable."
+    if (balances?.isConnected) balances.textContent = "IEA projections are temporarily unavailable."
   })
 }
 
@@ -236,7 +248,8 @@ function marketEvidenceRows(snapshot, catalog, route) {
         esc(String(row[3])) + "</td><td>" + esc(value + " " + row[5]) +
         '</td><td><a href="data-sources.html?provider=' + encodeURIComponent(row[0]) + '">' + esc(names[row[0]]) + "</a></td></tr>"
     }).join("") + "</tbody></table></div>" : "<p>No matching market observations are loaded for this metal.</p>"
-  return intro + marketIeaBalances(providers['iea-minerals']?.rows || [], normalizedMetal, format) + table + '<a href="data-sources.html">Browse all datasets and coverage</a>'
+  var projections = route.page === "shortages" ? "" : marketIeaBalances(providers["iea-minerals"]?.rows || [], "", format)
+  return intro + projections + table + '<a href="data-sources.html">Browse all datasets and coverage</a>'
 }
 
 
