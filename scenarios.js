@@ -353,9 +353,10 @@ function scnDriverPanel(params) {
   var filtersOpen = params.get("scn-filters") === "1"
   return '<section class="scn-panel" aria-labelledby="scn-drivers-heading"><div class="scn-reset"><h2 id="scn-drivers-heading" class="scn-heading">Industry drivers</h2>' +
     '<div class="scn-toolbar"><label>Region <select id="scn-region" name="scn-region" data-control>' + regions + '</select></label>' +
-    '<button id="scn-filters-button" type="button" class="ev-csv" data-action="scn-open-filters" aria-expanded="' + filtersOpen + '">Advanced filters</button>' +
     '<button id="scn-reset" type="button" class="ev-csv" data-action="scn-reset">Reset assumptions</button></div></div>' +
-    '<div class="scn-industries">' + sliders + '</div></section>' + (filtersOpen ? scnSideFilters(params) : "")
+    '<div class="scn-industries">' + sliders +
+    '<button id="scn-filters-button" type="button" class="ev-csv scn-filters-trigger" data-action="scn-open-filters" aria-expanded="' + filtersOpen + '">Advanced filters</button>' +
+    '</div></section>' + (filtersOpen ? scnSideFilters(params) : "")
 }
 
 function scnSideFilters(params) {
