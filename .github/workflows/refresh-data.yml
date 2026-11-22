@@ -1,0 +1,33 @@
+name: Refresh atlas data
+
+on:
+  schedule:
+    - cron: "17 6 5 * *"   # 5th of each month, 06:17 UTC (World Bank updates early in the month)
+  workflow_dispatch: {}      # "Run workflow" button for a manual refresh
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r pipeline/requirements.txt
+      - name: Fetch World Bank and UN Comtrade data
+        run: python pipeline/fetch_data.py
+        env:
+          COMTRADE_KEY: ${{ secrets.COMTRADE_KEY }}
+      - name: Open a pull request for review
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: data-refresh
+          delete-branch: true
+          add-paths: data/live.json
+          commit-message: "Data refresh from World Bank and UN Comtrade"
+          title: "Monthly data refresh"
+          body-path: pipeline/last_run.md
