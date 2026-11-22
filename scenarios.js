@@ -35,12 +35,37 @@ var SCN_INDUSTRIES = {
 }
 
 /* What-if assumptions, applied to the report baseline. Region factors are model inputs. */
-var SCN_REGIONS = {
-  global: { name: "Global", factor: 1 },
-  europe: { name: "Europe", factor: 0.65 },
-  northamerica: { name: "North America", factor: 0.45 },
-  asia: { name: "Asia", factor: 0.55 }
-}
+var SCN_REGION_GROUPS = [
+  { name: "Africa", factor: 0.5, regions: [
+    ["africa", "Africa"], ["north-africa", "Northern Africa"], ["east-africa", "Eastern Africa"],
+    ["central-africa", "Middle Africa"], ["southern-africa", "Southern Africa"], ["west-africa", "Western Africa"]
+  ] },
+  { name: "Americas", factor: 0.5, regions: [
+    ["americas", "Americas"], ["northamerica", "Northern America", 0.45],
+    ["latin-america-caribbean", "Latin America and the Caribbean"],
+    ["central-america", "Central America"], ["caribbean", "Caribbean"], ["south-america", "South America"]
+  ] },
+  { name: "Asia", factor: 0.55, regions: [
+    ["asia", "Asia"], ["central-asia", "Central Asia"], ["east-asia", "Eastern Asia"],
+    ["southeast-asia", "South-eastern Asia"], ["south-asia", "Southern Asia"], ["west-asia", "Western Asia"]
+  ] },
+  { name: "Europe", factor: 0.65, regions: [
+    ["europe", "Europe"], ["east-europe", "Eastern Europe"], ["north-europe", "Northern Europe"],
+    ["south-europe", "Southern Europe"], ["west-europe", "Western Europe"]
+  ] },
+  { name: "Oceania", factor: 0.5, regions: [
+    ["oceania", "Oceania"], ["australia-new-zealand", "Australia and New Zealand"],
+    ["melanesia", "Melanesia"], ["micronesia", "Micronesia"], ["polynesia", "Polynesia"]
+  ] },
+  { name: "Polar regions", factor: 0, regions: [["antarctica", "Antarctica"]] }
+]
+
+var SCN_REGIONS = { global: { name: "Global", factor: 1 } }
+SCN_REGION_GROUPS.forEach(function (group) {
+  group.regions.forEach(function (entry) {
+    SCN_REGIONS[entry[0]] = { name: entry[1], factor: entry.length === 3 ? entry[2] : group.factor }
+  })
+})
 
 var SCN_INDUSTRY_DRIVERS = [
   { id: "ev", name: "EVs and batteries", grow: ["Affordable EV models scale up", "Fleet electrification accelerates", "Local battery plants expand"], fall: ["EV incentives expire", "Battery plants delay expansion", "Buyers switch to hybrids"] },
@@ -259,8 +284,13 @@ function scnDriverPanel(params) {
       '<div class="scn-slide-ends" aria-hidden="true"><span>Decline</span><span>Grow</span></div></div>'
   }).join("")
   var region = scnRegion(params)
-  var regions = Object.keys(SCN_REGIONS).map(function (id) {
-    return '<option value="' + id + '"' + (region === id ? ' selected' : '') + '>' + SCN_REGIONS[id].name + '</option>'
+  function regionOption(id) {
+    return '<option value="' + esc(id) + '"' + (region === id ? ' selected' : '') + '>' + esc(SCN_REGIONS[id].name) + '</option>'
+  }
+  var regions = regionOption("global") + SCN_REGION_GROUPS.map(function (group) {
+    return '<optgroup label="' + esc(group.name) + '">' + group.regions.map(function (entry) {
+      return regionOption(entry[0])
+    }).join("") + '</optgroup>'
   }).join("")
   var filtersOpen = params.get("scn-filters") === "1"
   return '<section class="scn-panel" aria-labelledby="scn-drivers-heading"><div class="scn-reset"><h2 id="scn-drivers-heading" class="scn-heading">Industry drivers</h2>' +
@@ -317,7 +347,7 @@ function scnMetalCards(model) {
 
 function scnCalcTable(model) {
   return '<details class="ev-box ev-wide scn-calc"><summary>Show calculation</summary>' +
-    '<p class="ev-why">The baseline uses 24 indicators from report sections 3–4. Industry assumptions adjust the weights of scenarios and the industry scores. One region applies to all industry drivers using illustrative weights. Optional reasons record your assumptions. Each metal uses a representative application or product line. End-market weights for the additional metals are illustrative. ' +
+    '<p class="ev-why">The baseline uses 24 indicators from report sections 3–4. Industry assumptions adjust the weights of scenarios and the industry scores. One region applies to all industry drivers using illustrative weights. Most subregions share their group’s weight. Antarctica has no modeled industry exposure. Optional reasons record your assumptions. Each metal uses a representative application or product line. End-market weights for the additional metals are illustrative. ' +
     'Its score in each scenario is a weighted average of the end markets for that product line. The overall index (−2 to +2) weights those scores by scenario likelihood. ' +
     'The five squares show the separate scenario scores (blue for growth, orange for decline). These scores describe the modeled market outlook.</p>' +
     '<div class="scn-table-wrap"><table class="ev-table"><thead><tr><th>Metal</th><th>Product line</th>' +
