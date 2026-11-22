@@ -96,3 +96,29 @@ function scnFilterMetalResults(model, params) {
   }]
   return model
 }
+
+function scnMetalDrivers(params) {
+  return SCN_PRODUCTS.concat(SCN_METAL_OUTLOOKS).filter(function (product) {
+    return product.metal
+  }).sort(function (a, b) {
+    return a.metal.localeCompare(b.metal)
+  }).map(function (product) {
+    var key = "scn-metal-" + product.metal.toLowerCase()
+    var level = Number(params.get(key))
+    return { key: key, name: product.metal, weights: product.w, level: Number.isFinite(level) && Math.abs(level) <= 2 ? level : 0 }
+  })
+}
+
+function scnMetalIndustryShifts(params) {
+  var shifts = {}
+  var selected = scnMetalFilter(params)
+  var grade = (METAL_SCENARIO_PRODUCTS[selected] || []).find(function (item) { return item[0] === params.get("grade") })
+  scnMetalDrivers(params).forEach(function (metal) {
+    var weights = metal.name === selected && grade ? { [grade[2] === "nuclear" ? "energy" : grade[2]]: 1 } : metal.weights
+    var total = Object.values(weights).reduce(function (sum, weight) { return sum + weight }, 0)
+    Object.entries(weights).forEach(function (entry) {
+      shifts[entry[0]] = (shifts[entry[0]] || 0) + metal.level * entry[1] / total
+    })
+  })
+  return shifts
+}

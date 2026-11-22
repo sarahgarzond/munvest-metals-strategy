@@ -639,7 +639,10 @@ document.addEventListener("click", function (event) {
     }
     if (action.dataset.action === "scn-reset") {
       var updates = scnResetUpdates()
-      if (readRoute().page === "metal-scenarios") Object.assign(updates, { metal: null, grade: null, country: null, direction: null })
+      if (readRoute().page === "metal-scenarios") {
+        Object.assign(updates, { metal: null, grade: null, country: null, direction: null })
+        scnMetalDrivers(readRoute().params).forEach(function (metal) { updates[metal.key] = null })
+      }
       go(null, updates)
     }
     if (action.dataset.action === "scn-toggle-filters") {
@@ -714,6 +717,10 @@ document.addEventListener("click", function (event) {
 
 document.addEventListener("change", function (event) {
   var el = event.target
+  if (el.matches && el.matches("[data-metal-slider]")) {
+    go(null, { [el.dataset.metalSlider]: Number(el.value) || null, "scn-case": null })
+    return
+  }
   if (el.matches && el.matches("[data-industry-slider]")) {
     var prefix = "scn-" + el.dataset.industrySlider + "-"
     var sliderUpdates = { "scn-case": null }
@@ -735,12 +742,13 @@ document.addEventListener("change", function (event) {
   var update = {}
   update[el.name] = el.value
   if (el.id === "scn-filter-metal") update.grade = null
+  if (el.id === "scn-filter-metal" || el.id === "scn-filter-grade") update["scn-case"] = null
   if (el.name === "scn-region" || el.hasAttribute("data-advanced-slider")) update["scn-case"] = null
   go(null, update)
 })
 
 document.addEventListener("input", function (event) {
-  var slider = event.target.closest && event.target.closest("[data-industry-slider], [data-advanced-slider]")
+  var slider = event.target.closest && event.target.closest("[data-industry-slider], [data-metal-slider], [data-advanced-slider]")
   if (slider) {
     var route = readRoute()
     var params = new URLSearchParams(route.params)
@@ -749,7 +757,7 @@ document.addEventListener("input", function (event) {
       params.set(slider.name, slider.value)
       if (slider.hasAttribute("aria-valuetext")) slider.setAttribute("aria-valuetext", scnAdjustmentLabel(Number(slider.value)))
     } else {
-      params.set("scn-" + slider.dataset.industrySlider + "-level", slider.value)
+      params.set(slider.dataset.metalSlider || ("scn-" + slider.dataset.industrySlider + "-level"), slider.value)
       slider.setAttribute("aria-valuetext", scnLevelLabel(Number(slider.value)))
     }
     var model = scnModel(params, route.page === "metal-scenarios")

@@ -285,8 +285,18 @@ function scnDrivers(params) {
 function scnModel(params, byMetal) {
   var dr = scnDrivers(params)
   var p = [dr.a / 100, dr.b / 100, dr.c / 100, dr.d / 100]
+  var assumptionParams = params
+  if (byMetal) {
+    assumptionParams = new URLSearchParams(params)
+    var shifts = scnMetalIndustryShifts(params)
+    SCN_INDUSTRY_DRIVERS.forEach(function (industry) {
+      var key = "scn-" + industry.id
+      assumptionParams.delete(key + "-direction")
+      assumptionParams.set(key + "-level", Math.max(-2, Math.min(2, shifts[industry.id] || 0)))
+    })
+  }
   var assumptions = SCN_INDUSTRY_DRIVERS.map(function (industry) {
-    var input = scnIndustryAssumption(params, industry)
+    var input = scnIndustryAssumption(assumptionParams, industry)
     return { id: industry.id, name: industry.name, grow: industry.grow, fall: industry.fall, shift: input.shift }
   })
   var vis = {}
@@ -398,12 +408,14 @@ function scnLevelLabel(level) {
 }
 
 function scnDriverPanel(params, byMetal) {
-  var sliders = SCN_INDUSTRY_DRIVERS.map(function (item) {
-    var state = scnIndustryAssumption(params, item)
-    var id = "scn-" + item.id + "-level"
-    return '<div class="scn-industry-card"><label for="' + id + '">' + esc(item.name) + '</label>' +
-      '<input type="range" id="' + id + '" min="-2" max="2" step="0.04" value="' + state.level + '" data-industry-slider="' + item.id +
-      '" aria-valuetext="' + scnLevelLabel(state.level) + '">' +
+  var controls = byMetal ? scnMetalDrivers(params) : SCN_INDUSTRY_DRIVERS.map(function (item) {
+    return { key: "scn-" + item.id + "-level", name: item.name, level: scnIndustryAssumption(params, item).level }
+  })
+  var sliders = controls.map(function (item) {
+    return '<div class="scn-industry-card"><label for="' + item.key + '">' + esc(item.name) + '</label>' +
+      '<input type="range" id="' + item.key + '" min="-2" max="2" step="0.04" value="' + item.level + '"' +
+      (byMetal ? ' data-metal-slider="' + item.key + '"' : ' data-industry-slider="' + item.key.slice(4, -6) + '"') +
+      ' aria-valuetext="' + scnLevelLabel(item.level) + '">' +
       '<div class="scn-slide-ends" aria-hidden="true"><span>Decline</span><span>Grow</span></div></div>'
   }).join("")
   var region = scnRegion(params)
@@ -416,7 +428,7 @@ function scnDriverPanel(params, byMetal) {
     }).join("") + '</optgroup>'
   }).join("")
   var filtersOpen = params.get("scn-filters") === "1"
-  return '<section class="scn-panel" aria-labelledby="scn-drivers-heading"><div class="scn-reset"><h2 id="scn-drivers-heading" class="scn-heading">Industry drivers</h2>' +
+  return '<section class="scn-panel" aria-labelledby="scn-drivers-heading"><div class="scn-reset"><h2 id="scn-drivers-heading" class="scn-heading">' + (byMetal ? "Metal drivers" : "Industry drivers") + '</h2>' +
     '<div class="scn-toolbar"><label for="scn-region">Region</label><select id="scn-region" name="scn-region" data-control>' + regions + '</select>' +
     (byMetal ? scnMetalSelect(params, false) : '') +
     '<button id="scn-reset" type="button" class="ev-csv" data-action="scn-reset">Reset assumptions</button></div></div>' +
@@ -587,8 +599,8 @@ function scnMetalCards(model) {
 
 function scnCalcTable(model) {
   return '<details class="ev-box ev-wide scn-calc"><summary>Show calculation</summary>' +
-    '<p class="ev-why">The baseline uses 24 indicators from report sections 3–4. Industry assumptions adjust scenario weights and scores. Advanced market conditions shift the corresponding baseline driver by up to 20 percentage points using illustrative settings. Regions shift baseline demand using illustrative industry assumptions and scale the effect of slider changes. Subregions generally share their group’s baseline. Antarctica has no regional adjustment. Each metal uses a representative application or product line. A specific grade uses its primary end market as an illustrative proxy. End-market weights for the additional metals are illustrative. ' +
-    'Its score in each scenario is a weighted average of the end markets for that product line. The overall index (−2 to +2) weights those scores by scenario likelihood. The Scenario card compares all ten sliders with plausible demand paths. It gives more weight to paths that match the selected direction and strength, then normalizes the retained paths to 100%. These illustrative likelihoods are conditional on the settings and the candidate paths. Factor bars show how closely each associated industry’s modeled level matches its slider. Several factors may refer to the same industry. ' +
+    '<p class="ev-why">The baseline uses 24 indicators from report sections 3–4. Driver assumptions adjust scenario weights and scores. On Scenario by metal, metal settings are translated into industry demand using illustrative end-market weights. Advanced market conditions shift the corresponding baseline driver by up to 20 percentage points using illustrative settings. Regions shift baseline demand using illustrative industry assumptions and scale the effect of slider changes. Subregions generally share their group’s baseline. Antarctica has no regional adjustment. Each metal uses a representative application or product line. A specific grade uses its primary end market as an illustrative proxy. End-market weights for the additional metals are illustrative. ' +
+    'Its score in each scenario is a weighted average of the end markets for that product line. The overall index (−2 to +2) weights those scores by scenario likelihood. The Scenario card compares the resulting industry demand assumptions with plausible demand paths. It gives more weight to paths that match the selected direction and strength, then normalizes the retained paths to 100%. These illustrative likelihoods are conditional on the settings and the candidate paths. Factor bars show how closely each associated industry’s modeled level matches its slider. Several factors may refer to the same industry. ' +
     'The five squares show the separate outlook model’s scores (blue for growth, orange for decline).</p>' +
     '<details class="scn-scenario-sources"><summary>Sources behind the scenario examples</summary><ul>' +
     Object.values(SCN_NEWS).map(function (news) {
