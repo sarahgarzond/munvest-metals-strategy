@@ -244,7 +244,7 @@ function viewSimulator(route) {
   return '<div class="scn">' + pageHead("Market scenarios to 2035") +
     scnDriverPanel(model) +
     '<div class="scn-grid"><section class="scn-panel" aria-label="Scenario likelihoods"><div id="scn-likelihoods" class="scn-body">' + scnLikelihoods(model) + "</div></section>" +
-    '<section class="scn-panel" aria-label="Market outlook by metal">' +
+    '<section class="scn-panel" aria-labelledby="scn-metal-heading"><h2 id="scn-metal-heading" class="scn-metal-heading">Market outlook by metal</h2>' +
     '<div id="scn-metals" class="scn-body scn-cards">' + scnMetalCards(model) + "</div></section></div>" +
     '<div id="scn-calc">' + scnCalcTable(model) + "</div>" +
     '<p class="scn-link"><a href="#/strategy' + scnKeep(route.params) + '">See what this means for each product line →</a></p></div>'
