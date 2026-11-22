@@ -122,11 +122,10 @@ a { color: inherit; }
 }
 
 .nav a.nav-dot {
-  align-self: flex-start;
+  align-self: flex-end;
   justify-content: center;
   width: 44px;
   padding: 0;
-  margin-left: 1px;
 }
 
 .nav a.nav-dot::before {
