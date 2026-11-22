@@ -381,7 +381,7 @@ function viewShortages(route) {
       }
     })
   })
-  return pageHead("Shortages") + filters + '<div class="work' + (profile ? "" : " solo") + '">' + table + (profile ? detailPanel(route.params) : "") + "</div>"
+  return pageHead("Shortages") + '<p class="shortage-method">Product-grade gaps are project estimates and depend on the availability of both demand and supply figures.</p>' + filters + '<div class="work' + (profile ? "" : " solo") + '">' + table + (profile ? detailPanel(route.params) : "") + "</div>" + marketEvidencePanel()
 }
 
 function detailPanel(params) {
@@ -555,6 +555,7 @@ function render(options) {
   var focusId = document.activeElement && document.activeElement.id
   document.body.dataset.page = route.page
   document.getElementById("main").innerHTML = view(route)
+  loadMarketEvidence(route)
   if (focusId) {
     var el = document.getElementById(focusId)
     if (el) {
@@ -591,7 +592,7 @@ document.addEventListener("click", function (event) {
     if (action.dataset.action === "scn-open-filters" || action.dataset.action === "scn-close-filters") {
       var opening = action.dataset.action === "scn-open-filters" && readRoute().params.get("scn-filters") !== "1"
       go("trends", { "scn-filters": opening ? "1" : null }, { replace: true })
-      document.getElementById(opening ? "scn-filter-industry" : "scn-filters-button").focus()
+      document.getElementById(opening ? "scn-advanced-a" : "scn-filters-button").focus()
     }
     if (action.dataset.action === "scn-csv") scnCsv(action.dataset.kind)
     if (action.dataset.action === "clear-node") go("supply", { node: null })
@@ -674,11 +675,16 @@ document.addEventListener("change", function (event) {
 })
 
 document.addEventListener("input", function (event) {
-  var slider = event.target.closest && event.target.closest("[data-industry-slider]")
+  var slider = event.target.closest && event.target.closest("[data-industry-slider], [data-advanced-slider]")
   if (slider) {
     var params = new URLSearchParams(readRoute().params)
-    params.set("scn-" + slider.dataset.industrySlider + "-level", slider.value)
-    slider.setAttribute("aria-valuetext", scnLevelLabel(Number(slider.value)))
+    if (slider.hasAttribute("data-advanced-slider")) {
+      params.set(slider.name, slider.value)
+      if (slider.hasAttribute("aria-valuetext")) slider.setAttribute("aria-valuetext", scnAdjustmentLabel(Number(slider.value)))
+    } else {
+      params.set("scn-" + slider.dataset.industrySlider + "-level", slider.value)
+      slider.setAttribute("aria-valuetext", scnLevelLabel(Number(slider.value)))
+    }
     var model = scnModel(params)
     document.getElementById("scn-likelihoods").innerHTML = scnLikelihoods(model)
     document.getElementById("scn-metals").innerHTML = scnMetalCards(model)

@@ -38,6 +38,16 @@ TRADE = {  # key -> (HS code, flow, label)
     "hs902131_x": ("902131", "X", "Artificial joint exports (HS 902131)"),
     "hs902131_m": ("902131", "M", "Artificial joint imports (HS 902131)"),
 }
+TRADE_METALS = {
+    "750210": ("Nickel", "Unwrought unalloyed nickel"),
+    "810520": ("Cobalt", "Cobalt mattes, unwrought cobalt and powders"),
+    "740311": ("Copper", "Refined copper cathodes"),
+    "760110": ("Aluminium", "Unwrought non-alloy aluminium"),
+}
+for code, (_, label) in TRADE_METALS.items():
+    TRADE[f"hs{code}_m"] = (code, "M", f"{label} imports (HS {code})")
+    TRADE[f"hs{code}_x"] = (code, "X", f"{label} exports (HS {code})")
+
 JUMP = 0.5  # flag changes above 50% for a human to check
 
 
@@ -110,22 +120,36 @@ def parse_comtrade(payload: dict) -> tuple[dict, dict]:
     return vals, names
 
 
-def fetch_trade(key: str) -> dict:
-    out, names = {}, {}
+def fetch_trade(key: str, previous: dict) -> dict:
+    out = dict(previous.get("series", {}))
+    names = dict(previous.get("names", {}))
     year0 = dt.date.today().year - 1
-    for k, (hs, flow, label) in TRADE.items():
-        for year in (year0, year0 - 1):  # latest year with broad coverage
-            r = requests.get(COMTRADE, headers={**UA, "Ocp-Apim-Subscription-Key": key}, timeout=120,
-                             params={"cmdCode": hs, "flowCode": flow, "partnerCode": 0,
-                                     "period": year, "includeDesc": "true"})
-            r.raise_for_status()
-            vals, nm = parse_comtrade(r.json())
-            if len(vals) >= 30:
-                out[k] = {"label": f"{label}, {year}", "year": year, "unit": "USD", "d": vals}
-                names.update(nm)
+    updated = 0
+    for series_id, (hs, flow, label) in TRADE.items():
+        for year in (year0, year0 - 1):
+            try:
+                response = requests.get(
+                    COMTRADE, headers={**UA, "Ocp-Apim-Subscription-Key": key}, timeout=30,
+                    params={"cmdCode": hs, "flowCode": flow, "partnerCode": 0,
+                            "period": year, "includeDesc": "true"},
+                )
+                response.raise_for_status()
+                values, country_names = parse_comtrade(response.json())
+            except (requests.RequestException, ValueError) as error:
+                print(f"Comtrade {series_id}: {type(error).__name__}; keeping previous observations")
+                break
+            if len(values) >= 30:
+                series = {"label": f"{label}, {year}", "year": year, "unit": "USD", "d": values}
+                if hs in TRADE_METALS:
+                    series["metal"] = TRADE_METALS[hs][0]
+                out[series_id] = series
+                names.update(country_names)
+                updated += 1
                 break
         else:
-            raise ValueError(f"{k}: fewer than 30 reporting countries in {year0} and {year0 - 1}")
+            print(f"Comtrade {series_id}: insufficient reporters; keeping previous observations")
+    if not updated:
+        raise ValueError("no trade series updated")
     return {"series": out, "names": names}
 
 
@@ -159,7 +183,7 @@ def main() -> int:
     key = os.environ.get("COMTRADE_KEY", "").strip()
     if key:
         try:
-            new["trade"] = {**fetch_trade(key), "fetched": dt.date.today().isoformat()}
+            new["trade"] = {**fetch_trade(key, old.get("trade", {})), "fetched": dt.date.today().isoformat()}
             status["UN Comtrade"] = "updated"
         except Exception as e:
             status["UN Comtrade"] = f"failed, kept previous values ({type(e).__name__})"

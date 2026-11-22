@@ -169,3 +169,72 @@ function evAssumptions(s) {
     rows.map(function (r) { return "<tr><td>" + esc(r[0]) + "</td><td>" + r[1] + "</td><td>" + r[2] + "</td><td>" + r[3] + "</td></tr>" }).join("") +
     '</tbody></table><p class="ev-why">Every number on this page traces back to one row here. A row marked "Source missing" is an open task.</p></section>'
 }
+
+
+var marketSnapshotRequest
+
+function marketEvidencePanel() {
+  return '<details class="ev-box ev-wide market-evidence"><summary>Published market data</summary>' +
+    '<div id="market-evidence-content">Loading publisher observations…</div></details>'
+}
+
+function loadMarketEvidence(route) {
+  var container = document.getElementById("market-evidence-content")
+  if (!container) return
+  if (!marketSnapshotRequest) {
+    marketSnapshotRequest = Promise.all(["data/live.json", "data/providers.json"].map(function (file) {
+      return fetch(file).then(function (response) {
+        if (!response.ok) throw new Error(file)
+        return response.json()
+      })
+    })).catch(function (error) {
+      marketSnapshotRequest = null
+      throw error
+    })
+  }
+  marketSnapshotRequest.then(function (result) {
+    if (container.isConnected) container.innerHTML = marketEvidenceRows(result[0], result[1], route)
+  }).catch(function () {
+    if (container.isConnected) container.textContent = "Publisher observations are temporarily unavailable."
+  })
+}
+
+function marketEvidenceRows(snapshot, catalog, route) {
+  var metal = route.page === "shortages" && route.params.get("metal")
+  var normalizedMetal = metal && metal.toLowerCase().replace("aluminium", "aluminum")
+  var providers = snapshot.providers || {}
+  var names = Object.fromEntries(catalog.map(function (provider) { return [provider.id, provider.name] }))
+  var rows = []
+
+  Object.values(snapshot.prices?.series || {}).forEach(function (price) {
+    if (!normalizedMetal || price.name.toLowerCase() === normalizedMetal) {
+      rows.push(["world-bank", price.name + " benchmark price", "World benchmark", price.month, price.usd_t, "USD/t"])
+    }
+  })
+  Object.values(snapshot.trade?.series || {}).forEach(function (series) {
+    if (!series.metal || (normalizedMetal && normalizedMetal !== series.metal.toLowerCase().replace("aluminium", "aluminum"))) return
+    var reporter = Object.entries(series.d).sort(function (a, b) { return b[1] - a[1] })[0]
+    if (reporter) rows.push(["comtrade", series.label.replace(/, \d{4}$/, ""),
+      snapshot.trade.names[reporter[0]] || reporter[0], series.year, reporter[1], series.unit])
+  })
+  catalog.filter(function (provider) { return provider.id !== "world-bank" && provider.id !== "comtrade" }).forEach(function (provider) {
+    var id = provider.id
+    var latest = (providers[id]?.rows || []).filter(function (row) {
+      return !normalizedMetal || row.metric.toLowerCase().replace("aluminium", "aluminum").includes(normalizedMetal)
+    }).reduce(function (best, row) { return !best || row.period > best.period ? row : best }, null)
+    if (latest) rows.push([id, latest.metric, latest.geography, latest.period, latest.value, latest.unit])
+  })
+  var available = catalog.filter(function (provider) { return providers[provider.id]?.rows?.length }).length
+  var format = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 })
+  var intro = '<p>Publisher coverage: ' + available + ' of ' + catalog.length + ' sources. ' +
+    (route.page === "shortages" ? "These series provide market context. Product-grade gaps need matched demand and available supply." :
+      "These observations provide context for the 2035 assumptions. The scenario scores use the model’s illustrative weights.") + '</p>'
+  var table = rows.length ? '<div class="scn-table-wrap"><table class="ev-table"><thead><tr><th>Observation</th><th>Geography</th>' +
+    '<th>Period</th><th>Value</th><th>Publisher</th></tr></thead><tbody>' + rows.map(function (row) {
+      var value = typeof row[4] === "number" ? format.format(row[4]) : row[4]
+      return "<tr><td>" + esc(row[1]) + "</td><td>" + esc(row[2]) + "</td><td>" +
+        esc(String(row[3])) + "</td><td>" + esc(value + " " + row[5]) +
+        '</td><td><a href="data-sources.html?provider=' + encodeURIComponent(row[0]) + '">' + esc(names[row[0]]) + "</a></td></tr>"
+    }).join("") + "</tbody></table></div>" : "<p>No matching market observations are loaded for this metal.</p>"
+  return intro + table + '<a href="data-sources.html">Browse all datasets and coverage</a>'
+}

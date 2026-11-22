@@ -42,6 +42,9 @@ async function start() {
   const firstAvailable = catalog.find(source => snapshot[source.id]?.rows?.length);
   if (firstAvailable) select.value = firstAvailable.id;
 
+  const requested = new URLSearchParams(location.search).get("provider");
+  if (catalog.some(source => source.id === requested)) select.value = requested;
+
   function render() {
     const source = catalog.find(item => item.id === select.value);
     const entry = snapshot[source.id];
