@@ -289,7 +289,7 @@ function trkProject(lat, lon) { return [(lon + 180) / 360 * 1000, (90 - lat) / 1
 function trkMapData(model, base, params, byMetal) {
   if (!trkReady()) return null
   if (byMetal) {
-    var metal = scnMetalFilter(params)
+    var metal = scnMetalFilter(params) || params.get("focus")
     if (!metal || !TRACKER.production.some(function (p) { return p.metal === metal })) {
       var moved = scnMetalProducts(model).map(function (p) {
         var b = scnMetalProducts(base).find(function (x) { return x.metal === p.metal }) || p
@@ -350,22 +350,14 @@ function trkResults(model, params, byMetal) {
     return { name: p.cardTitle || p.metal, value: p.index - b.index, text: scnSigned(p.index - b.index) }
   }).filter(function (r) { return Math.abs(r.value) >= 0.005 }).sort(function (a, b) { return Math.abs(b.value) - Math.abs(a.value) }).slice(0, 8)
   var inputs = trkInputs(params, byMetal).map(function (r) { return { name: r.name, value: r.pct, text: r.pts ? (r.pct > 0 ? "+" : "\u2212") + Math.abs(r.pct) + " pts" : trkPctText(r.pct) } })
-  return trkRecommendation(model, base, params, byMetal) + trkDecision(model, base, params) +
-    '<div class="trk-charts"><figure><figcaption>Your 2035 inputs (vs tracker or baseline value)</figcaption>' +
-    trkBars(inputs, { empty: "No inputs changed.", min: 10 }) + "</figure>" +
-    '<figure><figcaption>Change in demand index vs evidence baseline (−2 to +2 scale)</figcaption>' +
-    trkBars(deltas, { empty: "No change against the evidence baseline yet.", min: 0.25 }) + "</figure></div>" +
-    trkMap3dShell(model, base, params, byMetal) +
-    (trkCountry(params) ? '<section class="trk-country"><h3>' + esc(TRK_GEO[trkCountry(params)][0]) + " in the tracker</h3>" + trkCountryFacts(trkCountry(params)) + "</section>" : "")
+  return trkRecommendation(model, base, params, byMetal) + trkDecision(model, base, params) + trkFlowMap(model, base, params, byMetal)
 }
 
 function trkPaint(model, params, byMetal) {
   var el = document.getElementById("trk-results")
-  if (el) {
-    el.innerHTML = trkResults(model, params, byMetal)
-    clearTimeout(trkPaint.timer)
-    trkPaint.timer = setTimeout(trkMount3d, 120)
-  }
+  if (el) el.innerHTML = trkResults(model, params, byMetal)
+  var topEl = document.getElementById("trk-top")
+  if (topEl) topEl.innerHTML = trkTop(model, params, byMetal)
 }
 
 function trkSnapshotLine() {
@@ -453,93 +445,6 @@ function trkDecision(model, base, params) {
     '<p class="trk-note">End-market weights: ' + (SCN_PRODUCTS.some(function (x) { return x.metal === p.metal }) ? "client product mapping from the project brief (to be checked with the company)." : "illustrative (scenarios.js SCN_METAL_OUTLOOKS), not yet from the tracker.") + "</p></section>"
 }
 
-/* ---------- 3D map (deck.gl) with the flat SVG map as fallback ---------- */
-
-var TRK_DECK_URL = "https://unpkg.com/deck.gl@9.2.11/dist.min.js"
-var trkDeckPromise = null
-var trkDeckInstance = null
-var trkLandPolys = null
-
-function trkLoadDeck() {
-  if (window.deck) return Promise.resolve(window.deck)
-  if (!trkDeckPromise) {
-    trkDeckPromise = new Promise(function (resolve, reject) {
-      var s = document.createElement("script")
-      s.src = window.TRK_DECK_URL_OVERRIDE || TRK_DECK_URL
-      s.onload = function () { window.deck ? resolve(window.deck) : reject(new Error("deck.gl missing")) }
-      s.onerror = function () { reject(new Error("deck.gl did not load")) }
-      document.head.appendChild(s)
-    })
-  }
-  return trkDeckPromise
-}
-
-function trkLand() {
-  if (trkLandPolys) return trkLandPolys
-  trkLandPolys = LAND_PATH.split("Z").map(function (part) {
-    var nums = part.replace(/[ML]/g, " ").trim().split(/[\s,]+/).map(Number)
-    var ring = []
-    for (var i = 0; i + 1 < nums.length; i += 2) ring.push([nums[i] / 1000 * 360 - 180, 90 - nums[i + 1] / 500 * 180])
-    return ring
-  }).filter(function (r) { return r.length > 2 })
-  return trkLandPolys
-}
-
-function trkMap3dShell(model, base, params, byMetal) {
-  var data = trkMapData(model, base, params, byMetal)
-  if (!data) return ""
-  var pts = data.points.map(function (p) { var g = TRK_GEO[p.iso]; return { iso: p.iso, name: g[0], lon: g[2], lat: g[1], value: p.value, text: p.text } })
-  window.trkMapPoints = { points: pts, selected: trkCountry(params), title: data.title }
-  return '<figure class="trk-map trk-map3d-wrap"><figcaption>' + esc(data.title) + ' <span class="trk-map-mode"><button type="button" class="ev-csv" data-action="trk-map-mode">' + (params.get("map") === "flat" ? "Show 3D" : "Show flat map") + "</button></span></figcaption>" +
-    (params.get("map") === "flat" ? "" : '<div id="trk-map3d" class="trk-map3d" role="img" aria-label="3D column map: ' + esc(data.title) + '"><p class="trk-note">Loading 3D map…</p></div>') +
-    '<div id="trk-map2d"' + (params.get("map") === "flat" ? "" : " hidden") + ">" + trkMap(model, base, params, byMetal).replace(/^<figure class="trk-map"><figcaption>.*?<\/figcaption>/, "").replace(/<\/figure>$/, "") + "</div>" +
-    '<p class="trk-note">Column height = value. Drag to rotate (right-click or Ctrl + drag to tilt), scroll to zoom. Source: ' + data.source + " via the tracker.</p></figure>"
-}
-
-function trkMount3d() {
-  var el = document.getElementById("trk-map3d")
-  if (!el || !window.trkMapPoints) return
-  var data = window.trkMapPoints
-  trkLoadDeck().then(function (deck) {
-    if (!document.body.contains(el)) return
-    if (trkDeckInstance) { try { trkDeckInstance.finalize() } catch (e) { /* already gone */ } trkDeckInstance = null }
-    el.innerHTML = ""
-    var night = document.documentElement.dataset.theme === "night"
-    var max = Math.max.apply(null, data.points.map(function (p) { return p.value }).concat([1e-9]))
-    var top = data.points.slice().sort(function (a, b) { return b.value - a.value }).slice(0, 6)
-    var sel = data.selected && !data.points.some(function (p) { return p.iso === data.selected }) && TRK_GEO[data.selected]
-      ? [{ name: TRK_GEO[data.selected][0] + " (selected, no value)", lon: TRK_GEO[data.selected][2], lat: TRK_GEO[data.selected][1] }] : []
-    var center = top.length ? top.reduce(function (s, p) { return [s[0] + p.lon * p.value, s[1] + p.lat * p.value, s[2] + p.value] }, [0, 0, 0]) : [10, 30, 1]
-    trkDeckInstance = new deck.Deck({
-      parent: el,
-      views: new deck.MapView({ repeat: false }),
-      initialViewState: { longitude: center[0] / center[2], latitude: Math.max(-20, Math.min(50, center[1] / center[2])), zoom: 1.15, pitch: 48, bearing: -12 },
-      controller: true,
-      layers: [
-        new deck.SolidPolygonLayer({ id: "land", data: trkLand(), getPolygon: function (d) { return d }, getFillColor: night ? [70, 95, 108] : [205, 214, 218], pickable: false }),
-        new deck.ColumnLayer({
-          id: "cols", data: data.points, diskResolution: 24, radius: 230000, extruded: true, pickable: true,
-          elevationScale: 1, getPosition: function (d) { return [d.lon, d.lat] },
-          getElevation: function (d) { return 200000 + 3800000 * d.value / max },
-          getFillColor: function (d) { return d.iso === data.selected ? [215, 125, 49] : [43, 108, 176, 230] },
-          material: { ambient: 0.5, diffuse: 0.6, shininess: 20 }
-        }),
-        new deck.ScatterplotLayer({ id: "selected", data: sel, getPosition: function (d) { return [d.lon, d.lat] }, getRadius: 260000, filled: false, stroked: true, getLineColor: [215, 125, 49], lineWidthMinPixels: 3, pickable: true }),
-        new deck.TextLayer({
-          id: "labels", data: top, getPosition: function (d) { return [d.lon, d.lat, 260000 + 3800000 * d.value / max] },
-          getText: function (d) { return d.name + " " + d.text }, getSize: 12, getColor: night ? [226, 235, 239] : [36, 52, 60],
-          getTextAnchor: "start", getPixelOffset: [8, -6], fontFamily: "Noto Sans, Arial, sans-serif", outlineWidth: 2, outlineColor: night ? [16, 29, 37] : [246, 241, 232], fontSettings: { sdf: true }
-        })
-      ],
-      getTooltip: function (info) { return info.object && info.object.name ? info.object.name + ": " + info.object.text : null }
-    })
-  }).catch(function () {
-    el.remove()
-    var flat = document.getElementById("trk-map2d")
-    if (flat) flat.hidden = false
-  })
-}
-
 /* ---------- What each slider changes ---------- */
 
 function trkSliderFeeds(industryKey) {
@@ -567,4 +472,143 @@ function trkSliderHelp(byMetal, key) {
   var events = trkEvents().filter(function (e) { return e.key === key })
   return (feeds.length ? "Feeds: " + feeds.slice(0, 4).map(function (x) { return esc(x.metal) + " " + Math.round(x.share * 100) + "%" }).join(", ") : "No metal in the outlook uses this industry") +
     (events.length ? ' · tracker basis: ' + esc(events[0].label) + " " + trkSources(events[0].sources) : "")
+}
+
+/* ---------- Glossary (hover terms) ---------- */
+
+var TRK_GLOSSARY = {
+  "demand index": "Direction and strength of 2035 demand on a −2 to +2 scale: 0 is flat, +2 the strongest growth the evidence supports. Not tonnes or prices (report section 12).",
+  "vision": "One of five 2035 futures for Germany and the EU, built from four uncertain drivers (report sections 4–5).",
+  "evidence baseline": "Results with all inputs at the values scored from the 24 sourced indicators in the report.",
+  "Grow / Shift / Hold": "Strategy rule: index above +0.5 grow, 0 to +0.5 shift the mix, below 0 hold (report section 10).",
+  "HHI": "Herfindahl–Hirschman index of production shares (sum of squared % shares). Above 2,500 = highly concentrated.",
+  "path weight": "Share of a demand storyline among the candidate storylines that fit your inputs. Illustrative, not a forecast."
+}
+
+function trkTerm(term, label) {
+  return '<abbr class="trk-term" tabindex="0" title="' + esc(TRK_GLOSSARY[term] || "") + '">' + esc(label || term) + "</abbr>"
+}
+
+/* ---------- Top of the calculator: headline numbers and two "baseline vs your scenario" graphs ---------- */
+
+function trkKpis(model, base, params, byMetal) {
+  var top = SCN_VISIONS.slice().sort(function (a, b) { return model.visions[b.id].p - model.visions[a.id].p })[0]
+  var baseTop = SCN_VISIONS.slice().sort(function (a, b) { return base.visions[b.id].p - base.visions[a.id].p })[0]
+  var items = scnMetalProducts(model), baseItems = scnMetalProducts(base)
+  var grow = items.filter(function (p) { return p.strategy.cls === "grow" }).length
+  var changed = items.filter(function (p) { var b = baseItems.find(function (x) { return x.metal === p.metal && x.name === p.name }); return b && b.strategy.label !== p.strategy.label })
+  var n = trkInputs(params, byMetal).length
+  var focus = trkFocus(model, params)
+  return '<div class="trk-kpis">' +
+    '<div class="trk-kpi"><span>Most likely ' + trkTerm("vision") + '</span><b>' + esc(top.short) + " " + scnPct(model.visions[top.id].p) + "</b><small>" + (top.id === baseTop.id ? "baseline " + scnPct(base.visions[top.id].p) : "baseline: " + esc(baseTop.short)) + "</small></div>" +
+    (focus ? '<div class="trk-kpi"><span>' + esc(focus.metal) + " " + trkTerm("demand index") + '</span><b class="scn-' + focus.strategy.cls + '-ink">' + scnSigned(focus.index) + " · " + esc(focus.strategy.label) + "</b><small>chance of growth " + scnPct(focus.chance) + "</small></div>" : "") +
+    '<div class="trk-kpi"><span>Metals rated Grow</span><b>' + grow + " of " + items.length + "</b><small>" + (changed.length ? changed.length + " strategy change" + (changed.length > 1 ? "s" : "") + " vs baseline" : "same as baseline") + "</small></div>" +
+    '<div class="trk-kpi"><span>Your changes</span><b>' + n + "</b><small>" + (n ? "inputs differ from the " + trkTerm("evidence baseline") : "you are at the " + trkTerm("evidence baseline")) + "</small></div>" +
+    '<div class="trk-kpi-tools"><button type="button" class="ev-csv" data-action="trk-copy">Copy link</button><button type="button" class="ev-csv" data-action="trk-print">Print brief</button>' +
+    '<button type="button" class="ev-csv" data-action="trk-compare">' + (params.get("compare") === "0" ? "Show baseline" : "Hide baseline") + "</button></div></div>"
+}
+
+/* Grouped columns: for each vision, the evidence baseline (grey) next to your scenario (vision colour). */
+function trkLikelihoodChart(model, base, compare) {
+  var rows = SCN_VISIONS.slice().sort(function (a, b) { return base.visions[b.id].p - base.visions[a.id].p })
+  var max = Math.max.apply(null, rows.map(function (v) { return Math.max(model.visions[v.id].p, base.visions[v.id].p) }))
+  var top = Math.min(1, Math.ceil(max * 10) / 10 + 0.05)
+  var W = 460, H = 250, padT = 26, padB = 52, padL = 30, gw = (W - padL) / rows.length, bw = compare ? gw * 0.3 : gw * 0.46
+  var Y = function (p) { return padT + (1 - p / top) * (H - padT - padB) }
+  var ticks = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9].filter(function (t) { return t <= top + 0.001 })
+  if (ticks.length > 6) ticks = ticks.filter(function (t, i) { return i % 2 === 0 })
+  var grid = ticks.map(function (t) {
+    return '<line x1="' + padL + '" x2="' + W + '" y1="' + Y(t).toFixed(1) + '" y2="' + Y(t).toFixed(1) + '" class="trk-lk-grid"></line><text x="' + (padL - 6) + '" y="' + (Y(t) + 3).toFixed(1) + '" class="trk-lk-tick">' + Math.round(t * 100) + "%</text>"
+  }).join("")
+  var groups = rows.map(function (v, i) {
+    var p = model.visions[v.id].p, b = base.visions[v.id].p, d = Math.round((p - b) * 100)
+    var cx = padL + gw * i + gw / 2
+    var color = typeof RPT_COLORS !== "undefined" ? RPT_COLORS[v.id] : "#4d6c7d"
+    var now = compare ? cx + 2 : cx - bw / 2
+    var out = ""
+    if (compare) {
+      out += '<rect x="' + (cx - bw - 2).toFixed(1) + '" y="' + Y(b).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + (Y(0) - Y(b)).toFixed(1) + '" class="trk-lk-base"><title>' + esc(v.name + " baseline " + scnPct(b)) + "</title></rect>" +
+        '<text x="' + (cx - bw / 2 - 2).toFixed(1) + '" y="' + (Y(b) - 5).toFixed(1) + '" class="trk-lk-val base">' + scnPct(b) + "</text>"
+    }
+    out += '<rect x="' + now.toFixed(1) + '" y="' + Y(p).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + (Y(0) - Y(p)).toFixed(1) + '" rx="2" fill="' + color + '"><title>' + esc(v.name + " your scenario " + scnPct(p)) + "</title></rect>" +
+      '<text x="' + (now + bw / 2).toFixed(1) + '" y="' + (Y(p) - 5).toFixed(1) + '" class="trk-lk-val">' + scnPct(p) + "</text>"
+    var name = v.short
+    out += '<text x="' + cx.toFixed(1) + '" y="' + (H - padB + 16) + '" class="trk-lk-name">' + esc(name) + "</text>"
+    if (compare && d) out += '<text x="' + cx.toFixed(1) + '" y="' + (H - padB + 32) + '" class="trk-lk-delta ' + (d > 0 ? "up" : "down") + '">' + (d > 0 ? "▲ +" : "▼ −") + Math.abs(d) + " pts</text>"
+    return out
+  }).join("")
+  return '<svg class="trk-lkcols" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Likelihood of each vision, baseline and your scenario">' + grid +
+    '<line x1="' + padL + '" x2="' + W + '" y1="' + Y(0).toFixed(1) + '" y2="' + Y(0).toFixed(1) + '" class="trk-lk-axis"></line>' + groups + "</svg>"
+}
+
+function trkMetalDots(model, base, params, compare) {
+  var items = scnMetalProducts(model), baseItems = scnMetalProducts(base)
+  var rows = items.map(function (p) {
+    var b = baseItems.find(function (x) { return x.metal === p.metal && x.name === p.name }) || p
+    return { p: p, b: b }
+  }).sort(function (a, c) { return c.p.index - a.p.index })
+  var vals = rows.reduce(function (acc, r) { return acc.concat([r.p.index, r.b.index]) }, [])
+  var lo = Math.min(-0.5, Math.floor(Math.min.apply(null, vals) * 4) / 4), hi = Math.max(1.25, Math.ceil(Math.max.apply(null, vals) * 4) / 4)
+  var W = 600, left = 104, right = 100, rowH = 22, top = 26, H = top + rows.length * rowH + 8
+  var X = function (v) { return left + (v - lo) / (hi - lo) * (W - left - right) }
+  var focus = (trkFocus(model, params) || {}).metal
+  var zones = '<rect x="' + X(lo) + '" y="' + (top - 6) + '" width="' + (X(0) - X(lo)) + '" height="' + (H - top) + '" class="trk-z-hold"></rect>' +
+    '<rect x="' + X(0) + '" y="' + (top - 6) + '" width="' + (X(0.5) - X(0)) + '" height="' + (H - top) + '" class="trk-z-shift"></rect>' +
+    '<rect x="' + X(0.5) + '" y="' + (top - 6) + '" width="' + (X(hi) - X(0.5)) + '" height="' + (H - top) + '" class="trk-z-grow"></rect>' +
+    '<text x="' + ((X(lo) + X(0)) / 2) + '" y="12" class="trk-z-lbl">Hold</text><text x="' + ((X(0) + X(0.5)) / 2) + '" y="12" class="trk-z-lbl">Shift</text><text x="' + ((X(0.5) + X(hi)) / 2) + '" y="12" class="trk-z-lbl">Grow</text>'
+  var marks = rows.map(function (r, i) {
+    var y = top + i * rowH + rowH / 2, x0 = X(r.b.index), x1 = X(r.p.index), moved = Math.abs(r.p.index - r.b.index) >= 0.005
+    return '<g class="trk-dot-row' + (r.p.metal === focus ? " on" : "") + '" data-action="trk-focus" data-metal="' + esc(r.p.metal) + '" tabindex="0" role="button" aria-label="' + esc(r.p.metal + " " + scnSigned(r.p.index) + " " + r.p.strategy.label) + '">' +
+      '<rect x="0" y="' + (y - rowH / 2) + '" width="' + W + '" height="' + rowH + '" class="trk-dot-hit"></rect>' +
+      '<text x="' + (left - 8) + '" y="' + (y + 4) + '" class="trk-dot-name">' + esc(r.p.cardTitle || r.p.metal) + "</text>" +
+      (compare && moved ? '<line x1="' + x0 + '" x2="' + x1 + '" y1="' + y + '" y2="' + y + '" class="trk-dot-arrow"></line><circle cx="' + x0 + '" cy="' + y + '" r="4.5" class="trk-dot-base"><title>Baseline ' + scnSigned(r.b.index) + "</title></circle>" : "") +
+      '<circle cx="' + x1 + '" cy="' + y + '" r="6" class="trk-dot-now trk-' + r.p.strategy.cls + '"><title>' + esc(r.p.metal + " " + scnSigned(r.p.index)) + "</title></circle>" +
+      '<text x="' + (W - right + 8) + '" y="' + (y + 4) + '" class="trk-dot-val">' + scnSigned(r.p.index) + (compare && moved ? " (" + (r.p.index > r.b.index ? "+" : "−") + Math.abs(r.p.index - r.b.index).toFixed(2) + ")" : "") + "</text></g>"
+  }).join("")
+  return '<svg class="trk-dots" viewBox="0 0 ' + W + " " + H + '" role="group" aria-label="Demand index by metal">' + zones +
+    '<line x1="' + X(0) + '" x2="' + X(0) + '" y1="' + (top - 6) + '" y2="' + H + '" class="trk-dot-zero"></line>' + marks + "</svg>"
+}
+
+function trkTop(model, params, byMetal) {
+  var base = scnModel(trkBaseParams(params), byMetal)
+  var compare = params.get("compare") !== "0"
+  return trkKpis(model, base, params, byMetal) +
+    '<div class="trk-graphs"><figure><figcaption>Likelihood of each 2035 ' + trkTerm("vision") + (compare ? ' <span class="trk-legend-inline"><i class="b"></i>evidence baseline <i class="n multi"></i>your scenario (coloured)</span>' : "") + "</figcaption>" + trkLikelihoodChart(model, base, compare) + "</figure>" +
+    '<figure><figcaption>' + trkTerm("demand index", "Demand index") + " by metal, 2035 · " + trkTerm("Grow / Shift / Hold", "strategy zones") + (compare ? ' <span class="trk-legend-inline"><i class="b dot"></i>baseline <i class="n dot"></i>your scenario</span>' : "") + "</figcaption>" + trkMetalDots(model, base, params, compare) +
+    '<p class="trk-note">Click a metal for its decision brief.</p></figure></div>'
+}
+
+/* ---------- Supply map: producers sized by share, flows to the client's country ---------- */
+
+function trkFlowMap(model, base, params, byMetal) {
+  var data = trkMapData(model, base, params, byMetal)
+  if (!data) return ""
+  var dest = trkCountry(params) || "DEU"
+  var dg = TRK_GEO[dest]; var dxy = trkProject(dg[1], dg[2])
+  var max = Math.max.apply(null, data.points.map(function (p) { return p.value }).concat([1e-9]))
+  var sorted = data.points.slice().sort(function (a, b) { return b.value - a.value })
+  var pick = params.get("mapc") && TRK_GEO[params.get("mapc")] ? params.get("mapc") : (sorted[0] || {}).iso
+  var flows = byMetal ? sorted.slice(0, 6).filter(function (p) { return p.iso !== dest }).map(function (p) {
+    var g = TRK_GEO[p.iso]; var a = trkProject(g[1], g[2])
+    var mx = (a[0] + dxy[0]) / 2, my = Math.min(a[1], dxy[1]) - Math.abs(a[0] - dxy[0]) * 0.18 - 10
+    return '<path d="M' + a[0].toFixed(1) + "," + a[1].toFixed(1) + " Q" + mx.toFixed(1) + "," + my.toFixed(1) + " " + dxy[0].toFixed(1) + "," + dxy[1].toFixed(1) + '" class="trk-flow-line" style="stroke-width:' + (1 + 7 * p.value / max).toFixed(1) + '"></path>'
+  }).join("") : ""
+  var placed = []
+  var bubbles = sorted.map(function (p, i) {
+    var g = TRK_GEO[p.iso]; var xy = trkProject(g[1], g[2]); var r = 3 + 20 * Math.sqrt(p.value / max)
+    var show = i < 6 && placed.every(function (q) { return Math.abs(q[0] - xy[0]) > 90 || Math.abs(q[1] - xy[1]) > 16 })
+    if (show) placed.push(xy)
+    var right = xy[0] > 860
+    return '<g class="trk-pt' + (p.iso === pick ? " pick" : "") + '" data-action="trk-map-country" data-iso="' + p.iso + '" tabindex="0" role="button" aria-label="' + esc(g[0] + " " + p.text) + '"><circle cx="' + xy[0].toFixed(1) + '" cy="' + xy[1].toFixed(1) + '" r="' + r.toFixed(1) + '"><title>' + esc(g[0] + ": " + p.text) + "</title></circle>" +
+      (show || p.iso === pick ? '<text x="' + (right ? xy[0] - r - 3 : xy[0] + r + 3).toFixed(1) + '" y="' + (xy[1] + 4).toFixed(1) + '"' + (right ? ' text-anchor="end"' : "") + ">" + esc(g[0] + " " + p.text) + "</text>" : "") + "</g>"
+  }).join("")
+  var destMark = byMetal ? '<g class="trk-dest"><circle cx="' + dxy[0].toFixed(1) + '" cy="' + dxy[1].toFixed(1) + '" r="6"></circle><text x="' + (dxy[0] + 9).toFixed(1) + '" y="' + (dxy[1] - 8).toFixed(1) + '">' + esc(dg[0]) + (trkCountry(params) ? "" : " (client)") + "</text></g>" : ""
+  var rank = '<ol class="trk-rank">' + sorted.slice(0, 8).map(function (p) {
+    return '<li class="' + (p.iso === pick ? "on" : "") + '"><button type="button" data-action="trk-map-country" data-iso="' + p.iso + '"><span>' + esc(TRK_GEO[p.iso][0]) + '</span><span class="trk-rank-bar"><span style="width:' + (p.value / max * 100).toFixed(1) + '%"></span></span><b>' + esc(p.text) + "</b></button></li>"
+  }).join("") + "</ol>"
+  var panel = pick ? '<div class="trk-map-panel"><h4>' + esc(TRK_GEO[pick][0]) + "</h4>" + trkCountryFacts(pick) + "</div>" : ""
+  return '<figure class="trk-map trk-flowmap"><figcaption>' + esc(data.title) + "</figcaption>" +
+    '<div class="trk-map-grid"><svg viewBox="0 28 1000 392" role="img" aria-label="' + esc(data.title) + '"><path class="trk-land" d="' + LAND_PATH + '"></path>' + flows + bubbles + destMark + "</svg>" +
+    '<div class="trk-map-side">' + rank + panel + "</div></div>" +
+    '<p class="trk-note">Circle area = value' + (byMetal ? "; lines = the six largest producers, drawn to " + esc(dg[0]) + " to show where the client's raw material comes from (illustrative routes, not trade data)" : "") + '. Click a country for its tracker data. Source: ' + data.source + " via the tracker. Country centres are approximate.</p></figure>"
 }
