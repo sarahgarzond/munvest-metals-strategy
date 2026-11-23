@@ -65,7 +65,7 @@ function readRoute() {
   var params = new URLSearchParams(q === -1 ? "" : raw.slice(q + 1))
   var alias = { scenarios: "builder", reactors: "builder", duplex: "builder" }
   if (alias[path]) path = alias[path]
-  var known = { shortages: 1, trends: 1, "metal-scenarios": 1, strategy: 1, demand: 1, builder: 1, supply: 1, wire: 1, plate: 1 }
+  var known = { shortages: 1, trends: 1, "metal-scenarios": 1, report: 1, strategy: 1, demand: 1, builder: 1, supply: 1, wire: 1, plate: 1 }
   return { page: known[path] ? path : "shortages", params: params }
 }
 
@@ -171,6 +171,7 @@ function titles(page) {
     shortages: "Current shortages",
     trends: "Scenario generator 2035",
     "metal-scenarios": "Scenario by metal",
+    report: "Scenario briefs",
     strategy: "Board strategy",
     demand: "Scenarios",
     builder: "Scenario builder",
@@ -181,7 +182,7 @@ function titles(page) {
 }
 
 function markNav(page) {
-  ["shortages", "trends", "metal-scenarios", "strategy", "demand", "builder", "supply"].forEach(function (id) {
+  ["shortages", "trends", "metal-scenarios", "report", "strategy", "demand", "builder", "supply"].forEach(function (id) {
     var link = document.getElementById("nav-" + id)
     if (!link) return
     if (page === id) link.setAttribute("aria-current", "page")
@@ -547,6 +548,7 @@ function summary(route) {
 function view(route, openScenarios) {
   if (route.page === "demand") return viewDemand(route)
   if (route.page === "trends" || route.page === "metal-scenarios") return viewSimulator(route, openScenarios)
+  if (route.page === "report") return viewReport(route)
   if (route.page === "strategy") return viewStrategy(route)
   if (route.page === "builder") return viewScenarios(route)
   if (route.page === "supply") return viewChain(route)
@@ -586,6 +588,11 @@ function render(options) {
   var openScenarios = (route.page === "trends" || route.page === "metal-scenarios") ? scnOpenPathways() : undefined
   document.getElementById("main").innerHTML = view(route, openScenarios)
   loadMarketEvidence(route)
+  if (typeof trkMount3d === "function") setTimeout(trkMount3d, 60)
+  if (route.page === "report" && route.params.get("go")) {
+    var target = document.getElementById(route.params.get("go"))
+    if (target) setTimeout(function () { target.scrollIntoView({ block: "start" }) }, 30)
+  }
   if (focusId) {
     var el = document.getElementById(focusId)
     if (el) {
@@ -647,12 +654,32 @@ document.addEventListener("click", function (event) {
     }
     if (action.dataset.action === "scn-toggle-filters") {
       event.preventDefault()
-      var opening = readRoute().params.get("scn-filters") !== "1"
-      go(null, { "scn-filters": opening ? "1" : null }, { replace: true })
+      var closing = readRoute().params.get("scn-filters") !== "0"
+      go(null, { "scn-filters": closing ? "0" : null }, { replace: true })
       document.getElementById("scn-filters-button").focus({ preventScroll: true })
       return
     }
     if (action.dataset.action === "scn-csv") scnCsv(action.dataset.kind)
+    if (action.dataset.action === "trk-focus") {
+      go(null, { focus: action.dataset.metal }, { replace: true })
+      var brief = document.getElementById("trk-decision")
+      if (brief) brief.scrollIntoView({ block: "nearest" })
+      return
+    }
+    if (action.dataset.action === "trk-map-mode") {
+      go(null, { map: readRoute().params.get("map") === "flat" ? null : "flat" }, { replace: true })
+      return
+    }
+    if (action.dataset.action === "scn-preset") {
+      var presetUpdates = { a: null, b: null, c: null, d: null, "scn-preset": null, "scn-case": null }
+      var preset = action.dataset.preset
+      if (preset && RPT_PRESETS[preset]) {
+        Object.assign(presetUpdates, RPT_PRESETS[preset])
+        presetUpdates["scn-preset"] = preset
+      }
+      go(null, presetUpdates, { replace: true })
+      return
+    }
     if (action.dataset.action === "clear-node") go("supply", { node: null })
     if (action.dataset.action === "zoom") {
       var step = action.dataset.dir === "in" ? 0.35 : -0.35
@@ -673,6 +700,16 @@ document.addEventListener("click", function (event) {
       go("builder", { count: next }, { replace: true, partial: true })
     }
     return
+  }
+  var jump = event.target.closest("[data-scroll], [data-rpt-go]")
+  if (jump && !event.metaKey && !event.ctrlKey) {
+    var targetId = jump.dataset.scroll || jump.dataset.rptGo
+    var targetEl = document.getElementById(targetId)
+    if (targetEl) {
+      event.preventDefault()
+      targetEl.scrollIntoView({ behavior: "smooth", block: "start" })
+      return
+    }
   }
   var sort = event.target.closest("[data-sort]")
   if (sort) {
@@ -717,17 +754,25 @@ document.addEventListener("click", function (event) {
 
 document.addEventListener("change", function (event) {
   var el = event.target
+  if (el.matches && el.matches("[data-event]")) {
+    var ev = trkEvents().find(function (item) { return item.id === el.dataset.event })
+    var value = Number(el.value)
+    var same = !ev || !Number.isFinite(value) || value <= 0 || Math.abs(value / ev.target.value - 1) < 0.005
+    go(null, { ["ev-" + el.dataset.event]: same ? null : value, "scn-case": null }, { replace: true })
+    return
+  }
   if (el.matches && el.matches("[data-metal-slider]")) {
-    go(null, { [el.dataset.metalSlider]: Number(el.value) || null, "scn-case": null })
+    go(null, { [el.dataset.metalSlider]: (Number(el.value) / (Number(el.dataset.scale) || 1)) || null, "scn-case": null })
     return
   }
   if (el.matches && el.matches("[data-industry-slider]")) {
     var prefix = "scn-" + el.dataset.industrySlider + "-"
     var sliderUpdates = { "scn-case": null }
-    sliderUpdates[prefix + "level"] = Number(el.value) || null
+    var sliderLevel = Number(el.value) / (Number(el.dataset.scale) || 1)
+    sliderUpdates[prefix + "level"] = sliderLevel || null
     sliderUpdates[prefix + "direction"] = null
     var industry = SCN_INDUSTRY_DRIVERS.find(function (item) { return item.id === el.dataset.industrySlider })
-    if (Math.sign(Number(el.value)) !== Math.sign(scnIndustryAssumption(readRoute().params, industry).level)) {
+    if (Math.sign(sliderLevel) !== Math.sign(Number(readRoute().params.get(prefix + "level")) || 0)) {
       sliderUpdates[prefix + "path"] = null
     }
     go(null, sliderUpdates)
@@ -743,26 +788,41 @@ document.addEventListener("change", function (event) {
   update[el.name] = el.value
   if (el.id === "scn-filter-metal") update.grade = null
   if (el.id === "scn-filter-metal" || el.id === "scn-filter-grade") update["scn-case"] = null
-  if (el.name === "scn-region" || el.hasAttribute("data-advanced-slider")) update["scn-case"] = null
+  if (el.name === "scn-region" || el.name === "scn-country" || el.name === "scn-ev-industry" || el.hasAttribute("data-advanced-slider")) update["scn-case"] = null
   go(null, update)
 })
 
 document.addEventListener("input", function (event) {
-  var slider = event.target.closest && event.target.closest("[data-industry-slider], [data-metal-slider], [data-advanced-slider]")
+  var slider = event.target.closest && event.target.closest("[data-industry-slider], [data-metal-slider], [data-advanced-slider], [data-event]")
   if (slider) {
     var route = readRoute()
     var params = new URLSearchParams(route.params)
     params.delete("scn-case")
-    if (slider.hasAttribute("data-advanced-slider")) {
+    if (slider.hasAttribute("data-event")) {
+      var ev = trkEvents().find(function (item) { return item.id === slider.dataset.event })
+      var value = Number(slider.value)
+      if (!ev || !Number.isFinite(value) || value <= 0) return
+      params.set("ev-" + ev.id, value)
+      var pct = trkEventPct(params, ev)
+      var twin = slider.type === "range" ? document.getElementById("ev-" + ev.id) : document.getElementById("ev-range-" + ev.id)
+      if (twin) twin.value = slider.type === "range" ? Math.round(value * 100) / 100 : value
+      var out = document.getElementById("ev-out-" + ev.id)
+      if (out) { out.textContent = trkPctText(pct) + " vs tracker" + (Math.abs(pct) > TRK_FULL_RANGE_PCT ? " (model effect capped at ±" + TRK_FULL_RANGE_PCT + "%)" : ""); out.className = "trk-delta " + (pct > 0.5 ? "up" : pct < -0.5 ? "down" : "") }
+    } else if (slider.hasAttribute("data-advanced-slider")) {
       params.set(slider.name, slider.value)
       if (slider.hasAttribute("aria-valuetext")) slider.setAttribute("aria-valuetext", scnAdjustmentLabel(Number(slider.value)))
     } else {
-      params.set(slider.dataset.metalSlider || ("scn-" + slider.dataset.industrySlider + "-level"), slider.value)
-      slider.setAttribute("aria-valuetext", scnLevelLabel(Number(slider.value)))
+      var level = Number(slider.value) / (Number(slider.dataset.scale) || 1)
+      params.set(slider.dataset.metalSlider || ("scn-" + slider.dataset.industrySlider + "-level"), level)
+      slider.setAttribute("aria-valuetext", scnLevelLabel(level))
+      var output = document.getElementById("out-" + slider.id)
+      if (output) { output.textContent = scnPctLabel(level); output.className = "trk-delta " + (level > 0 ? "up" : level < 0 ? "down" : "") }
     }
-    var model = scnModel(params, route.page === "metal-scenarios")
+    var byMetal = route.page === "metal-scenarios"
+    var model = scnModel(params, byMetal)
     document.getElementById("scn-likelihoods").innerHTML = scnLikelihoods(model, scnOpenPathways())
     document.getElementById("scn-metals").innerHTML = scnMetalCards(model)
+    trkPaint(model, params, byMetal)
     return
   }
   var input = event.target.closest && event.target.closest("[role='combobox']")
