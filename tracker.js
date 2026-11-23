@@ -228,6 +228,10 @@ function trkInputs(params, byMetal) {
     })
   }
   trkActiveEvents(params).forEach(function (e) { rows.push({ name: e.label, pct: trkEventPct(params, e), sources: e.sources }) })
+  var dr = scnDrivers(params)
+  SCN_DRIVERS.forEach(function (d) {
+    if (dr[d.key] !== d.def) rows.push({ name: d.name.slice(4) + " (" + dr[d.key] + "% vs " + d.def + "%)", pct: dr[d.key] - d.def, pts: true })
+  })
   return rows
 }
 
@@ -345,23 +349,222 @@ function trkResults(model, params, byMetal) {
     var b = scnMetalProducts(base).find(function (x) { return x.metal === p.metal && x.name === p.name }) || p
     return { name: p.cardTitle || p.metal, value: p.index - b.index, text: scnSigned(p.index - b.index) }
   }).filter(function (r) { return Math.abs(r.value) >= 0.005 }).sort(function (a, b) { return Math.abs(b.value) - Math.abs(a.value) }).slice(0, 8)
-  var inputs = trkInputs(params, byMetal).map(function (r) { return { name: r.name, value: r.pct, text: trkPctText(r.pct) } })
-  return trkRecommendation(model, base, params, byMetal) +
+  var inputs = trkInputs(params, byMetal).map(function (r) { return { name: r.name, value: r.pct, text: r.pts ? (r.pct > 0 ? "+" : "\u2212") + Math.abs(r.pct) + " pts" : trkPctText(r.pct) } })
+  return trkRecommendation(model, base, params, byMetal) + trkDecision(model, base, params) +
     '<div class="trk-charts"><figure><figcaption>Your 2035 inputs (vs tracker or baseline value)</figcaption>' +
     trkBars(inputs, { empty: "No inputs changed.", min: 10 }) + "</figure>" +
     '<figure><figcaption>Change in demand index vs evidence baseline (−2 to +2 scale)</figcaption>' +
     trkBars(deltas, { empty: "No change against the evidence baseline yet.", min: 0.25 }) + "</figure></div>" +
-    trkMap(model, base, params, byMetal) +
+    trkMap3dShell(model, base, params, byMetal) +
     (trkCountry(params) ? '<section class="trk-country"><h3>' + esc(TRK_GEO[trkCountry(params)][0]) + " in the tracker</h3>" + trkCountryFacts(trkCountry(params)) + "</section>" : "")
 }
 
 function trkPaint(model, params, byMetal) {
   var el = document.getElementById("trk-results")
-  if (el) el.innerHTML = trkResults(model, params, byMetal)
+  if (el) {
+    el.innerHTML = trkResults(model, params, byMetal)
+    clearTimeout(trkPaint.timer)
+    trkPaint.timer = setTimeout(trkMount3d, 120)
+  }
 }
 
 function trkSnapshotLine() {
   if (!trkReady()) return ""
   return '<p class="trk-note">Data: <a href="' + esc(TRACKER.sheet) + '" target="_blank" rel="noopener">Sector Research Tracker</a>, snapshot ' + esc(TRACKER.snapshot) +
     " · " + TRACKER.events.length + " events, " + Object.keys(TRACKER.sources).length + " logged sources.</p>"
+}
+
+/* ---------- Decision brief: what to do with one metal, and why ---------- */
+
+var TRK_METAL_SIGNPOSTS = {
+  Cobalt: "C1", Tungsten: "C2", Nickel: "C3", Manganese: "D1", Lithium: "D1", Copper: "D6"
+}
+
+function trkFocus(model, params) {
+  var items = scnMetalProducts(model)
+  var want = params.get("focus") || scnMetalFilter(params)
+  var hit = items.find(function (p) { return p.metal === want })
+  if (hit) return hit
+  return items.slice().sort(function (a, b) { return b.index - a.index })[0]
+}
+
+function trkAction(p) {
+  var client = SCN_PRODUCTS.find(function (x) { return x.metal === p.metal })
+  if (client) return { text: client.action, basis: "Client product line (report section 10)" }
+  var top = Object.keys(p.w || {}).sort(function (a, b) { return p.w[b] - p.w[a] })[0]
+  var where = top ? SCN_INDUSTRIES[top].name.toLowerCase() : "its main markets"
+  var text = p.strategy.cls === "grow" ? "Prioritise capacity and qualification for grades sold into " + where + "."
+    : p.strategy.cls === "shift" ? "Keep volume but move the mix towards the end markets that grow; review " + where + " exposure."
+    : "Serve existing demand; add no new capacity until a signpost turns."
+  return { text: text, basis: "Not a client product line: rule-based action from the demand index" }
+}
+
+function trkSupply(metal) {
+  if (!trkReady()) return null
+  var rows = TRACKER.production.filter(function (r) { return r.metal === metal })
+  if (!rows.length) return null
+  var measure = rows[0].measure
+  var list = rows.filter(function (r) { return r.measure === measure && r.country !== "World" && r.share != null }).sort(function (a, b) { return b.share - a.share })
+  if (!list.length) return null
+  var hhi = Math.round(list.reduce(function (s, r) { return s + Math.pow(r.share * 100, 2) }, 0))
+  return { measure: measure, top: list[0], top3: list.slice(0, 3), hhi: hhi, source: rows[0].source, label: rows[0].label }
+}
+
+function trkPrice(metal) {
+  if (!trkReady() || !TRACKER.supplement) return null
+  return TRACKER.supplement.find(function (r) { return r.metal === metal && /^Price/.test(r.indicator) && r.v0 && r.v1 }) || null
+}
+
+function trkDecision(model, base, params) {
+  var p = trkFocus(model, params)
+  if (!p) return ""
+  var b = scnMetalProducts(base).find(function (x) { return x.metal === p.metal && x.name === p.name }) || p
+  var act = trkAction(p)
+  var total = Object.keys(p.w || {}).reduce(function (s, k) { return s + p.w[k] }, 0) || 1
+  var why = Object.keys(p.w || {}).map(function (k) {
+    return { name: SCN_INDUSTRIES[k].name + " (" + Math.round(p.w[k] / total * 100) + "% weight)", value: p.w[k] / total * model.industries[k].index }
+  }).sort(function (a, b) { return Math.abs(b.value) - Math.abs(a.value) })
+  var strip = '<div class="trk-strip">' + SCN_VISIONS.map(function (v, i) {
+    var val = p.per[i]
+    return '<span style="width:' + (model.visions[v.id].p * 100).toFixed(2) + "%;background:" + scnShade(val) + ";color:" + scnInk(val) + '" title="' + esc(v.name + " · " + scnPct(model.visions[v.id].p) + " likely · " + scnSigned(val)) + '"><b>' + esc(v.short) + "</b>" + scnSigned(val) + "</span>"
+  }).join("") + "</div>"
+  var sup = trkSupply(p.metal)
+  var price = trkPrice(p.metal)
+  var risk = []
+  if (sup) risk.push("Largest producer: <b>" + esc(sup.top.country) + " " + Math.round(sup.top.share * 100) + "%</b> of world (" + esc(sup.measure) + ", 2025) · concentration index (HHI of listed countries) <b>" + sup.hhi.toLocaleString("en-US") + "</b>" + (sup.hhi > 2500 ? " = highly concentrated" : "") + " · " + (sup.source ? trkSourceLink(sup.source) : esc(sup.label)))
+  if (price) risk.push(esc(price.indicator) + ": " + price.v0 + " → <b>" + price.v1 + " " + esc(price.unit) + "</b> (" + esc(price.y0) + "→" + esc(price.y1) + ", " + trkPctText((price.v1 / price.v0 - 1) * 100) + ") · " + trkSources(price.sources))
+  var sp = TRK_METAL_SIGNPOSTS[p.metal] && typeof RPT_INDICATORS !== "undefined" ? RPT_INDICATORS.find(function (x) { return x.id === TRK_METAL_SIGNPOSTS[p.metal] }) : null
+  var apps = trkReady() ? TRACKER.applications.filter(function (a) { return a.material === p.metal && a.key }) : []
+  var appCount = {}
+  apps.forEach(function (a) { appCount[a.industry] = (appCount[a.industry] || 0) + 1 })
+  var chips = scnMetalProducts(model).map(function (x) {
+    return '<button type="button" class="trk-chip trk-' + x.strategy.cls + (x.metal === p.metal ? " on" : "") + '" data-action="trk-focus" data-metal="' + esc(x.metal) + '">' + esc(x.metal) + "</button>"
+  }).join("")
+  return '<section class="trk-decision" id="trk-decision"><div class="trk-chips" role="group" aria-label="Choose a metal for the decision brief">' + chips + "</div>" +
+    '<div class="trk-dec-head"><span class="scn-badge scn-' + p.strategy.cls + '">' + esc(p.strategy.label) + "</span><h3>" + esc(p.cardTitle || p.metal) + ' <small>' + esc(p.name) + "</small></h3>" +
+    '<span class="trk-dec-ix">index <b>' + scnSigned(p.index) + "</b>" + (Math.abs(p.index - b.index) >= 0.005 ? " (baseline " + scnSigned(b.index) + ")" : "") + " · grows in " + p.per.filter(function (v) { return v > 0 }).length + " of 5 visions · chance of growth " + scnPct(p.chance) + "</span></div>" +
+    '<p class="trk-dec-act"><b>What to do:</b> ' + esc(act.text) + ' <small>' + esc(act.basis) + "</small></p>" +
+    '<div class="trk-dec-grid"><figure><figcaption>Why: contribution of each end market to the index</figcaption>' + rptHBars(why.map(function (w) { return { name: w.name, value: w.value } }), Math.max(0.6, Math.abs(p.index))) + "</figure>" +
+    '<figure><figcaption>Across the five visions (block width = likelihood)</figcaption>' + strip +
+    '<p class="trk-note">Blue = demand grows in that vision, orange = falls. A Grow that turns orange in a likely vision is a risk to plan for.</p></figure></div>' +
+    '<div class="trk-dec-grid"><div><h4>Supply and price risk</h4>' + (risk.length ? "<ul>" + risk.map(function (r) { return "<li>" + r + "</li>" }).join("") + "</ul>" : '<p class="trk-note">No supply or price data for this metal in the tracker yet.</p>') + "</div>" +
+    "<div><h4>Where the client sells it (tracker)</h4>" + (apps.length ? "<ul>" + Object.keys(appCount).map(function (k) { return "<li>" + esc(k) + ": " + appCount[k] + " product rows</li>" }).join("") + "</ul>" : '<p class="trk-note">No product rows for this metal in the tracker.</p>') +
+    (sp ? "<h4>Signpost to watch</h4><p>" + esc(sp.id + " " + sp.name + ": " + sp.data) + " " + rptSrc(sp.src) + "</p>" : "") + "</div></div>" +
+    '<p class="trk-note">End-market weights: ' + (SCN_PRODUCTS.some(function (x) { return x.metal === p.metal }) ? "client product mapping from the project brief (to be checked with the company)." : "illustrative (scenarios.js SCN_METAL_OUTLOOKS), not yet from the tracker.") + "</p></section>"
+}
+
+/* ---------- 3D map (deck.gl) with the flat SVG map as fallback ---------- */
+
+var TRK_DECK_URL = "https://unpkg.com/deck.gl@9.2.11/dist.min.js"
+var trkDeckPromise = null
+var trkDeckInstance = null
+var trkLandPolys = null
+
+function trkLoadDeck() {
+  if (window.deck) return Promise.resolve(window.deck)
+  if (!trkDeckPromise) {
+    trkDeckPromise = new Promise(function (resolve, reject) {
+      var s = document.createElement("script")
+      s.src = window.TRK_DECK_URL_OVERRIDE || TRK_DECK_URL
+      s.onload = function () { window.deck ? resolve(window.deck) : reject(new Error("deck.gl missing")) }
+      s.onerror = function () { reject(new Error("deck.gl did not load")) }
+      document.head.appendChild(s)
+    })
+  }
+  return trkDeckPromise
+}
+
+function trkLand() {
+  if (trkLandPolys) return trkLandPolys
+  trkLandPolys = LAND_PATH.split("Z").map(function (part) {
+    var nums = part.replace(/[ML]/g, " ").trim().split(/[\s,]+/).map(Number)
+    var ring = []
+    for (var i = 0; i + 1 < nums.length; i += 2) ring.push([nums[i] / 1000 * 360 - 180, 90 - nums[i + 1] / 500 * 180])
+    return ring
+  }).filter(function (r) { return r.length > 2 })
+  return trkLandPolys
+}
+
+function trkMap3dShell(model, base, params, byMetal) {
+  var data = trkMapData(model, base, params, byMetal)
+  if (!data) return ""
+  var pts = data.points.map(function (p) { var g = TRK_GEO[p.iso]; return { iso: p.iso, name: g[0], lon: g[2], lat: g[1], value: p.value, text: p.text } })
+  window.trkMapPoints = { points: pts, selected: trkCountry(params), title: data.title }
+  return '<figure class="trk-map trk-map3d-wrap"><figcaption>' + esc(data.title) + ' <span class="trk-map-mode"><button type="button" class="ev-csv" data-action="trk-map-mode">' + (params.get("map") === "flat" ? "Show 3D" : "Show flat map") + "</button></span></figcaption>" +
+    (params.get("map") === "flat" ? "" : '<div id="trk-map3d" class="trk-map3d" role="img" aria-label="3D column map: ' + esc(data.title) + '"><p class="trk-note">Loading 3D map…</p></div>') +
+    '<div id="trk-map2d"' + (params.get("map") === "flat" ? "" : " hidden") + ">" + trkMap(model, base, params, byMetal).replace(/^<figure class="trk-map"><figcaption>.*?<\/figcaption>/, "").replace(/<\/figure>$/, "") + "</div>" +
+    '<p class="trk-note">Column height = value. Drag to rotate (right-click or Ctrl + drag to tilt), scroll to zoom. Source: ' + data.source + " via the tracker.</p></figure>"
+}
+
+function trkMount3d() {
+  var el = document.getElementById("trk-map3d")
+  if (!el || !window.trkMapPoints) return
+  var data = window.trkMapPoints
+  trkLoadDeck().then(function (deck) {
+    if (!document.body.contains(el)) return
+    if (trkDeckInstance) { try { trkDeckInstance.finalize() } catch (e) { /* already gone */ } trkDeckInstance = null }
+    el.innerHTML = ""
+    var night = document.documentElement.dataset.theme === "night"
+    var max = Math.max.apply(null, data.points.map(function (p) { return p.value }).concat([1e-9]))
+    var top = data.points.slice().sort(function (a, b) { return b.value - a.value }).slice(0, 6)
+    var sel = data.selected && !data.points.some(function (p) { return p.iso === data.selected }) && TRK_GEO[data.selected]
+      ? [{ name: TRK_GEO[data.selected][0] + " (selected, no value)", lon: TRK_GEO[data.selected][2], lat: TRK_GEO[data.selected][1] }] : []
+    var center = top.length ? top.reduce(function (s, p) { return [s[0] + p.lon * p.value, s[1] + p.lat * p.value, s[2] + p.value] }, [0, 0, 0]) : [10, 30, 1]
+    trkDeckInstance = new deck.Deck({
+      parent: el,
+      views: new deck.MapView({ repeat: false }),
+      initialViewState: { longitude: center[0] / center[2], latitude: Math.max(-20, Math.min(50, center[1] / center[2])), zoom: 1.15, pitch: 48, bearing: -12 },
+      controller: true,
+      layers: [
+        new deck.SolidPolygonLayer({ id: "land", data: trkLand(), getPolygon: function (d) { return d }, getFillColor: night ? [70, 95, 108] : [205, 214, 218], pickable: false }),
+        new deck.ColumnLayer({
+          id: "cols", data: data.points, diskResolution: 24, radius: 230000, extruded: true, pickable: true,
+          elevationScale: 1, getPosition: function (d) { return [d.lon, d.lat] },
+          getElevation: function (d) { return 200000 + 3800000 * d.value / max },
+          getFillColor: function (d) { return d.iso === data.selected ? [215, 125, 49] : [43, 108, 176, 230] },
+          material: { ambient: 0.5, diffuse: 0.6, shininess: 20 }
+        }),
+        new deck.ScatterplotLayer({ id: "selected", data: sel, getPosition: function (d) { return [d.lon, d.lat] }, getRadius: 260000, filled: false, stroked: true, getLineColor: [215, 125, 49], lineWidthMinPixels: 3, pickable: true }),
+        new deck.TextLayer({
+          id: "labels", data: top, getPosition: function (d) { return [d.lon, d.lat, 260000 + 3800000 * d.value / max] },
+          getText: function (d) { return d.name + " " + d.text }, getSize: 12, getColor: night ? [226, 235, 239] : [36, 52, 60],
+          getTextAnchor: "start", getPixelOffset: [8, -6], fontFamily: "Noto Sans, Arial, sans-serif", outlineWidth: 2, outlineColor: night ? [16, 29, 37] : [246, 241, 232], fontSettings: { sdf: true }
+        })
+      ],
+      getTooltip: function (info) { return info.object && info.object.name ? info.object.name + ": " + info.object.text : null }
+    })
+  }).catch(function () {
+    el.remove()
+    var flat = document.getElementById("trk-map2d")
+    if (flat) flat.hidden = false
+  })
+}
+
+/* ---------- What each slider changes ---------- */
+
+function trkSliderFeeds(industryKey) {
+  var list = SCN_PRODUCTS.concat(SCN_METAL_OUTLOOKS).filter(function (p) { return p.metal && p.w[industryKey] }).map(function (p) {
+    var total = Object.keys(p.w).reduce(function (s, k) { return s + p.w[k] }, 0)
+    return { metal: p.metal, share: p.w[industryKey] / total }
+  }).sort(function (a, b) { return b.share - a.share })
+  var seen = {}
+  return list.filter(function (x) { if (seen[x.metal]) return false; seen[x.metal] = true; return true })
+}
+
+function trkMetalFeeds(metal) {
+  var p = SCN_PRODUCTS.concat(SCN_METAL_OUTLOOKS).find(function (x) { return x.metal === metal })
+  if (!p) return []
+  var total = Object.keys(p.w).reduce(function (s, k) { return s + p.w[k] }, 0)
+  return Object.keys(p.w).map(function (k) { return { name: SCN_INDUSTRIES[k].name, share: p.w[k] / total } }).sort(function (a, b) { return b.share - a.share })
+}
+
+function trkSliderHelp(byMetal, key) {
+  if (byMetal) {
+    var f = trkMetalFeeds(key)
+    return f.length ? "Moves demand in: " + f.map(function (x) { return esc(x.name) + " " + Math.round(x.share * 100) + "%" }).join(", ") : ""
+  }
+  var feeds = trkSliderFeeds(key)
+  var events = trkEvents().filter(function (e) { return e.key === key })
+  return (feeds.length ? "Feeds: " + feeds.slice(0, 4).map(function (x) { return esc(x.metal) + " " + Math.round(x.share * 100) + "%" }).join(", ") : "No metal in the outlook uses this industry") +
+    (events.length ? ' · tracker basis: ' + esc(events[0].label) + " " + trkSources(events[0].sources) : "")
 }

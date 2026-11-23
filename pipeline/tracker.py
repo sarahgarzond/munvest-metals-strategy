@@ -213,6 +213,25 @@ def parse_outlook(wb):
     return {"totals": totals, "components": components}
 
 
+def parse_supplement(wb):
+    """Metals supplement, section B: reserves, prices, end uses, import reliance and supply policy."""
+    rows = rows_of(wb, "Metals supplement")
+    start = next((i for i, r in enumerate(rows) if text(r[0]).startswith("B.")), None)
+    out, metal = [], ""
+    if start is None:
+        return out
+    for r in rows[start + 2:]:
+        if text(r[0]).startswith("C."):
+            break
+        if not text(r[1]):
+            continue
+        metal = text(r[0]) or metal
+        out.append({"metal": metal, "indicator": text(r[1]), "detail": text(r[2]), "y0": text(r[3]), "v0": number(r[4]),
+                    "y1": text(r[5]), "v1": number(r[6]), "raw1": text(r[6]), "unit": text(r[7]), "why": text(r[8]),
+                    "sources": source_ids(r[9]), "note": text(r[9])})
+    return out
+
+
 def slug(*parts):
     return re.sub(r"[^a-z0-9]+", "-", " ".join(parts).lower()).strip("-")[:48]
 
@@ -279,6 +298,7 @@ def build(xlsx_bytes):
         "production": parse_country_production(wb),
         "countryData": parse_country_data(wb),
         "outlook": outlook,
+        "supplement": parse_supplement(wb),
         "events": build_events(database, outlook),
     }
     missing = sorted({s for e in data["events"] for s in e["sources"] if s not in data["sources"]})

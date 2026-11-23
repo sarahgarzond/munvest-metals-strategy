@@ -206,7 +206,7 @@ function scnIndustryAssumption(params, industry) {
 }
 
 function scnResetUpdates() {
-  var updates = { a: null, b: null, c: null, d: null, "scn-case": null, "scn-industry": null, "scn-region": null, "scn-country": null, "scn-ev-industry": null }
+  var updates = { a: null, b: null, c: null, d: null, "scn-case": null, "scn-industry": null, "scn-region": null, "scn-country": null, "scn-ev-industry": null, "scn-preset": null, focus: null }
   if (typeof trkEvents === "function") trkEvents().forEach(function (e) { updates["ev-" + e.id] = null })
   SCN_INDUSTRY_DRIVERS.forEach(function (industry) {
     ["region", "direction", "level", "path"].forEach(function (key) { updates["scn-" + industry.id + "-" + key] = null })
@@ -431,7 +431,8 @@ function scnDriverPanel(params, byMetal) {
       (byMetal ? ' data-metal-slider="' + item.key + '"' : ' data-industry-slider="' + item.key.slice(4, -6) + '"') +
       ' aria-valuetext="' + scnLevelLabel(item.level) + '">' +
       '<div class="scn-slide-ends" aria-hidden="true"><span>−50%</span><span>0</span><span>+50%</span></div>' +
-      (note ? '<p class="trk-baseline">' + note + '</p>' : '') + '</div>'
+      (note ? '<p class="trk-baseline">' + note + '</p>' : '') +
+      (typeof trkSliderHelp === "function" ? '<p class="trk-feeds">' + trkSliderHelp(byMetal, byMetal ? item.name : item.key.slice(4, -6)) + '</p>' : '') + '</div>'
   }).join("")
   var filtersOpen = params.get("scn-filters") !== "0"
   return '<section class="scn-panel" aria-labelledby="scn-drivers-heading"><div class="scn-reset"><h2 id="scn-drivers-heading" class="scn-heading">' +
@@ -439,6 +440,7 @@ function scnDriverPanel(params, byMetal) {
     '<div class="scn-toolbar">' + (typeof trkCountrySelect === "function" ? trkCountrySelect(params) : "") +
     (byMetal ? scnMetalSelect(params, false) : '') +
     '<button id="scn-reset" type="button" class="ev-csv" data-action="scn-reset">Reset to evidence baseline</button></div></div>' +
+    scnPresetBar(params) +
     '<p class="trk-help">Each slider is the change in 2035 demand against the baseline (' + (byMetal ? "tracker 2035 demand where it exists" : "report scenario model") +
     '). ±50% is the full range of the model. Results update as you move a slider.</p>' +
     '<div class="scn-industries">' + sliders + '</div>' +
@@ -450,6 +452,18 @@ function scnDriverPanel(params, byMetal) {
         scnAdvancedGroup("Scenario assumptions", SCN_DRIVERS, params, false) +
         scnAdvancedGroup("Market conditions", SCN_ADVANCED, params, true)) + '</div>' : '') +
     '</details></section>'
+}
+
+/* Start points: the evidence baseline or one of the five visions (drivers set to 85% / 15%, illustrative). */
+function scnPresetBar(params) {
+  if (typeof RPT_PRESETS === "undefined") return ""
+  var current = params.get("scn-preset") || ""
+  var page = readRoute().page
+  return '<div class="trk-presets" role="group" aria-label="Start from"><span>Start from:</span>' +
+    '<button type="button" class="trk-chip' + (current ? '' : ' on') + '" data-action="scn-preset" data-preset="">Evidence baseline</button>' +
+    SCN_VISIONS.map(function (v) {
+      return '<button type="button" class="trk-chip' + (current === v.id ? ' on' : '') + '" data-action="scn-preset" data-preset="' + v.id + '" style="--c:' + RPT_COLORS[v.id] + '">' + esc(v.name) + '</button>'
+    }).join("") + (current ? '<span class="trk-note">Drivers set to 85% / 15% for ' + esc(SCN_VISIONS.find(function (v) { return v.id === current }).name) + ' (illustrative start point). <a href="#/report?go=rpt-' + current + '">Read the brief →</a></span>' : '') + '</div>'
 }
 
 function scnAdvancedGroup(title, items, params, relative) {
@@ -650,6 +664,7 @@ function viewSimulator(route, openScenarios) {
     : "Calculator: change expected 2035 demand by industry or replace a tracker 2035 value, and see which 2035 vision becomes more likely and what it means for each metal."
   return '<div class="scn">' + pageHead(byMetal ? "Scenario by metal" : "Scenario generator 2035") +
     '<p class="trk-intro">' + esc(intro) + '</p>' +
+    '<nav class="trk-flow" aria-label="Workflow"><a href="#scn-drivers-heading" data-scroll="scn-drivers-heading"><b>1</b> Set inputs</a><a href="#trk-results-heading" data-scroll="trk-results-heading"><b>2</b> Read the result</a><a href="#trk-decision" data-scroll="trk-decision"><b>3</b> Decide per metal</a><a href="#scn-likelihoods-heading" data-scroll="scn-likelihoods-heading"><b>4</b> Check the story</a><a href="#/report"><b>5</b> Scenario briefs</a></nav>' +
     scnDriverPanel(route.params, byMetal) +
     '<section class="scn-panel trk-results-panel" aria-labelledby="trk-results-heading"><h2 id="trk-results-heading" class="scn-heading"><span class="trk-step">2</span>Result and recommendation</h2>' +
     '<div id="trk-results" class="scn-body">' + (typeof trkResults === "function" ? trkResults(model, route.params, byMetal) : "") + '</div></section>' +

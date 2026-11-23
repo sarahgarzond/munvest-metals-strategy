@@ -65,7 +65,7 @@ function readRoute() {
   var params = new URLSearchParams(q === -1 ? "" : raw.slice(q + 1))
   var alias = { scenarios: "builder", reactors: "builder", duplex: "builder" }
   if (alias[path]) path = alias[path]
-  var known = { shortages: 1, trends: 1, "metal-scenarios": 1, strategy: 1, demand: 1, builder: 1, supply: 1, wire: 1, plate: 1 }
+  var known = { shortages: 1, trends: 1, "metal-scenarios": 1, report: 1, strategy: 1, demand: 1, builder: 1, supply: 1, wire: 1, plate: 1 }
   return { page: known[path] ? path : "shortages", params: params }
 }
 
@@ -171,6 +171,7 @@ function titles(page) {
     shortages: "Current shortages",
     trends: "Scenario generator 2035",
     "metal-scenarios": "Scenario by metal",
+    report: "Scenario briefs",
     strategy: "Board strategy",
     demand: "Scenarios",
     builder: "Scenario builder",
@@ -181,7 +182,7 @@ function titles(page) {
 }
 
 function markNav(page) {
-  ["shortages", "trends", "metal-scenarios", "strategy", "demand", "builder", "supply"].forEach(function (id) {
+  ["shortages", "trends", "metal-scenarios", "report", "strategy", "demand", "builder", "supply"].forEach(function (id) {
     var link = document.getElementById("nav-" + id)
     if (!link) return
     if (page === id) link.setAttribute("aria-current", "page")
@@ -547,6 +548,7 @@ function summary(route) {
 function view(route, openScenarios) {
   if (route.page === "demand") return viewDemand(route)
   if (route.page === "trends" || route.page === "metal-scenarios") return viewSimulator(route, openScenarios)
+  if (route.page === "report") return viewReport(route)
   if (route.page === "strategy") return viewStrategy(route)
   if (route.page === "builder") return viewScenarios(route)
   if (route.page === "supply") return viewChain(route)
@@ -586,6 +588,11 @@ function render(options) {
   var openScenarios = (route.page === "trends" || route.page === "metal-scenarios") ? scnOpenPathways() : undefined
   document.getElementById("main").innerHTML = view(route, openScenarios)
   loadMarketEvidence(route)
+  if (typeof trkMount3d === "function") setTimeout(trkMount3d, 60)
+  if (route.page === "report" && route.params.get("go")) {
+    var target = document.getElementById(route.params.get("go"))
+    if (target) setTimeout(function () { target.scrollIntoView({ block: "start" }) }, 30)
+  }
   if (focusId) {
     var el = document.getElementById(focusId)
     if (el) {
@@ -653,6 +660,26 @@ document.addEventListener("click", function (event) {
       return
     }
     if (action.dataset.action === "scn-csv") scnCsv(action.dataset.kind)
+    if (action.dataset.action === "trk-focus") {
+      go(null, { focus: action.dataset.metal }, { replace: true })
+      var brief = document.getElementById("trk-decision")
+      if (brief) brief.scrollIntoView({ block: "nearest" })
+      return
+    }
+    if (action.dataset.action === "trk-map-mode") {
+      go(null, { map: readRoute().params.get("map") === "flat" ? null : "flat" }, { replace: true })
+      return
+    }
+    if (action.dataset.action === "scn-preset") {
+      var presetUpdates = { a: null, b: null, c: null, d: null, "scn-preset": null, "scn-case": null }
+      var preset = action.dataset.preset
+      if (preset && RPT_PRESETS[preset]) {
+        Object.assign(presetUpdates, RPT_PRESETS[preset])
+        presetUpdates["scn-preset"] = preset
+      }
+      go(null, presetUpdates, { replace: true })
+      return
+    }
     if (action.dataset.action === "clear-node") go("supply", { node: null })
     if (action.dataset.action === "zoom") {
       var step = action.dataset.dir === "in" ? 0.35 : -0.35
@@ -673,6 +700,16 @@ document.addEventListener("click", function (event) {
       go("builder", { count: next }, { replace: true, partial: true })
     }
     return
+  }
+  var jump = event.target.closest("[data-scroll], [data-rpt-go]")
+  if (jump && !event.metaKey && !event.ctrlKey) {
+    var targetId = jump.dataset.scroll || jump.dataset.rptGo
+    var targetEl = document.getElementById(targetId)
+    if (targetEl) {
+      event.preventDefault()
+      targetEl.scrollIntoView({ behavior: "smooth", block: "start" })
+      return
+    }
   }
   var sort = event.target.closest("[data-sort]")
   if (sort) {
