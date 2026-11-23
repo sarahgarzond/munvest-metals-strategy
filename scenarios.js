@@ -178,6 +178,8 @@ var SCN_INDUSTRY_DRIVERS = [
 ]
 
 function scnRegion(params) {
+  var country = typeof trkCountry === "function" ? trkCountry(params) : ""
+  if (country && SCN_REGIONS[TRK_GEO[country][3]]) return TRK_GEO[country][3]
   var region = params && params.get("scn-region")
   if (Object.prototype.hasOwnProperty.call(SCN_REGIONS, region)) return region
   // Older scenario links can carry a region on an individual industry.
@@ -196,6 +198,7 @@ function scnIndustryAssumption(params, industry) {
   if (rawLevel == null || !Number.isFinite(level) || Math.abs(level) > 2) {
     level = legacy === "grow" ? 2 : legacy === "fall" ? -2 : 0
   }
+  if (typeof trkEventLevel === "function") level = Math.max(-2, Math.min(2, level + trkEventLevel(params, industry.id)))
   var profile = SCN_REGIONS[region]
   var baseline = SCN_REGIONAL_BASELINES[profile.group]?.[industry.id] || 0
   var shift = Math.max(-1, Math.min(1, baseline + level / 2 * profile.factor))
@@ -203,7 +206,8 @@ function scnIndustryAssumption(params, industry) {
 }
 
 function scnResetUpdates() {
-  var updates = { a: null, b: null, c: null, d: null, "scn-case": null, "scn-industry": null, "scn-region": null }
+  var updates = { a: null, b: null, c: null, d: null, "scn-case": null, "scn-industry": null, "scn-region": null, "scn-country": null, "scn-ev-industry": null }
+  if (typeof trkEvents === "function") trkEvents().forEach(function (e) { updates["ev-" + e.id] = null })
   SCN_INDUSTRY_DRIVERS.forEach(function (industry) {
     ["region", "direction", "level", "path"].forEach(function (key) { updates["scn-" + industry.id + "-" + key] = null })
   })
@@ -396,6 +400,7 @@ function scnInk(v) { return Math.abs(v) > 0.65 ? "#fff" : "#24343c" }
 function scnKeep(params) {
   var q = new URLSearchParams()
   Object.keys(scnResetUpdates()).forEach(function (key) { if (key !== "scn-industry" && key !== "scn-case" && params.get(key)) q.set(key, params.get(key)) })
+  params.forEach(function (value, key) { if (/^scn-metal-/.test(key)) q.set(key, value) })
   var s = q.toString()
   return s ? "?" + s : ""
 }
@@ -403,40 +408,45 @@ function scnKeep(params) {
 /* ---------- Market scenarios (simulator) ---------- */
 
 function scnLevelLabel(level) {
-  if (level === 0) return "Baseline"
-  return Math.round(Math.abs(level) * 50) + "% toward " + (level > 0 ? "growth" : "decline")
+  if (!level) return "Evidence baseline"
+  return (level > 0 ? "+" : "−") + Math.round(Math.abs(level) * 25) + "% demand in 2035 vs baseline"
+}
+
+function scnPctLabel(level) {
+  var pct = Math.round(level * 25)
+  return pct === 0 ? "baseline" : (pct > 0 ? "+" : "−") + Math.abs(pct) + "%"
 }
 
 function scnDriverPanel(params, byMetal) {
   var controls = byMetal ? scnMetalDrivers(params) : SCN_INDUSTRY_DRIVERS.map(function (item) {
-    return { key: "scn-" + item.id + "-level", name: item.name, level: scnIndustryAssumption(params, item).level }
+    var raw = Number(params.get("scn-" + item.id + "-level"))
+    return { key: "scn-" + item.id + "-level", name: item.name, level: Number.isFinite(raw) && Math.abs(raw) <= 2 ? raw : 0 }
   })
   var sliders = controls.map(function (item) {
-    return '<div class="scn-industry-card"><label for="' + item.key + '">' + esc(item.name) + '</label>' +
-      '<input type="range" id="' + item.key + '" min="-2" max="2" step="0.04" value="' + item.level + '"' +
+    var baseline = byMetal && typeof trkMetalBaseline === "function" ? trkMetalBaseline(item.name) : null
+    var note = baseline ? esc(baseline.text) + (baseline.source ? " · " + trkSourceLink(baseline.source) : baseline.label ? " · " + esc(baseline.label) : "") : ""
+    return '<div class="scn-industry-card"><label for="' + item.key + '">' + esc(item.name) +
+      ' <output id="out-' + item.key + '" class="trk-delta ' + (item.level > 0 ? "up" : item.level < 0 ? "down" : "") + '">' + scnPctLabel(item.level) + '</output></label>' +
+      '<input type="range" id="' + item.key + '" min="-50" max="50" step="5" value="' + Math.round(item.level * 25) + '" data-scale="25"' +
       (byMetal ? ' data-metal-slider="' + item.key + '"' : ' data-industry-slider="' + item.key.slice(4, -6) + '"') +
       ' aria-valuetext="' + scnLevelLabel(item.level) + '">' +
-      '<div class="scn-slide-ends" aria-hidden="true"><span>Decline</span><span>Grow</span></div></div>'
+      '<div class="scn-slide-ends" aria-hidden="true"><span>−50%</span><span>0</span><span>+50%</span></div>' +
+      (note ? '<p class="trk-baseline">' + note + '</p>' : '') + '</div>'
   }).join("")
-  var region = scnRegion(params)
-  function regionOption(id) {
-    return '<option value="' + esc(id) + '"' + (region === id ? ' selected' : '') + '>' + esc(SCN_REGIONS[id].name) + '</option>'
-  }
-  var regions = regionOption("global") + SCN_REGION_GROUPS.map(function (group) {
-    return '<optgroup label="' + esc(group.name) + '">' + group.regions.map(function (entry) {
-      return regionOption(entry[0])
-    }).join("") + '</optgroup>'
-  }).join("")
-  var filtersOpen = params.get("scn-filters") === "1"
-  return '<section class="scn-panel" aria-labelledby="scn-drivers-heading"><div class="scn-reset"><h2 id="scn-drivers-heading" class="scn-heading">' + (byMetal ? "Metal drivers" : "Industry drivers") + '</h2>' +
-    '<div class="scn-toolbar"><label for="scn-region">Region</label><select id="scn-region" name="scn-region" data-control>' + regions + '</select>' +
+  var filtersOpen = params.get("scn-filters") !== "0"
+  return '<section class="scn-panel" aria-labelledby="scn-drivers-heading"><div class="scn-reset"><h2 id="scn-drivers-heading" class="scn-heading">' +
+    '<span class="trk-step">1</span>' + (byMetal ? "Set 2035 demand by metal" : "Set 2035 demand by industry") + '</h2>' +
+    '<div class="scn-toolbar">' + (typeof trkCountrySelect === "function" ? trkCountrySelect(params) : "") +
     (byMetal ? scnMetalSelect(params, false) : '') +
-    '<button id="scn-reset" type="button" class="ev-csv" data-action="scn-reset">Reset assumptions</button></div></div>' +
+    '<button id="scn-reset" type="button" class="ev-csv" data-action="scn-reset">Reset to evidence baseline</button></div></div>' +
+    '<p class="trk-help">Each slider is the change in 2035 demand against the baseline (' + (byMetal ? "tracker 2035 demand where it exists" : "report scenario model") +
+    '). ±50% is the full range of the model. Results update as you move a slider.</p>' +
     '<div class="scn-industries">' + sliders + '</div>' +
-    '<details class="scn-inline-filters"' + (filtersOpen ? ' open' : '') + '><summary id="scn-filters-button" data-action="scn-toggle-filters">Advanced filters</summary>' +
+    '<details class="scn-inline-filters"' + (filtersOpen ? ' open' : '') + '><summary id="scn-filters-button" data-action="scn-toggle-filters">Advanced filters: industry events, grades and market conditions</summary>' +
     (filtersOpen ? '<div class="scn-filter-fields">' +
+      (typeof trkEventPanel === "function" ? trkEventPanel(params) : "") +
       (byMetal ? (scnMetalFilter(params) ? '<div class="scn-filter-select scn-grade-filter">' + scnMetalSelect(params, true) + '</div>' :
-        '<p>Select a metal to see its grades and products.</p>') :
+        '<p class="trk-note">Select a metal above to filter by grade or product.</p>') :
         scnAdvancedGroup("Scenario assumptions", SCN_DRIVERS, params, false) +
         scnAdvancedGroup("Market conditions", SCN_ADVANCED, params, true)) + '</div>' : '') +
     '</details></section>'
@@ -553,28 +563,42 @@ function scnScenarioFactors(candidate, settings, region) {
     var regionalActions = region === "north-africa" && SCN_NORTH_AFRICA_ACTIONS[item.id]
     var regionalAction = regionalActions && regionalActions[score >= 0.2 ? 0 : score <= -0.2 ? 1 : 2]
     return {
+      industry: item.name,
       label: regionalAction || (scenarioAction ? scenarioAction[0] : action),
+      shift: item.shift,
+      pathShift: score,
       percent: Math.round(100 * (1 - Math.abs(score - item.shift) / 2))
     }
   })
 }
 
+/* The scenario card names the demand path that best matches the inputs. Its rows show the modelled change in
+   2035 demand for each industry (shift × 50%, the same scale as the sliders). The path weight is its share among the
+   candidate paths. Paths and example company actions are illustrative storylines, not sourced forecasts. */
 function scnLikelihoods(model, open) {
   var candidates = scnDemandScenarios(model)
   var selected = candidates.find(function (candidate) { return candidate.id === model.selectedCase }) || candidates[0]
   var factors = scnScenarioFactors(selected, model.assumptions, model.region)
+    .sort(function (a, b) { return Math.abs(b.shift) - Math.abs(a.shift) })
   var alternatives = candidates.filter(function (candidate) { return candidate !== selected })
-  return '<div class="scn-case-heading"><span id="scn-case-label" tabindex="-1">Probabilities of occurring</span><b title="Illustrative likelihood: ' + esc(selected.title) + '">' +
-    selected.percent + '%</b></div>' +
+  var changed = factors.filter(function (f) { return Math.abs(f.shift) >= 0.02 })
+  return '<div class="scn-case-heading"><span id="scn-case-label" tabindex="-1">Best-matching demand path</span>' +
+    '<b title="Share of this path among ' + candidates.length + ' candidate paths">' + selected.percent + '% weight</b></div>' +
+    '<p class="trk-path-title">' + esc(selected.title) + '</p>' +
+    '<p class="trk-note">' + (changed.length ? changed.length + ' of ' + factors.length + ' industries differ from the baseline.' :
+      'All industries are at the evidence baseline, so the path with no change fits best.') + ' Bars: modelled change in 2035 demand.</p>' +
     factors.map(function (factor) {
-      return '<div class="scn-lk"><span>' + esc(factor.label) + '</span><span class="scn-lk-track" aria-hidden="true"><span class="scn-lk-bar' +
-        (factor.percent >= 85 ? ' top' : '') + '" style="width:' + factor.percent +
-        '%"></span></span><b title="Fit to your sliders">' + factor.percent + '%</b></div>'
-    }).join("") + (alternatives.length
-      ? '<details class="scn-alternatives"' + (open ? ' open' : '') + '><summary>More scenarios</summary><ul>' +
+      var pct = Math.round(factor.shift * 50)
+      var w = Math.min(Math.abs(factor.shift), 1) * 50
+      return '<div class="scn-lk trk-lk"><span><b>' + esc(factor.industry) + '</b><small>e.g. ' + esc(factor.label) + '</small></span>' +
+        '<span class="trk-bar-track" aria-hidden="true"><span class="trk-bar ' + (pct >= 0 ? 'up' : 'down') + '" style="' + (pct >= 0 ? 'left:50%' : 'right:50%') + ';width:' + w.toFixed(1) + '%"></span></span>' +
+        '<b>' + (pct === 0 ? '0%' : (pct > 0 ? '+' : '−') + Math.abs(pct) + '%') + '</b></div>'
+    }).join("") +
+    '<p class="trk-note">Example actions are illustrative storylines, not sourced forecasts.</p>' + (alternatives.length
+      ? '<details class="scn-alternatives"' + (open ? ' open' : '') + '><summary>Other paths (' + alternatives.length + ')</summary><ul>' +
         alternatives.map(function (candidate) {
           return '<li><button type="button" class="ev-csv" data-action="scn-select-case" data-case="' + esc(candidate.id) + '">' +
-            esc(candidate.title) + ' · ' + candidate.percent + '%</button></li>'
+            esc(candidate.title) + ' · ' + candidate.percent + '% weight</button></li>'
         }).join("") + '</ul></details>'
       : "")
 }
@@ -599,7 +623,7 @@ function scnMetalCards(model) {
 
 function scnCalcTable(model) {
   return '<details class="ev-box ev-wide scn-calc"><summary>Show calculation</summary>' +
-    '<p class="ev-why">The baseline uses 24 indicators from report sections 3–4. Driver assumptions adjust scenario weights and scores. On Scenario by metal, metal settings are translated into industry demand using illustrative end-market weights. Advanced market conditions shift the corresponding baseline driver by up to 20 percentage points using illustrative settings. Regions shift baseline demand using illustrative industry assumptions and scale the effect of slider changes. Subregions generally share their group’s baseline. Antarctica has no regional adjustment. Each metal uses a representative application or product line. A specific grade uses its primary end market as an illustrative proxy. End-market weights for the additional metals are illustrative. ' +
+    '<p class="ev-why">The baseline uses 24 indicators from report sections 3–4. Driver assumptions adjust scenario weights and scores. On Scenario by metal, metal settings are translated into industry demand using illustrative end-market weights. Advanced market conditions shift the corresponding baseline driver by up to 20 percentage points using illustrative settings. A selected country uses the illustrative industry tilt of its UN subregion and scales the effect of slider changes; these tilts are not yet tracker data. Sliders are the change in 2035 demand against the baseline; ±50% equals the full model range (±2). A 2035 event from the tracker compares your 2035 value with the tracker’s 2035 value; ±50% again equals the full range for that industry, and several events in one industry add up to that limit. Metal tonnages linked to an event scale in proportion to it, as in the tracker’s own estimate. Each metal uses a representative application or product line. A specific grade uses its primary end market as an illustrative proxy. End-market weights for the additional metals are illustrative. ' +
     'Its score in each scenario is a weighted average of the end markets for that product line. The overall index (−2 to +2) weights those scores by scenario likelihood. The Scenario card compares the resulting industry demand assumptions with plausible demand paths. It gives more weight to paths that match the selected direction and strength, then normalizes the retained paths to 100%. These illustrative likelihoods are conditional on the settings and the candidate paths. Factor bars show how closely each associated industry’s modeled level matches its slider. Several factors may refer to the same industry. ' +
     'The five squares show the separate outlook model’s scores (blue for growth, orange for decline).</p>' +
     '<details class="scn-scenario-sources"><summary>Sources behind the scenario examples</summary><ul>' +
@@ -621,11 +645,19 @@ function scnCalcTable(model) {
 function viewSimulator(route, openScenarios) {
   var byMetal = route.page === "metal-scenarios"
   var model = scnModel(route.params, byMetal)
+  var intro = byMetal
+    ? "Calculator: change expected 2035 demand for a metal or an industry event, and see the demand outlook, the recommended strategy and where supply comes from."
+    : "Calculator: change expected 2035 demand by industry or replace a tracker 2035 value, and see which 2035 vision becomes more likely and what it means for each metal."
   return '<div class="scn">' + pageHead(byMetal ? "Scenario by metal" : "Scenario generator 2035") +
+    '<p class="trk-intro">' + esc(intro) + '</p>' +
     scnDriverPanel(route.params, byMetal) +
-    '<div class="scn-grid"><section class="scn-panel" aria-labelledby="scn-likelihoods-heading"><h2 id="scn-likelihoods-heading" class="scn-heading">Scenario</h2><div id="scn-likelihoods" class="scn-body">' + scnLikelihoods(model, openScenarios) + "</div></section>" +
-    '<section class="scn-panel" aria-labelledby="scn-metal-heading"><h2 id="scn-metal-heading" class="scn-heading">Market outlook by metal</h2>' +
+    '<section class="scn-panel trk-results-panel" aria-labelledby="trk-results-heading"><h2 id="trk-results-heading" class="scn-heading"><span class="trk-step">2</span>Result and recommendation</h2>' +
+    '<div id="trk-results" class="scn-body">' + (typeof trkResults === "function" ? trkResults(model, route.params, byMetal) : "") + '</div></section>' +
+    '<div class="scn-grid"><section class="scn-panel" aria-labelledby="scn-likelihoods-heading"><h2 id="scn-likelihoods-heading" class="scn-heading">Scenario story</h2><div id="scn-likelihoods" class="scn-body">' + scnLikelihoods(model, openScenarios) + "</div></section>" +
+    '<section class="scn-panel" aria-labelledby="scn-metal-heading"><h2 id="scn-metal-heading" class="scn-heading">Market outlook by metal <small>demand index −2 to +2 · squares = 5 visions</small></h2>' +
     '<div id="scn-metals" class="scn-body scn-cards">' + scnMetalCards(model) + "</div></section></div>" +
+    '<h2 class="scn-heading trk-section"><span class="trk-step">3</span>Evidence and calculation</h2>' +
+    (typeof trkSnapshotLine === "function" ? trkSnapshotLine() : "") +
     '<div id="scn-calc">' + scnCalcTable(model) + "</div>" + marketEvidencePanel() +
     '<p class="scn-link"><a href="#/strategy' + scnKeep(route.params) + '">See what this means for each product line →</a></p></div>'
 }

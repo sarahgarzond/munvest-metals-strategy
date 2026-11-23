@@ -32,3 +32,19 @@ scenario. Leave missing observations out of the export.
 
 Use only observations permitted for redistribution. GitHub Pages serves the
 generated JSON publicly, including any values loaded from a local CSV.
+
+## Sector Research Tracker
+
+`python pipeline/tracker.py` reads the team's Google Sheet (shared as "anyone with the link
+can view") and writes `tracker-data.js`, which the scenario pages load. Use
+`--xlsx file.xlsx` with a manual export if the download is blocked. The workflow
+`refresh-tracker.yml` runs every Monday and on demand ("Run workflow") and opens a review
+pull request. What the dashboard reads:
+
+- `Database`: a series with an actual value (2026 or earlier) and a 2035 value becomes a
+  2035 event for its sector. Metal-demand rows (t, kt) for 2035 that share a Source ID with
+  the event scale with it.
+- `2035 outlook`: metal 2035 baselines and the IEA demand components (energy and EV events).
+- `material-product-industry-application`: products shown under each industry.
+- `Country production` and `Country Data (Aero & MedTech)`: country selector, map and facts.
+- `Source Log`: every Source ID becomes a link to the source.

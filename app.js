@@ -647,8 +647,8 @@ document.addEventListener("click", function (event) {
     }
     if (action.dataset.action === "scn-toggle-filters") {
       event.preventDefault()
-      var opening = readRoute().params.get("scn-filters") !== "1"
-      go(null, { "scn-filters": opening ? "1" : null }, { replace: true })
+      var closing = readRoute().params.get("scn-filters") !== "0"
+      go(null, { "scn-filters": closing ? "0" : null }, { replace: true })
       document.getElementById("scn-filters-button").focus({ preventScroll: true })
       return
     }
@@ -717,17 +717,25 @@ document.addEventListener("click", function (event) {
 
 document.addEventListener("change", function (event) {
   var el = event.target
+  if (el.matches && el.matches("[data-event]")) {
+    var ev = trkEvents().find(function (item) { return item.id === el.dataset.event })
+    var value = Number(el.value)
+    var same = !ev || !Number.isFinite(value) || value <= 0 || Math.abs(value / ev.target.value - 1) < 0.005
+    go(null, { ["ev-" + el.dataset.event]: same ? null : value, "scn-case": null }, { replace: true })
+    return
+  }
   if (el.matches && el.matches("[data-metal-slider]")) {
-    go(null, { [el.dataset.metalSlider]: Number(el.value) || null, "scn-case": null })
+    go(null, { [el.dataset.metalSlider]: (Number(el.value) / (Number(el.dataset.scale) || 1)) || null, "scn-case": null })
     return
   }
   if (el.matches && el.matches("[data-industry-slider]")) {
     var prefix = "scn-" + el.dataset.industrySlider + "-"
     var sliderUpdates = { "scn-case": null }
-    sliderUpdates[prefix + "level"] = Number(el.value) || null
+    var sliderLevel = Number(el.value) / (Number(el.dataset.scale) || 1)
+    sliderUpdates[prefix + "level"] = sliderLevel || null
     sliderUpdates[prefix + "direction"] = null
     var industry = SCN_INDUSTRY_DRIVERS.find(function (item) { return item.id === el.dataset.industrySlider })
-    if (Math.sign(Number(el.value)) !== Math.sign(scnIndustryAssumption(readRoute().params, industry).level)) {
+    if (Math.sign(sliderLevel) !== Math.sign(Number(readRoute().params.get(prefix + "level")) || 0)) {
       sliderUpdates[prefix + "path"] = null
     }
     go(null, sliderUpdates)
@@ -743,26 +751,41 @@ document.addEventListener("change", function (event) {
   update[el.name] = el.value
   if (el.id === "scn-filter-metal") update.grade = null
   if (el.id === "scn-filter-metal" || el.id === "scn-filter-grade") update["scn-case"] = null
-  if (el.name === "scn-region" || el.hasAttribute("data-advanced-slider")) update["scn-case"] = null
+  if (el.name === "scn-region" || el.name === "scn-country" || el.name === "scn-ev-industry" || el.hasAttribute("data-advanced-slider")) update["scn-case"] = null
   go(null, update)
 })
 
 document.addEventListener("input", function (event) {
-  var slider = event.target.closest && event.target.closest("[data-industry-slider], [data-metal-slider], [data-advanced-slider]")
+  var slider = event.target.closest && event.target.closest("[data-industry-slider], [data-metal-slider], [data-advanced-slider], [data-event]")
   if (slider) {
     var route = readRoute()
     var params = new URLSearchParams(route.params)
     params.delete("scn-case")
-    if (slider.hasAttribute("data-advanced-slider")) {
+    if (slider.hasAttribute("data-event")) {
+      var ev = trkEvents().find(function (item) { return item.id === slider.dataset.event })
+      var value = Number(slider.value)
+      if (!ev || !Number.isFinite(value) || value <= 0) return
+      params.set("ev-" + ev.id, value)
+      var pct = trkEventPct(params, ev)
+      var twin = slider.type === "range" ? document.getElementById("ev-" + ev.id) : document.getElementById("ev-range-" + ev.id)
+      if (twin) twin.value = slider.type === "range" ? Math.round(value * 100) / 100 : value
+      var out = document.getElementById("ev-out-" + ev.id)
+      if (out) { out.textContent = trkPctText(pct) + " vs tracker" + (Math.abs(pct) > TRK_FULL_RANGE_PCT ? " (model effect capped at ±" + TRK_FULL_RANGE_PCT + "%)" : ""); out.className = "trk-delta " + (pct > 0.5 ? "up" : pct < -0.5 ? "down" : "") }
+    } else if (slider.hasAttribute("data-advanced-slider")) {
       params.set(slider.name, slider.value)
       if (slider.hasAttribute("aria-valuetext")) slider.setAttribute("aria-valuetext", scnAdjustmentLabel(Number(slider.value)))
     } else {
-      params.set(slider.dataset.metalSlider || ("scn-" + slider.dataset.industrySlider + "-level"), slider.value)
-      slider.setAttribute("aria-valuetext", scnLevelLabel(Number(slider.value)))
+      var level = Number(slider.value) / (Number(slider.dataset.scale) || 1)
+      params.set(slider.dataset.metalSlider || ("scn-" + slider.dataset.industrySlider + "-level"), level)
+      slider.setAttribute("aria-valuetext", scnLevelLabel(level))
+      var output = document.getElementById("out-" + slider.id)
+      if (output) { output.textContent = scnPctLabel(level); output.className = "trk-delta " + (level > 0 ? "up" : level < 0 ? "down" : "") }
     }
-    var model = scnModel(params, route.page === "metal-scenarios")
+    var byMetal = route.page === "metal-scenarios"
+    var model = scnModel(params, byMetal)
     document.getElementById("scn-likelihoods").innerHTML = scnLikelihoods(model, scnOpenPathways())
     document.getElementById("scn-metals").innerHTML = scnMetalCards(model)
+    trkPaint(model, params, byMetal)
     return
   }
   var input = event.target.closest && event.target.closest("[role='combobox']")

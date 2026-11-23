@@ -1818,3 +1818,61 @@ h1.chain-title {
 }
 
 .scn-grade-filter { max-width: 280px; }
+
+/* ---------- Tracker-linked calculator (tracker.js) ---------- */
+.trk-intro { max-width: 78ch; margin: -4px 0 14px; color: var(--muted); }
+.trk-help { margin: 0 16px 8px; font-size: 12px; color: var(--muted); }
+.trk-note { font-size: 12px; color: var(--muted); margin: 6px 0; }
+.trk-step { display: inline-grid; place-items: center; width: 22px; height: 22px; margin-right: 8px; border-radius: 50%; background: var(--ink); color: var(--canvas); font-size: 12px; font-family: "Noto Sans", sans-serif; vertical-align: 2px; }
+.trk-section { margin: 22px 0 6px; }
+.trk-delta { font-weight: 600; font-variant-numeric: tabular-nums; margin-left: 6px; color: var(--muted); }
+.trk-delta.up { color: #2b6cb0; }
+.trk-delta.down { color: var(--copper); }
+.scn-industry-card .scn-slide-ends { display: flex; justify-content: space-between; }
+.trk-baseline { margin: 2px 0 6px; font-size: 11px; line-height: 1.35; color: var(--muted); }
+.trk-src { font-size: 11px; padding: 0 3px; border: 1px solid var(--line); border-radius: 3px; text-decoration: none; white-space: nowrap; }
+.trk-missing { color: var(--copper); }
+.trk-events { display: grid; gap: 10px; }
+.trk-event { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; }
+.trk-event h4 { margin: 0 0 4px; font-size: 14px; }
+.trk-event h4 small { font-weight: 400; color: var(--muted); }
+.trk-event-input { display: grid; grid-template-columns: auto minmax(120px, 1fr) 9em auto; gap: 8px; align-items: center; font-size: 12px; }
+.trk-event-input input[type=number] { width: 100%; padding: 4px 6px; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); color: var(--ink); font: inherit; }
+.trk-linked { margin: 6px 0 0; padding-left: 18px; font-size: 12px; }
+.trk-active { font-size: 12px; margin: 0; }
+.trk-apps summary { cursor: pointer; font-size: 12px; color: var(--link); }
+.trk-apps table { font-size: 11px; }
+.trk-results-panel .scn-body { display: grid; gap: 14px; }
+.trk-reco { border-left: 4px solid var(--ink); padding: 8px 12px; background: rgba(53, 84, 100, 0.06); }
+.trk-reco p { margin: 4px 0; font-size: 13px; }
+.trk-reco-head { font-size: 16px !important; }
+.trk-charts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.trk-charts figure, .trk-map { margin: 0; min-width: 0; }
+.trk-charts figcaption, .trk-map figcaption { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.trk-bars { display: grid; gap: 4px; }
+.trk-bar-row, .trk-lk { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 3.6em; gap: 8px; align-items: center; font-size: 12px; }
+.trk-bar-row b, .trk-lk > b { text-align: right; font-variant-numeric: tabular-nums; }
+.trk-bar-track { position: relative; height: 10px; background: rgba(53, 84, 100, 0.08); border-radius: 3px; }
+.trk-bar-track::after { content: ""; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--line); }
+.trk-bar { position: absolute; top: 0; bottom: 0; border-radius: 3px; transition: width .15s; }
+.trk-bar.up { background: #2b6cb0; }
+.trk-bar.down { background: var(--copper); }
+.trk-lk span small { display: block; color: var(--muted); font-size: 11px; }
+.trk-path-title { margin: 0 0 4px; font-weight: 600; }
+.trk-map svg { width: 100%; height: auto; display: block; background: rgba(53, 84, 100, 0.04); border-radius: 6px; }
+.trk-land { fill: rgba(53, 84, 100, 0.18); }
+.trk-pt circle { fill: rgba(43, 108, 176, 0.45); stroke: #2b6cb0; stroke-width: 1; }
+.trk-pt.sel circle { stroke: var(--copper); stroke-width: 3; }
+.trk-pt.none circle { fill: none; }
+.trk-pt text { font-size: 11px; fill: var(--ink); paint-order: stroke; stroke: var(--canvas); stroke-width: 3px; }
+.trk-facts { margin: 4px 0 0; padding-left: 18px; font-size: 12px; }
+.trk-country h3 { margin: 0; font-size: 14px; }
+.scn-heading small { font-weight: 400; font-size: 11px; color: var(--muted); margin-left: 6px; }
+@media (max-width: 760px) {
+  .trk-charts { grid-template-columns: 1fr; }
+  .trk-event-input { grid-template-columns: 1fr 1fr; }
+}
+[data-theme="night"] .trk-reco { background: #1d313b; }
+[data-theme="night"] .trk-delta.up, [data-theme="night"] .trk-bar.up { color: #8cc4f0; }
+[data-theme="night"] .trk-bar.up { background: #5aa3dd; }
+[data-theme="night"] .trk-land { fill: rgba(226, 235, 239, 0.16); }
