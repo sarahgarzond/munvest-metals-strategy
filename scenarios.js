@@ -424,26 +424,28 @@ function scnDriverPanel(params, byMetal) {
   })
   var sliders = controls.map(function (item) {
     var baseline = byMetal && typeof trkMetalBaseline === "function" ? trkMetalBaseline(item.name) : null
-    var note = baseline ? esc(baseline.text) + (baseline.source ? " · " + trkSourceLink(baseline.source) : baseline.label ? " · " + esc(baseline.label) : "") : ""
-    return '<div class="scn-industry-card"><label for="' + item.key + '">' + esc(item.name) +
-      ' <output id="out-' + item.key + '" class="trk-delta ' + (item.level > 0 ? "up" : item.level < 0 ? "down" : "") + '">' + scnPctLabel(item.level) + '</output></label>' +
+    var note = baseline ? esc(baseline.text) + (baseline.source ? " · " + trkSourceLink(baseline.source) : baseline.label ? " · " + esc(baseline.label) : "") :
+      "Baseline: the report's scenario model for this industry (sections 6 and 10)."
+    var help = typeof trkSliderHelp === "function" ? trkSliderHelp(byMetal, byMetal ? item.name : item.key.slice(4, -6)) : ""
+    var cls = item.level > 0 ? "up" : item.level < 0 ? "down" : ""
+    return '<div class="trk-srow' + (item.level ? " changed" : "") + '"><div class="trk-shead"><label for="' + item.key + '">' + esc(item.name) + '</label>' +
+      '<output id="out-' + item.key + '" class="trk-delta ' + cls + '">' + scnPctLabel(item.level) + '</output></div>' +
       '<input type="range" id="' + item.key + '" min="-50" max="50" step="5" value="' + Math.round(item.level * 25) + '" data-scale="25"' +
       (byMetal ? ' data-metal-slider="' + item.key + '"' : ' data-industry-slider="' + item.key.slice(4, -6) + '"') +
       ' aria-valuetext="' + scnLevelLabel(item.level) + '">' +
-      '<div class="scn-slide-ends" aria-hidden="true"><span>−50%</span><span>0</span><span>+50%</span></div>' +
-      (note ? '<p class="trk-baseline">' + note + '</p>' : '') +
-      (typeof trkSliderHelp === "function" ? '<p class="trk-feeds">' + trkSliderHelp(byMetal, byMetal ? item.name : item.key.slice(4, -6)) + '</p>' : '') + '</div>'
+      '<div class="trk-sscale" aria-hidden="true"><span>−50%</span><span>baseline</span><span>+50%</span></div>' +
+      '<details class="trk-smore"><summary>What this moves</summary><p>' + note + '</p>' + (help ? '<p>' + help + '</p>' : '') + '</details></div>'
   }).join("")
   var filtersOpen = params.get("scn-filters") !== "0"
   return '<section class="scn-panel" aria-labelledby="scn-drivers-heading"><div class="scn-reset"><h2 id="scn-drivers-heading" class="scn-heading">' +
-    '<span class="trk-step">1</span>' + (byMetal ? "Set 2035 demand by metal" : "Set 2035 demand by industry") + '</h2>' +
+    (byMetal ? "Your 2035 assumptions by metal" : "Your 2035 assumptions by industry") + '</h2>' +
     '<div class="scn-toolbar">' + (typeof trkCountrySelect === "function" ? trkCountrySelect(params) : "") +
     (byMetal ? scnMetalSelect(params, false) : '') +
     '<button id="scn-reset" type="button" class="ev-csv" data-action="scn-reset">Reset to evidence baseline</button></div></div>' +
     scnPresetBar(params) +
     '<p class="trk-help">Each slider is the change in 2035 demand against the baseline (' + (byMetal ? "tracker 2035 demand where it exists" : "report scenario model") +
     '). ±50% is the full range of the model. Results update as you move a slider.</p>' +
-    '<div class="scn-industries">' + sliders + '</div>' +
+    '<div class="trk-sgrid">' + sliders + '</div>' +
     '<details class="scn-inline-filters"' + (filtersOpen ? ' open' : '') + '><summary id="scn-filters-button" data-action="scn-toggle-filters">Advanced filters: industry events, grades and market conditions</summary>' +
     (filtersOpen ? '<div class="scn-filter-fields">' +
       (typeof trkEventPanel === "function" ? trkEventPanel(params) : "") +
@@ -662,19 +664,19 @@ function viewSimulator(route, openScenarios) {
   var intro = byMetal
     ? "Calculator: change expected 2035 demand for a metal or an industry event, and see the demand outlook, the recommended strategy and where supply comes from."
     : "Calculator: change expected 2035 demand by industry or replace a tracker 2035 value, and see which 2035 vision becomes more likely and what it means for each metal."
-  return '<div class="scn">' + pageHead(byMetal ? "Scenario by metal" : "Scenario generator 2035") +
+  return '<div class="scn trk-calc">' + pageHead(byMetal ? "Scenario by metal" : "Scenario generator 2035") +
     '<p class="trk-intro">' + esc(intro) + '</p>' +
-    '<nav class="trk-flow" aria-label="Workflow"><a href="#scn-drivers-heading" data-scroll="scn-drivers-heading"><b>1</b> Set inputs</a><a href="#trk-results-heading" data-scroll="trk-results-heading"><b>2</b> Read the result</a><a href="#trk-decision" data-scroll="trk-decision"><b>3</b> Decide per metal</a><a href="#scn-likelihoods-heading" data-scroll="scn-likelihoods-heading"><b>4</b> Check the story</a><a href="#/report"><b>5</b> Scenario briefs</a></nav>' +
+    '<section class="trk-top" aria-label="Results"><div id="trk-top">' + (typeof trkTop === "function" ? trkTop(model, route.params, byMetal) : "") + '</div></section>' +
     scnDriverPanel(route.params, byMetal) +
-    '<section class="scn-panel trk-results-panel" aria-labelledby="trk-results-heading"><h2 id="trk-results-heading" class="scn-heading"><span class="trk-step">2</span>Result and recommendation</h2>' +
+    '<section class="scn-panel trk-results-panel" aria-labelledby="trk-results-heading"><h2 id="trk-results-heading" class="scn-heading">Recommendation and decision brief</h2>' +
     '<div id="trk-results" class="scn-body">' + (typeof trkResults === "function" ? trkResults(model, route.params, byMetal) : "") + '</div></section>' +
-    '<div class="scn-grid"><section class="scn-panel" aria-labelledby="scn-likelihoods-heading"><h2 id="scn-likelihoods-heading" class="scn-heading">Scenario story</h2><div id="scn-likelihoods" class="scn-body">' + scnLikelihoods(model, openScenarios) + "</div></section>" +
-    '<section class="scn-panel" aria-labelledby="scn-metal-heading"><h2 id="scn-metal-heading" class="scn-heading">Market outlook by metal <small>demand index −2 to +2 · squares = 5 visions</small></h2>' +
+    '<div class="scn-grid"><section class="scn-panel" aria-labelledby="scn-likelihoods-heading"><h2 id="scn-likelihoods-heading" class="scn-heading">Scenario story <small>' + (typeof trkTerm === "function" ? trkTerm("path weight") : "") + '</small></h2><div id="scn-likelihoods" class="scn-body">' + scnLikelihoods(model, openScenarios) + "</div></section>" +
+    '<section class="scn-panel" aria-labelledby="scn-metal-heading"><h2 id="scn-metal-heading" class="scn-heading">Market outlook by metal <small>squares = 5 visions</small></h2>' +
     '<div id="scn-metals" class="scn-body scn-cards">' + scnMetalCards(model) + "</div></section></div>" +
-    '<h2 class="scn-heading trk-section"><span class="trk-step">3</span>Evidence and calculation</h2>' +
+    '<h2 class="scn-heading trk-section">Evidence and calculation</h2>' +
     (typeof trkSnapshotLine === "function" ? trkSnapshotLine() : "") +
     '<div id="scn-calc">' + scnCalcTable(model) + "</div>" + marketEvidencePanel() +
-    '<p class="scn-link"><a href="#/strategy' + scnKeep(route.params) + '">See what this means for each product line →</a></p></div>'
+    '<p class="scn-link"><a href="#/report">Read the scenario briefs →</a> · <a href="#/strategy' + scnKeep(route.params) + '">Strategy by product line →</a></p></div>'
 }
 
 /* ---------- Board strategy ---------- */

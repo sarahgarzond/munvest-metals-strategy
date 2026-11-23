@@ -116,7 +116,7 @@ function rptVisionChapter(model, v, i, n) {
   }).join("")
   var play = RPT_PLAYBOOK.find(function (x) { return x.vision === v.id })
   return '<section class="rpt-chapter" id="rpt-' + v.id + '" style="--vc:' + RPT_COLORS[v.id] + '">' +
-    '<header class="rpt-ch-head"><span class="rpt-ch-no">8.' + (n + 1) + '</span><div><h2>' + esc(v.name) + '</h2><p class="rpt-role">' + esc(info.role) + " · likelihood " + scnPct(p) + '</p></div>' +
+    '<header class="rpt-ch-head"><span class="rpt-ch-no">' + (n + 4) + '</span><div><h2>' + esc(v.name) + '</h2><p class="rpt-role">Vision ' + (n + 1) + " of 5 by likelihood · " + esc(info.role) + " · likelihood " + scnPct(p) + '</p></div>' +
     '<span class="rpt-ch-bar"><span style="width:' + (p * 100 / 0.3).toFixed(1) + '%"></span></span></header>' +
     '<blockquote>“' + esc(info.quote) + '”</blockquote><p class="rpt-cond">' + esc(info.conditions) + "</p>" +
     '<ol class="rpt-timeline">' + info.story.map(function (s) { return "<li><b>" + esc(s[0]) + "</b><p>" + esc(s[1]) + "</p></li>" }).join("") + "</ol>" +

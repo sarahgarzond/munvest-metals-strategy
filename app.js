@@ -588,7 +588,6 @@ function render(options) {
   var openScenarios = (route.page === "trends" || route.page === "metal-scenarios") ? scnOpenPathways() : undefined
   document.getElementById("main").innerHTML = view(route, openScenarios)
   loadMarketEvidence(route)
-  if (typeof trkMount3d === "function") setTimeout(trkMount3d, 60)
   if (route.page === "report" && route.params.get("go")) {
     var target = document.getElementById(route.params.get("go"))
     if (target) setTimeout(function () { target.scrollIntoView({ block: "start" }) }, 30)
@@ -666,8 +665,18 @@ document.addEventListener("click", function (event) {
       if (brief) brief.scrollIntoView({ block: "nearest" })
       return
     }
-    if (action.dataset.action === "trk-map-mode") {
-      go(null, { map: readRoute().params.get("map") === "flat" ? null : "flat" }, { replace: true })
+    if (action.dataset.action === "trk-map-country") {
+      go(null, { mapc: action.dataset.iso }, { replace: true })
+      return
+    }
+    if (action.dataset.action === "trk-print") { window.print(); return }
+    if (action.dataset.action === "trk-copy") {
+      var done = function () { action.textContent = "Link copied" }
+      if (navigator.clipboard) navigator.clipboard.writeText(location.href).then(done, function () {})
+      return
+    }
+    if (action.dataset.action === "trk-compare") {
+      go(null, { compare: readRoute().params.get("compare") === "0" ? null : "0" }, { replace: true })
       return
     }
     if (action.dataset.action === "scn-preset") {
