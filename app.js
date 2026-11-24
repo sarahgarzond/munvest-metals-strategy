@@ -63,9 +63,9 @@ function readRoute() {
   var q = raw.indexOf("?")
   var path = (q === -1 ? raw : raw.slice(0, q)).replace(/^\//, "")
   var params = new URLSearchParams(q === -1 ? "" : raw.slice(q + 1))
-  var alias = { scenarios: "builder", reactors: "builder", duplex: "builder" }
+  var alias = { scenarios: "builder", reactors: "builder", duplex: "builder", "metal-scenarios": "trends", strategy: "trends" }
   if (alias[path]) path = alias[path]
-  var known = { shortages: 1, trends: 1, "metal-scenarios": 1, report: 1, strategy: 1, demand: 1, builder: 1, supply: 1, wire: 1, plate: 1 }
+  var known = { shortages: 1, trends: 1, report: 1, demand: 1, builder: 1, supply: 1, wire: 1, plate: 1 }
   return { page: known[path] ? path : "shortages", params: params }
 }
 
@@ -170,9 +170,7 @@ function titles(page) {
   return {
     shortages: "Current shortages",
     trends: "Scenario generator 2035",
-    "metal-scenarios": "Scenario by metal",
     report: "Scenario briefs",
-    strategy: "Board strategy",
     demand: "Scenarios",
     builder: "Scenario builder",
     supply: "Metal market",
@@ -182,7 +180,7 @@ function titles(page) {
 }
 
 function markNav(page) {
-  ["shortages", "trends", "metal-scenarios", "report", "strategy", "demand", "builder", "supply"].forEach(function (id) {
+  ["shortages", "trends", "report", "demand", "builder", "supply"].forEach(function (id) {
     var link = document.getElementById("nav-" + id)
     if (!link) return
     if (page === id) link.setAttribute("aria-current", "page")
@@ -528,10 +526,12 @@ function summary(route) {
   }
   if (route.page === "builder") return scenarioSummary(simModel(route.params))
   if (route.page === "trends") {
-    var best = scnDemandScenarios(scnModel(route.params))[0]
-    return best.title + " " + best.percent + "% modeled likelihood."
+    var model = scnModel(route.params)
+    return SCN_CALLS.map(function (c) {
+      var list = model.metalOutlooks.filter(function (p) { return p.strategy.label === c.label }).map(function (p) { return p.metal })
+      return list.length ? c.label + ": " + list.join(", ") : ""
+    }).filter(Boolean).join(". ")
   }
-  if (route.page === "strategy") return scnSummary(scnModel(route.params))
   if (route.page === "demand") {
     var scenario = futureScenario(route.params.get("scenario"))
     return scenario ? scenario.name : "Scenarios"
@@ -547,9 +547,8 @@ function summary(route) {
 
 function view(route, openScenarios) {
   if (route.page === "demand") return viewDemand(route)
-  if (route.page === "trends" || route.page === "metal-scenarios") return viewSimulator(route, openScenarios)
+  if (route.page === "trends") return viewGenerator(route)
   if (route.page === "report") return viewReport(route)
-  if (route.page === "strategy") return viewStrategy(route)
   if (route.page === "builder") return viewScenarios(route)
   if (route.page === "supply") return viewChain(route)
   if (route.page === "wire") return viewForm(route, "Wire", "Nickel")
@@ -585,8 +584,7 @@ function render(options) {
   }
   var focusId = document.activeElement && document.activeElement.id
   document.body.dataset.page = route.page
-  var openScenarios = (route.page === "trends" || route.page === "metal-scenarios") ? scnOpenPathways() : undefined
-  document.getElementById("main").innerHTML = view(route, openScenarios)
+  document.getElementById("main").innerHTML = view(route)
   loadMarketEvidence(route)
   if (route.page === "report" && route.params.get("go")) {
     var target = document.getElementById(route.params.get("go"))
@@ -637,19 +635,8 @@ document.addEventListener("click", function (event) {
       try { localStorage.setItem("atlas-nav", closed ? "open" : "closed") } catch (err) { /* storage blocked */ }
       syncNav()
     }
-    if (action.dataset.action === "scn-select-case") {
-      go(null, { "scn-case": action.dataset.case }, { replace: true })
-      var alternatives = document.querySelector("#scn-likelihoods .scn-alternatives")
-      if (alternatives) alternatives.open = false
-      document.getElementById("scn-case-label").focus()
-    }
     if (action.dataset.action === "scn-reset") {
-      var updates = scnResetUpdates()
-      if (readRoute().page === "metal-scenarios") {
-        Object.assign(updates, { metal: null, grade: null, country: null, direction: null })
-        scnMetalDrivers(readRoute().params).forEach(function (metal) { updates[metal.key] = null })
-      }
-      go(null, updates)
+      go(null, scnResetUpdates())
     }
     if (action.dataset.action === "scn-toggle-filters") {
       event.preventDefault()
@@ -662,11 +649,7 @@ document.addEventListener("click", function (event) {
     if (action.dataset.action === "trk-focus") {
       go(null, { focus: action.dataset.metal }, { replace: true })
       var brief = document.getElementById("trk-decision")
-      if (brief) brief.scrollIntoView({ block: "nearest" })
-      return
-    }
-    if (action.dataset.action === "trk-map-country") {
-      go(null, { mapc: action.dataset.iso }, { replace: true })
+      if (brief && action.closest("#scn-metals")) brief.scrollIntoView({ block: "start", behavior: "smooth" })
       return
     }
     if (action.dataset.action === "trk-print") { window.print(); return }
@@ -770,8 +753,11 @@ document.addEventListener("change", function (event) {
     go(null, { ["ev-" + el.dataset.event]: same ? null : value, "scn-case": null }, { replace: true })
     return
   }
-  if (el.matches && el.matches("[data-metal-slider]")) {
-    go(null, { [el.dataset.metalSlider]: (Number(el.value) / (Number(el.dataset.scale) || 1)) || null, "scn-case": null })
+  if (el.matches && el.matches("[data-condition]")) {
+    var item = RPT_INDICATORS.find(function (x) { return x.id === el.dataset.condition })
+    var cond = { a: null, b: null, c: null, d: null, "scn-preset": null }
+    cond["mc-" + item.id] = Number(el.value) === item.score ? null : el.value
+    go(null, cond, { replace: true })
     return
   }
   if (el.matches && el.matches("[data-industry-slider]")) {
@@ -802,7 +788,7 @@ document.addEventListener("change", function (event) {
 })
 
 document.addEventListener("input", function (event) {
-  var slider = event.target.closest && event.target.closest("[data-industry-slider], [data-metal-slider], [data-advanced-slider], [data-event]")
+  var slider = event.target.closest && event.target.closest("[data-industry-slider], [data-event]")
   if (slider) {
     var route = readRoute()
     var params = new URLSearchParams(route.params)
@@ -817,21 +803,14 @@ document.addEventListener("input", function (event) {
       if (twin) twin.value = slider.type === "range" ? Math.round(value * 100) / 100 : value
       var out = document.getElementById("ev-out-" + ev.id)
       if (out) { out.textContent = trkPctText(pct) + " vs tracker" + (Math.abs(pct) > TRK_FULL_RANGE_PCT ? " (model effect capped at ±" + TRK_FULL_RANGE_PCT + "%)" : ""); out.className = "trk-delta " + (pct > 0.5 ? "up" : pct < -0.5 ? "down" : "") }
-    } else if (slider.hasAttribute("data-advanced-slider")) {
-      params.set(slider.name, slider.value)
-      if (slider.hasAttribute("aria-valuetext")) slider.setAttribute("aria-valuetext", scnAdjustmentLabel(Number(slider.value)))
     } else {
       var level = Number(slider.value) / (Number(slider.dataset.scale) || 1)
-      params.set(slider.dataset.metalSlider || ("scn-" + slider.dataset.industrySlider + "-level"), level)
+      params.set("scn-" + slider.dataset.industrySlider + "-level", level)
       slider.setAttribute("aria-valuetext", scnLevelLabel(level))
       var output = document.getElementById("out-" + slider.id)
       if (output) { output.textContent = scnPctLabel(level); output.className = "trk-delta " + (level > 0 ? "up" : level < 0 ? "down" : "") }
     }
-    var byMetal = route.page === "metal-scenarios"
-    var model = scnModel(params, byMetal)
-    document.getElementById("scn-likelihoods").innerHTML = scnLikelihoods(model, scnOpenPathways())
-    document.getElementById("scn-metals").innerHTML = scnMetalCards(model)
-    trkPaint(model, params, byMetal)
+    olPaint(scnModel(params), params)
     return
   }
   var input = event.target.closest && event.target.closest("[role='combobox']")

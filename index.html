@@ -14,17 +14,15 @@
       if (localStorage.getItem("munvest-theme") === "night") document.documentElement.dataset.theme = "night"
     } catch (error) { /* use the default theme when storage is unavailable */ }
   </script>
-  <link rel="stylesheet" href="styles.css?v=trk3">
+  <link rel="stylesheet" href="styles.css?v=ol1">
 </head>
 <body>
   <a class="skip" href="#main">Skip</a>
   <aside id="site-nav" class="sidebar">
     <nav class="nav" aria-label="Sections">
       <a id="nav-trends" href="#/trends">Scenario generator 2035</a>
-      <a id="nav-metal-scenarios" href="#/metal-scenarios">Scenario by metal</a>
       <a id="nav-report" href="#/report">Scenario briefs</a>
       <a id="nav-shortages" href="#/shortages">Current shortages</a>
-      <a id="nav-strategy" href="#/strategy">Board strategy</a>
     </nav>
     <button type="button" id="nav-toggle" class="nav-toggle" data-action="nav" aria-expanded="true" aria-controls="site-nav">
       <span class="nav-chevron" aria-hidden="true"></span>
@@ -49,11 +47,12 @@
   <script src="chains.js?v=sim21"></script>
   <script src="evidence.js?v=scn20"></script>
   <script src="tracker-data.js?v=trk2"></script>
-  <script src="tracker.js?v=trk3"></script>
-  <script src="scenarios.js?v=trk3"></script>
+  <script src="tracker.js?v=ol1"></script>
+  <script src="scenarios.js?v=ol1"></script>
   <script src="report-data.js?v=trk2"></script>
   <script src="report.js?v=trk3"></script>
-  <script src="metal-scenarios.js?v=trk1"></script>
-  <script src="app.js?v=trk3"></script>
+  <script src="outlook-data.js?v=ol1"></script>
+  <script src="outlook.js?v=ol1"></script>
+  <script src="app.js?v=ol1"></script>
 </body>
 </html>
